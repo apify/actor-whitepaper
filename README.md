@@ -568,6 +568,15 @@ const value = await Actor.getValue('my-state');
 This is in `actor.json` file.
 It combines legacy `apify.json`, `INPUT_SCHEMA.json` and adds output schema.
 
+**TODO**: The biggest question here is 
+whether we should apply description, name and options from `actor.json` file
+and how (e.g. this is how NPM does it)
+or rather let people to update these things only manually
+(e.g. GitHub repo description
+or Docker Hub image info). The latter usually leads to outdated info,
+but e.g. allows admins to easily update things without access to source
+code and necessity to rebuild the actor.
+
 This file should be added to the source control, and links your project
 with an Apify actor in the cloud.
 
