@@ -40,6 +40,13 @@ Once we get there, this document will turn into a documentation.
 
 <!-- tocstop -->
 
+## TODOs
+
+- Define and articulate log for CLI/SDK convention. E.g. use `actor:xxx`
+  only when specific thing is only related to an actor, but nothing else.
+  General commands e.g. `apify publish` can be used for actors and storages,
+  so no point to have `apify actor:publish` and `apify dataset:publish`.
+
 ## Introduction
 
 Actors are serverless programs running in the cloud.
@@ -54,16 +61,15 @@ There are many differences.
 
 Actors are inspired by the **UNIX philosophy**:
 
-1) Make each program do one thing well. To do a new job, build afresh rather than complicate old programs by adding new "features".
-
-2) Expect the output of every program to become the input to another, as yet unknown, program. Don't clutter output with extraneous information.
-Avoid stringently columnar or binary input formats. Don't insist on interactive input.
-
+1) Make each program do one thing well. To do a new job,
+   build afresh rather than complicate old programs by adding new "features".
+2) Expect the output of every program to become the input to another, as yet unknown, program.
+   Don't clutter output with extraneous information.
+   Avoid stringently columnar or binary input formats. Don't insist on interactive input.
 3) Design and build software, even operating systems, to be tried early, ideally within weeks.
-Don't hesitate to throw away the clumsy parts and rebuild them.
-
+   Don't hesitate to throw away the clumsy parts and rebuild them.
 4) Use tools in preference to unskilled help to lighten a programming task,
-even if you have to detour to build the tools and expect to throw some of them out after you've finished using them.
+   even if you have to detour to build the tools and expect to throw some of them out after you've finished using them.
 
 Actors are programs running in Docker containers in the cloud.
 They take input, perform an action and generate an output.
@@ -87,7 +93,7 @@ TODO: Add links here
 ## Setup
 
 You can start using actors
-in [Apify console](https://my.apify.com/actors) without installing any local client.
+in [Apify Console](https://my.apify.com/actors) without installing any local client.
 
 **Node.js**
 
@@ -274,6 +280,19 @@ Apify NOTE: The system must enable overriding the default dataset, and e.g.
 forwarding the data to another named dataset, that will be consumed by another actor.
 Maybe the dataset should enable removal of records from beginning?
 
+**TODO:** We should have consistent naming, "call" is bit confusing, "run" is what it
+si. But will that work together with "apify run" that runs locally?
+
+**TODO:** Enable overriding of dataset to use by the actor?
+Perhaps it's enough to have an utility actor (e.g. `apify/publish-dataset`),
+you will webhook it to actor run, and on finish
+it will take the default dataset, publish it and atomically rename
+it (e.g. `jancurn/london-denstists`). But this way we'd lose all dataset settings
+(e.g. permissions, name, description), maybe Datasets should have
+an operation "swap" that would enable atomic replace of dataset data
+while keeping its ID and settings.
+
+
 **UNIX equivalent**
 ```
 # Run a program in the background
@@ -344,7 +363,7 @@ const run = await Actor.callTask(
 ```
 
 
-## Metamorph
+### Metamorph
 
 Replace running actor's Docker image with another.
 This is useful e.g. for repackaging an actor as a new actor
@@ -383,7 +402,7 @@ Actor.metamorph({
 });
 ```
 
-## Attach webhook to an actor run
+### Attach webhook to an actor run
 
 Run another actor or an external HTTP API endpoint
 after actor run finishes or fails.

@@ -1,6 +1,10 @@
 # Naming of things
 
-Here are some ideas for renames.
+TODO: Mention how to write about and link actors. We need to pick:
+- **Web Scraper** ([apify/web-scraper](https://apify.com/apify/web-scraper)).
+- [**Web Scraper**](https://apify.com/apify/web-scraper) (`apify/web-scraper`).
+
+Here are some ideas for renames:
 
 | Current name | New name |
 |---|---|
