@@ -11,6 +11,7 @@ Once we get there, this document will turn into a documentation.
 
 <!-- toc -->
 
+- [TODOs](#todos)
 - [Introduction](#introduction)
 - [Philosophy](#philosophy)
   * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
@@ -24,8 +25,8 @@ Once we get there, this document will turn into a documentation.
   * [Abort an actor](#abort-an-actor)
   * [Update running actor status](#update-running-actor-status)
   * [Run an actor](#run-an-actor)
-- [Metamorph](#metamorph)
-- [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
+  * [Metamorph](#metamorph)
+  * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
   * [Pipe result of and actor to another](#pipe-result-of-and-actor-to-another)
   * [Read environment variables](#read-environment-variables)
   * [Watch system events](#watch-system-events)
