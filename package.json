@@ -1,0 +1,21 @@
+{
+  "name": "actor-specs",
+  "version": "0.0.1",
+  "description": "This is just to generate table of content in Markdown files",
+  "devDependencies": {
+    "markdown-toc": "^1.2.0"
+  },
+  "scripts": {
+    "build-toc": "./node_modules/.bin/markdown-toc README.md -i"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apifytech/actor-scraper"
+  },
+  "author": {
+    "name": "Jan Curn",
+    "email": "jan@apify.com",
+    "url": "https://apify.com/jancurn"
+  },
+  "license": "Apache-2.0"
+}
