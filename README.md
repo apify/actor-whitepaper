@@ -47,6 +47,8 @@ Once we get there, this document will turn into a documentation.
   only when specific thing is only related to an actor, but nothing else.
   General commands e.g. `apify publish` can be used for actors and storages,
   so no point to have `apify actor:publish` and `apify dataset:publish`.
+  E.g. the "actor" prefix should be used whenever it's related to a specific actor run,
+  or maybe when you're inside of the run.
 
 ## Introduction
 
@@ -60,7 +62,7 @@ There are many differences.
 
 ## Philosophy
 
-Actors are inspired by the **UNIX philosophy**:
+Actors are inspired by the [**UNIX philosophy**](https://en.wikipedia.org/wiki/Unix_philosophy):
 
 1) Make each program do one thing well. To do a new job,
    build afresh rather than complicate old programs by adding new "features".
