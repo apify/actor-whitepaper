@@ -49,6 +49,7 @@ Once we get there, this document will turn into a documentation.
   so no point to have `apify actor:publish` and `apify dataset:publish`.
   E.g. the "actor" prefix should be used whenever it's related to a specific actor run,
   or maybe when you're inside of the run.
+- How to show progress of actor run? Probably live view is best way to go!  
 
 ## Introduction
 
