@@ -1,8 +1,13 @@
 # Naming of things
 
-TODO: Mention how to write about and link actors. We need to pick:
-- **Web Scraper** ([apify/web-scraper](https://apify.com/apify/web-scraper)).
-- [**Web Scraper**](https://apify.com/apify/web-scraper) (`apify/web-scraper`).
+TODO: Mention how to reference actors for the first time:
+
+> Our new **Web Scraper** ([apify/web-scraper](https://apify.com/apify/web-scraper)) actor is great.
+> Use Web Scraper to extract data.
+
+NOTE: In the first mention, use bold font for actor name and put the link to the technical name.
+Use the word actor! The subsequent mentions can use just the human-readable name. 
+
 
 Here are some ideas for renames:
 
