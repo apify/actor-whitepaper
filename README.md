@@ -49,7 +49,12 @@ Once we get there, this document will turn into a documentation.
   so no point to have `apify actor:publish` and `apify dataset:publish`.
   E.g. the "actor" prefix should be used whenever it's related to a specific actor run,
   or maybe when you're inside of the run.
-- How to show progress of actor run? Probably live view is best way to go!  
+- How to show progress of actor run? Probably live view is best way to go!
+- Support use cases like e.g. one actor pushes data to dataset, so enable
+  another actor to push the results to google sheet (probably using webhooks)
+- Cluster the operations into sections like Input/output, Chaining operations etc.
+  For chaining, we have 3 ways: call, metamorhp, webhooks, describe the difference between them
+  (e.g. first two need to be developed by author of the actor, the last one not)
 
 ## Introduction
 
