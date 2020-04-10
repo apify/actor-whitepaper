@@ -55,6 +55,7 @@ Once we get there, this document will turn into a documentation.
 - Cluster the operations into sections like Input/output, Chaining operations etc.
   For chaining, we have 3 ways: call, metamorhp, webhooks, describe the difference between them
   (e.g. first two need to be developed by author of the actor, the last one not)
+- Mention CI/CD, e.g. how to integrate with GiHub etc.
 
 ## Introduction
 
