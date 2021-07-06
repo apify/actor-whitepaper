@@ -1,5 +1,6 @@
 {
     "name": "apify/google-search-scraper",
+    "title": "Google Search Scraper", // ?
     "version": "0.0",
     "buildTag": "latest",
     "env": null,

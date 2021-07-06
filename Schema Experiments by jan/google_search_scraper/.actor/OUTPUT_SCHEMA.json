@@ -39,22 +39,29 @@
             "default": {
                 "name": "All SERPs grouped by page",
                 "fields": "searchQuery.term,organicResults",
-                "desc": true
+                "descending": true,
                 "format": "html" // Is this needed? The consumer of output should pick the format
             },
             "raw": {
                 "name": "All search results",
                 "unwind": "organicResults",
-                "fields": "searchQuery,organicResults",
+                "fields": "searchQuery,organicResults"
             }
-        }
+        },
+
+        // Similar to prefill, not sure about this, who will fill this?
+        //  Maybe go back to example run, or just dataset URL?
+        "example": [,
+            "url": "http://google.com",
+            ""
+        ]
     },
 
     "pageHtmlSnapshots": {
         "title": "Page HTML snapshots",
         "description": "Saved snapshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
         "type": "key-value-store",
-        // Tells which records are that
+        // Tells filter for the records to show/return, we'd have to add "perfix" query param to kv-store API
         "prefix": "SNAPSHOT-html-"
     },
 
