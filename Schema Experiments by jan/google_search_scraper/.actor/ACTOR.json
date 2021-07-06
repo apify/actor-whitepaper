@@ -3,6 +3,9 @@
     "title": "Google Search Scraper", // ?
     "version": "0.0",
     "buildTag": "latest",
-    "env": null,
+    "env": {
+        "MYSQL_USER": "my_username",
+        "MYSQL_PASSWORD": "@mySecretPassword"
+    },
     "template": "basic"
 }
