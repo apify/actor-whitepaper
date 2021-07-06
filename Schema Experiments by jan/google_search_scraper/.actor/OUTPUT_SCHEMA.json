@@ -1,0 +1,68 @@
+{
+    // The system will generate OUTPUT.json file and save it there right away, according to the schema below,
+    // so the consumers can read it right away after start of actor. This is done before writing INPUT.json
+    "searchResults": {
+        "title": "Search results",
+        "description": "The main results of the actor, each record is one Google SERPs page.",
+        "type": "dataset",
+        // This is basically a dataset schema here (so maybe call it "schema"?):
+        "fields": {
+            "url": "string",
+            "hasNextPage": "boolean",
+            "resultsTotal": "number",
+            "relatedQueries": "array",
+            "searchQuery": {
+                "term": "string",
+                "page": "number",
+                "type": "string",
+                "domain": "string",
+                "countryCode": "string",
+                "languageCode": "string",
+                "locationUule": "string",
+                "resultsPerPage": "number"
+            },
+            "organicResults": "array",
+            "paidResults": "array",
+            // Or use this syntax?
+            "searchQuery": "object",
+            "searchQuery.term": "string",
+            "searchQuery.page": "number",
+            "searchQuery.type": "string",
+            "searchQuery.domain": "string",
+            "searchQuery.countryCode": "string",
+            "searchQuery.languageCode": "string",
+            "searchQuery.locationUule": "string",
+            "searchQuery.resultsPerPage": "number"
+        },
+        // This should tell the output consumers how to render or preview the data.
+        "views": {
+            "default": {
+                "name": "All SERPs grouped by page",
+                "fields": "searchQuery.term,organicResults",
+                "desc": true
+                "format": "html" // Is this needed? The consumer of output should pick the format
+            },
+            "raw": {
+                "name": "All search results",
+                "unwind": "organicResults",
+                "fields": "searchQuery,organicResults",
+            }
+        }
+    },
+
+    "pageHtmlSnapshots": {
+        "title": "Page HTML snapshots",
+        "description": "Saved snapshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
+        "type": "key-value-store",
+        // Tells which records are that
+        "prefix": "SNAPSHOT-html-"
+    },
+
+    "pageScreenshots": {
+        "title": "Page screenshots",
+        "description": "Saved screenshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
+        "type": "key-value-store",
+        "prefix": "SCREENSHOT-png-"
+    },
+}
+

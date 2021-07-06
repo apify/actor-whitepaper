@@ -1,0 +1,7 @@
+{
+    "name": "apify/google-search-scraper",
+    "version": "0.0",
+    "buildTag": "latest",
+    "env": null,
+    "template": "basic"
+}

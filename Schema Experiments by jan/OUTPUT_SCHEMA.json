@@ -1,0 +1,62 @@
+{
+    "name": "bob/dataset-to-mysql",
+    "version": "0.1",
+    "buildTag": "latest",
+    "env": {
+        "MYSQL_USER": "my_username",
+        "MYSQL_PASSWORD": "@mySecretPassword"
+    },
+    // TODO: Do we need this? "template": "basic",
+    // Optional. If omitted, there is not input schema and checks.
+    "input": {
+        "description": "To update crawler to another site you need to change startUrls and pageFunction options!",
+        // "type": "object",
+        // "schemaVersion": 1,
+        "properties": {
+            "startUrls": {
+                "title": "Start URLs",
+                "type": "array",
+                "description": "URLs to start with",
+                "prefill": [
+                    { "url": "http://example.com" },
+                    { "url": "http://example.com/some-path" }
+                ],
+                "editor": "requestListSources"
+            },
+            "pageFunction": {
+                "title": "Page function",
+                "type": "string",
+                "description": "Function executed for each request",
+                "prefill": "async () => {\n  return $('title').text();\n\n}",
+                "editor": "javascript"
+            }
+        },
+        "required": ["startUrls", "pageFunction"]
+    },
+    // Optional. If omitted, there is no output schema.
+    "output": {
+        "properties": {
+            "flatResultsUrl": {
+                "title": "All organic results",
+                "description": "Shows all organic Google Search results",
+                "type": "string",
+                "datasetViewParams": {
+                    "unwind": ...
+                    "defaultDataset",
+                }
+                // This says the app to render Dataset viewer for this info
+                "viewer": "dataset"
+            },
+            "fullResultsUrl": {
+                "title": "SERPs grouped by page",
+                "type": "string",
+                "viewer": "dataset",
+                "groupCaption": "Advanced",
+            },
+            "screenshotUrl": {
+                "xxx": "{DEFAULT_KEY_VALUE_STORE}/screenshot.png"
+
+            }
+        },
+    },
+};
