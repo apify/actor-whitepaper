@@ -65,7 +65,14 @@ Actors are programs running in Docker containers in the cloud. They take input, 
 
 TODO: Add links to the texts in table
 
-[Untitled](https://www.notion.so/c6bb0f78bdaa440195d7f1c800d73232)
+------
+command-line options |	input object
+read stdin |	read from dataset
+write to stdout	| push data to dataset, update actor status
+write to stderr	| set exit message
+program exit code | 	actor exit code
+file system	| key-value store
+--------
 
 ## Installation and setup
 
