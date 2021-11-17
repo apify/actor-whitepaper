@@ -3,8 +3,6 @@
 Created: September 15, 2020 8:11 PM
 Last Edited Time: November 18, 2021 12:11 AM
 
-**This content was originally at [https://github.com/apify/actor-specs](https://github.com/apify/actor-specs), but we moved it here, to enable collaboration.**
-
 This is a work-in-progress document that contains the specification for Apify actors. Note that some of the functionality is already implemented and available, but some features or integrations not. This is not documentation, it’s rather a lighthouse where we want to get. Once we get there, this document will turn into documentation.
 
 ## Table of Contents
