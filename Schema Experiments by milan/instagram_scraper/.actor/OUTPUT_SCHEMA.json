@@ -7,7 +7,6 @@
         "title": "Generic dataset output", //optional
         "description": "Instagram posts ...", //optional
         "fields": {
-            // this cannot be used for validation
             "id": { // string or JSON schema object
                 "type": "String",
                 ...
