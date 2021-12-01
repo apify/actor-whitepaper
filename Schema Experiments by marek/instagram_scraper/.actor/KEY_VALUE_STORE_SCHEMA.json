@@ -1,0 +1,16 @@
+{
+    "schemaVersion": 1,
+
+    "prefixGroups": {
+        "default": {
+            "name": "Post images",
+            "prefix": "images-",
+            "contentTypes": ["image/jpeg", "image/png"]
+        },
+        "userPictures": {
+            "name": "User pictures",
+            "prefix": "user-pictures-",
+            "contentTypes": ["image/jpeg", "image/png"]
+        }
+    }
+}

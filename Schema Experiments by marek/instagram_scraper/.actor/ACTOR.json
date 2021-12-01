@@ -1,0 +1,16 @@
+{
+    "schemaVersion": 2,
+    "title": "Instagram Scraper",
+    "description": "Scrape and download Instagram posts, profiles, places, hashtags, photos, and comments. Supports search queries and URL lists. ",
+    "version": "0.0",
+    "buildTag": "latest",
+    "env": {
+        "MYSQL_USER": "my_username",
+        "MYSQL_PASSWORD": "@mySecretPassword"
+    },
+
+    "runView": [
+        "defaultDataset.default",
+        "defaultKeyValueStore.images"
+    ]
+}

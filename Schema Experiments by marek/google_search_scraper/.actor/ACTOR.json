@@ -1,0 +1,17 @@
+{
+    "schemaVersion": 2,
+    "title": "Google Search Scraper",
+    "description": "SERP API to enable you to scrape Google Search Engine Results Pages (SERPs).",
+    "version": "0.0",
+    "buildTag": "latest",
+    "env": {
+        "MYSQL_USER": "my_username",
+        "MYSQL_PASSWORD": "@mySecretPassword"
+    },
+
+    "runView": [
+        "defaultDataset.default",
+        "defaultDataset.ads",
+        // "liveView" - not here
+    ]
+}

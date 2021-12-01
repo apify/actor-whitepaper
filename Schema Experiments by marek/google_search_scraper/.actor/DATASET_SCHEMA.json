@@ -1,0 +1,57 @@
+{
+    "schemaVersion": 1,
+
+    // This simplified schema or pure JSON Schema?
+    "schema": {
+        "url": "String",
+        "hasNextPage": "Boolean",
+        "resultsTotal": "Number",
+
+        "searchQuery": "Object",
+        "searchQuery.term": "String",
+        "searchQuery.page": "Number",
+        "searchQuery.type": "String",
+        "searchQuery.domain": "String",
+        "searchQuery.countryCode": "String",
+        "searchQuery.languageCode": "String",
+        "searchQuery.locationUule": "String",
+        "searchQuery.resultsPerPage": "Number",
+
+        "relatedQueries": "Array",
+        "relatedQueries.$": "StrictObject",  // StrictObject does not enable addtional fields
+        "relatedQueries.$.title": "String",
+        "relatedQueries.$.url": "String",
+
+        "paidResults": "Array",
+
+        // Here you probably want to describe just required fields but not all the fields
+        // as it could be quite error prone especially when fetching data via XHR and there
+        // might be more fields at some point.
+        "paidResults.$": "Object",
+        "paidResults.$.title": "String"
+        "paidResults.$.url": "String"
+        "paidResults.$.displayedUrl": "String"
+        "paidResults.$.description": "String"
+        "paidResults.$.siteLinks": "Array"
+        "paidResults.$.siteLinks.$.title": "String",
+        "paidResults.$.siteLinks.$.url": "String",
+        "paidResults.$.siteLinks.$.description": "String",
+
+        ....
+    },
+
+    "views": {
+        "default": {
+            "name": "Organic results by page",
+            "fields": "searchQuery.term,hasNextPage,resultsTotal,results",
+            "omit": "results.$.siteLinks.$.description", // too long for default view
+            "descending": true,
+            "format": "html" // We could allow format as default override
+        },
+        "ads": {
+            "name": "Ads",
+            "unwind": "paidResults",
+            "fields": "searchQuery.term,url,title"
+        }
+    }
+}
