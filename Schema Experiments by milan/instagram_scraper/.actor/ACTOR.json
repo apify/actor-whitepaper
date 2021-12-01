@@ -1,0 +1,22 @@
+{
+    "schemaVersion": 1,
+    "name": "apify/instagram-scraper",
+    "title": "Instagram Scraper",
+    "description": "The 200-char description",
+    "version": "0.0",
+    "buildTag": "latest",
+    "env": {
+        "MYSQL_USER": "my_username",
+        "MYSQL_PASSWORD": "@mySecretPassword"
+    },
+    "defaultView": "default-dataset",
+    "runtimeView": [
+        "liveview-iframe",
+        "default-dataset"
+    ],
+    "resultsView": [
+        "default-dataset",
+        "comments-dataset",
+        "pageHtmlSnapshots-kv"
+    ]
+}

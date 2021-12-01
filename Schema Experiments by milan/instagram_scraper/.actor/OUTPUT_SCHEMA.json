@@ -1,0 +1,137 @@
+// each schema is the property of dataset/key-value-store/liveview it cannot be changed
+[
+    {
+        "schemaVersion": 1,
+        "type": "dataset",
+        "name": "default-dataset",
+        "title": "Generic dataset output", //optional
+        "description": "Instagram posts ...", //optional
+        "fields": {
+            // this cannot be used for validation
+            "id": { // string or JSON schema object
+                "type": "String",
+                ...
+            },
+            "caption": "String",
+            "metrics": {
+                "like_count": "Number",
+                "comment_count": "Number"
+            },
+            "attachments": [
+                {
+                    "image-url": "string",
+                    "video-url": "string"
+                }
+            ],
+            "valid": "boolean"
+        },
+        "views": [
+            {
+                "type": "list",
+                "mapping": [
+                    {
+                        "image": {
+                            "field": "attachment[0].image-url",
+                            "decorator": "small-image-url"
+                        },
+                        "caption": {
+                            "field": "caption"
+                        }
+                    }
+                ],
+                "settings": {}
+            },
+            {
+                "type": "grid",
+                "mapping": [
+                    {
+                        "image": null,
+                        "caption": null
+                    }
+                ]
+            },
+            {
+                "type": "table",
+                "columns": [
+                    {
+                        "header": "Caption",
+                        "field": "caption"
+                    },
+                    {
+                        "header": "Preview",
+                        "field": "attachments.image_url",
+                        "decorator": "small-image-url"
+                    },
+                    {
+                        "header": "Likes",
+                        "field": "metrics.like_count"
+                    }
+                ]
+            },
+            {
+                "type": "table-raw",
+                "exludeColumns": [
+                    "attachments.*"
+                ]
+            }
+        ]
+    },
+    {
+        "schemaVersion": 1,
+        "type": "dataset",
+        "name": "comments-dataset",
+        "title": "Comments output", //optional
+        "fields": {
+            "id": "string",
+            "text": "string",
+            "createdAt": "ISODate"
+        },
+        "views": [
+            {
+                "type": "table",
+                "columns": [
+                    {
+                        "header": "Created at",
+                        "field": "createdAt",
+                        "decorator": "date-time"
+                    },
+                    {
+                        "header": "Message",
+                        "field": "text"
+                    }
+                ]
+            },
+            {
+                "type": "table-raw"
+            }
+        ]
+    },
+    {
+        "schemaVersion": 1,
+        "type": "liveview",
+        "name": "liveview-iframe",
+        "viewer": "iframe-viewer"
+    },
+    {
+        "schemaVersion": 1,
+        "type": "liveview",
+        "name": "liveview-interactive",
+        "viewer": "iframe-interactive-viewer"
+    },
+    {
+        "schemaVersion": 1,
+        "type": "key-value-store",
+        "name": "default-kv",
+        "title": "Page HTML snapshots",
+        "description": "Saved snapshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
+        "prefix": "SOME_PREFIX-"
+    },
+    {
+        "schemaVersion": 1,
+        "type": "key-value-store",
+        "name": "pageHtmlSnapshots-kv",
+        "title": "Page HTML snapshots",
+        "description": "Saved snapshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
+        "prefix": "SNAPSHOT-html-"
+    }
+]
