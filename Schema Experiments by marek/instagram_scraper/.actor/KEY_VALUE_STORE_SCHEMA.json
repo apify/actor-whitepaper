@@ -13,4 +13,13 @@
             "contentTypes": ["image/jpeg", "image/png"]
         }
     }
+    
+    "records": {
+        // You should be also able to describe exact record not only a prefix group
+        "profileScreenshot": {
+            "name": "Profile screenshot",
+            "key": "profile-screenshot",
+            "contentTypes": ["image/jpeg"]
+        }
+    }
 }
