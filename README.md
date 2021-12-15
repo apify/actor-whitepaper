@@ -251,66 +251,70 @@ $ apify actor push-data --dataset=./my_dataset someResult=123
 $echo "Something" >> dataset.csv
 ```
 
-### Exit the actor
+### Exit actor
+
+Terminate the actor and tell users what happened.
 
 #### Node.js
 
 ```jsx
-// Apify.actor.abort() or Apify.Actor.abort() ?
 await Actor.exit(0, 'Succeeded, crawled 50 pages');
-await Actor.exit(1, `Couldn't finish crawl`);
+await Actor.exit(1, `Couldn't finish the crawl`);
 ```
 
 #### Python
 
 ```python
-await actor.push_data({ some_result=123 })
+await actor.exit(0, 'Generated 14 screenshots')
 ```
 
 #### CLI
 
 ```bash
-$ apify actor exit    # Success
-$ apify actor exit 1
-$ apify actor exit --message "Couldn't finish crawl" 1
+# Success
+$ apify actor exit
+$ apify actor exit --message "Email sent"
+
+# Actor failed 
+$ apify actor exit --code=1 --message "Couldn't fetch the URL"
 ```
 
 
 #### UNIX equivalent
 
 ```c
-exit()
+exit(1)
 ```
 
-### Abort an actor
+### Abort other actor
 
-**UNIX equivalent**
+Abort other running actor on the Apify platform, setting it to `ABORTED` state. 
+
+#### Node.js
+
+```jsx
+await Actor.kill({ message: 'You fared well, friend', runId: 'RUN_ID' });
+```
+
+#### CLI
+
+```bash
+$ apify actor kill --token=123 [RUN_ID]
+```
+
+
+#### UNIX equivalent
 
 ```
 # Terminate a program
 $ kill <pid>
 ```
 
-**CLI**
+### Update actor status
 
-```bash
-$ apify actor abort [RUN_ID]
-# OR?
-$ apify actor abort --token=123 [RUN_ID]
-```
+Periodically set a text-only status message to the currently running actor, to tell users what is it doing.
 
-**Node**
-
-```jsx
-await Actor.abort('RUN_ID'); // TODO: This should probably use client, not "self"
-// await Actor.kill('RUN_ID'); // TODO ?
-```
-
-### Update running actor status
-
-Periodically set a text-only status message to the running actor, which is displayed to its users.
-
-**CLI**
+#### CLI
 
 ```bash
 $ apify actor set-status-message "Crawled 45 of 100 pages"
@@ -318,12 +322,12 @@ $ apify actor set-status-message --run=[RUN_ID] \
   --token=X "Crawled 45 of 100 pages"
 ```
 
-**Node.js**
+#### Node.js
 
 ```jsx
 await Actor.setStatusMessage('Crawled 45 of 100 pages');
 
-// TODO: For setting non-self actor, we should probably use API and skip this
+// TODO: For setting non-self actor, we should probably use API client and skip this
 await Actor.setStatusMessage('Crawled 45 of 100 pages', { runId: 123 });
 ```
 
