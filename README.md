@@ -1,39 +1,43 @@
 # Apify Actors specification proposal (WIP)
 
-Created: September 15, 2020 8:11 PM
-Last Edited Time: November 18, 2021 12:11 AM
-
 This is a work-in-progress document that contains the specification for Apify actors. Note that some of the functionality is already implemented and available, but some features or integrations not. This is not documentation, it’s rather a lighthouse where we want to get. Once we get there, this document will turn into documentation.
 
 ## Table of Contents
 
-- [TODOs](about:blank#todos)
-- [Introduction](about:blank#introduction)
-- [Philosophy](about:blank#philosophy)
-    - [UNIX program vs. Apify actor](about:blank#unix-program-vs-apify-actor)
-- [Setup](about:blank#setup)
-- [Programming interface](about:blank#programming-interface)
-    - [Get input](about:blank#get-input)
-    - [Set actor output](about:blank#set-actor-output)
-    - [Main function](about:blank#main-function)
-    - [Push data to dataset](about:blank#push-data-to-dataset)
-    - [Exit an actor](about:blank#exit-an-actor)
-    - [Abort an actor](about:blank#abort-an-actor)
-    - [Update running actor status](about:blank#update-running-actor-status)
-    - [Run an actor](about:blank#run-an-actor)
-    - [Metamorph](about:blank#metamorph)
-    - [Attach webhook to an actor run](about:blank#attach-webhook-to-an-actor-run)
-    - [Pipe result of and actor to another](about:blank#pipe-result-of-and-actor-to-another)
-    - [Read environment variables](about:blank#read-environment-variables)
-    - [Watch system events](about:blank#watch-system-events)
-    - [Get memory information](about:blank#get-memory-information)
-    - [Key-value store](about:blank#key-value-store)
-    - [Actor specification file (`actor.json`)](about:blank#actor-specification-file-actorjson)
-    - [Documentation (`README.md`)](about:blank#documentation-readmemd)
-- [Development](about:blank#development)
-- [Sharing & Community](about:blank#sharing--community)
-    - [User profile page](about:blank#user-profile-page)
-    - [Shared actors](about:blank#shared-actors)
+<!-- toc -->
+
+- [TODOs](#todos)
+- [Introduction](#introduction)
+- [Philosophy](#philosophy)
+  * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
+- [Installation and setup](#installation-and-setup)
+  * [**Node.js**](#nodejs)
+  * [**Python**](#python)
+  * [**CLI**](#cli)
+  * [**Slack**](#slack)
+- [Programming interface](#programming-interface)
+  * [Get input](#get-input)
+  * [Main function](#main-function)
+  * [Push data to dataset](#push-data-to-dataset)
+  * [Exit an actor](#exit-an-actor)
+  * [Abort an actor](#abort-an-actor)
+  * [Update running actor status](#update-running-actor-status)
+  * [Start an actor (without waiting for finish)](#start-an-actor-without-waiting-for-finish)
+  * [Metamorph](#metamorph)
+  * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
+  * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
+  * [Read environment variables](#read-environment-variables)
+  * [Watch system events](#watch-system-events)
+  * [Get memory information](#get-memory-information)
+  * [Key-value store (aka File store)](#key-value-store-aka-file-store)
+  * [Actor specification file (`actor.json`)](#actor-specification-file-actorjson)
+  * [Documentation (`README.md`)](#documentation-readmemd)
+- [Development](#development)
+- [Sharing & Community](#sharing--community)
+  * [User profile page](#user-profile-page)
+  * [Shared actors](#shared-actors)
+
+<!-- tocstop -->
 
 ## TODOs
 
@@ -46,7 +50,10 @@ This is a work-in-progress document that contains the specification for Apify ac
 
 ## Introduction
 
-Actors are serverless programs running in the cloud. They can run as short or as long as necessary, even forever. The actor can perform anything from a simple action such as filling out a web form or sending an email, to complex operations such as crawling an entire website or removing duplicates from a large dataset.
+Actors are serverless programs running in the cloud.
+They can run as short or as long as necessary, even forever.
+The actor can perform anything from a simple action such as
+filling out a web form or sending an email, to complex operations such as crawling an entire website or removing duplicates from a large dataset.
 
 Note that Actors are only loosely related to [Actor model](https://en.wikipedia.org/wiki/Actor_model) from computer science. There are many differences.
 
