@@ -8,7 +8,7 @@
         // How to tell the system it should use default dataset, or named? Or what if actor caller
         // could say which dataset/kv-store should be used for the run (new or existing with name),
         // and "dataset" here would just mean that dataset produced by the actor.
-        // "default": true,
+        "default": true,
         // This is basically a dataset schema here (so maybe call it "schema"?):
         "fields": {
             "url": "string",
@@ -26,10 +26,16 @@
                 "resultsPerPage": "number"
             },
             "organicResults": "array",
+            "organicResults.$": {
+                // ... xxx
+            },
             "paidResults": "array",
             // Or use this syntax?
             "searchQuery": "object",
-            "searchQuery.term": "string",
+            "searchQuery.term": {
+                "type": "string",
+                "optional": true
+            },
             "searchQuery.page": "number",
             "searchQuery.type": "string",
             "searchQuery.domain": "string",
@@ -55,18 +61,21 @@
 
         // Similar to prefill, not sure about this, who will fill this?
         //  Maybe go back to example run, or just dataset URL?
-        "example": [,
+        "example": [{
             "url": "http://google.com",
-            ""
-        ]
+            "searchQuery": "ffwef",
+            ...
+        }]
     },
 
     "pageHtmlSnapshots": {
         "title": "Page HTML snapshots",
         "description": "Saved snapshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
-        "type": "key-value-store", // or "default-key-value-store" ?
+        "type/source/target/location": "key-value-store", // or "default-key-value-store" ?
         // Tells filter for the records to show/return, we'd have to add "perfix" query param to kv-store API
-        "prefix": "SNAPSHOT-html-"
+        "prefix": "SNAPSHOT-html-",
+        // How to enforce???? Maybe future
+        "contentType": "image/png"
     },
 
     "pageScreenshots": {
@@ -74,6 +83,6 @@
         "description": "Saved screenshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
         "type": "key-value-store", // or "default-key-value-store" ?
         "prefix": "SCREENSHOT-png-"
-    },
+    }
 }
 
