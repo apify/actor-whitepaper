@@ -29,13 +29,18 @@ This is a work-in-progress document that contains the specification for Apify ac
     + [Python](#python-1)
     + [CLI](#cli-1)
     + [UNIX equivalent](#unix-equivalent-2)
-  * [Exit the actor](#exit-the-actor)
+  * [Exit actor](#exit-actor)
     + [Node.js](#nodejs-3)
     + [Python](#python-2)
     + [CLI](#cli-2)
     + [UNIX equivalent](#unix-equivalent-3)
-  * [Abort an actor](#abort-an-actor)
-  * [Update running actor status](#update-running-actor-status)
+  * [Aborting an actor](#aborting-an-actor)
+    + [Node.js](#nodejs-4)
+    + [CLI](#cli-3)
+    + [UNIX equivalent](#unix-equivalent-4)
+  * [Update actor status](#update-actor-status)
+    + [CLI](#cli-4)
+    + [Node.js](#nodejs-5)
   * [Start an actor (without waiting for finish)](#start-an-actor-without-waiting-for-finish)
   * [Metamorph](#metamorph)
   * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
@@ -286,20 +291,20 @@ $ apify actor exit --code=1 --message "Couldn't fetch the URL"
 exit(1)
 ```
 
-### Abort other actor
+### Aborting an actor
 
-Abort other running actor on the Apify platform, setting it to `ABORTED` state. 
+Abort itself or other running actor on the Apify platform, setting it to `ABORTED` state. 
 
 #### Node.js
 
 ```jsx
-await Actor.kill({ message: 'You fared well, friend', runId: 'RUN_ID' });
+await Actor.abort({ message: 'Job was done,', runId: 'RUN_ID' });
 ```
 
 #### CLI
 
 ```bash
-$ apify actor kill --token=123 [RUN_ID]
+$ apify actor abort --run=[RUN_ID] --token=123 
 ```
 
 
@@ -318,8 +323,7 @@ Periodically set a text-only status message to the currently running actor, to t
 
 ```bash
 $ apify actor set-status-message "Crawled 45 of 100 pages"
-$ apify actor set-status-message --run=[RUN_ID] \
-  --token=X "Crawled 45 of 100 pages"
+$ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 ```
 
 #### Node.js
@@ -327,13 +331,16 @@ $ apify actor set-status-message --run=[RUN_ID] \
 ```jsx
 await Actor.setStatusMessage('Crawled 45 of 100 pages');
 
-// TODO: For setting non-self actor, we should probably use API client and skip this
-await Actor.setStatusMessage('Crawled 45 of 100 pages', { runId: 123 });
+// Setting status message to other actor externally is also possible
+await Actor.setStatusMessage('Everyone is well', { runId: 123 });
 ```
 
 ### Start an actor (without waiting for finish)
 
-Apify NOTE: The system must enable overriding the default dataset, and e.g. forwarding the data to another named dataset, that will be consumed by another actor. Maybe the dataset should enable removal of records from beginning? Currently, actors need to implement it themselves.
+Apify NOTE: The system must enable overriding the default dataset,
+and e.g. forwarding the data to another named dataset,
+that will be consumed by another actor.
+Maybe the dataset should enable removal of records from beginning? Currently, actors need to implement it themselves.
 
 **TODO:** We should have consistent naming, “call” is bit confusing, “run” is what it si. But will that work together with “apify run” that runs locally? In the new client we have "start"
 
