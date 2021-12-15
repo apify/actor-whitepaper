@@ -17,9 +17,23 @@ This is a work-in-progress document that contains the specification for Apify ac
   * [**Slack**](#slack)
 - [Programming interface](#programming-interface)
   * [Get input](#get-input)
+    + [Node.js](#nodejs)
+    + [Python](#python)
+    + [CLI](#cli)
+    + [UNIX equivalent](#unix-equivalent)
   * [Main function](#main-function)
+    + [Node.js](#nodejs-1)
+    + [UNIX equivalent](#unix-equivalent-1)
   * [Push data to dataset](#push-data-to-dataset)
-  * [Exit an actor](#exit-an-actor)
+    + [Node.js](#nodejs-2)
+    + [Python](#python-1)
+    + [CLI](#cli-1)
+    + [UNIX equivalent](#unix-equivalent-2)
+  * [Exit the actor](#exit-the-actor)
+    + [Node.js](#nodejs-3)
+    + [Python](#python-2)
+    + [CLI](#cli-2)
+    + [UNIX equivalent](#unix-equivalent-3)
   * [Abort an actor](#abort-an-actor)
   * [Update running actor status](#update-running-actor-status)
   * [Start an actor (without waiting for finish)](#start-an-actor-without-waiting-for-finish)
@@ -55,7 +69,9 @@ They can run as short or as long as necessary, even forever.
 The actor can perform anything from a simple action such as
 filling out a web form or sending an email, to complex operations such as crawling an entire website or removing duplicates from a large dataset.
 
-Note that Actors are only loosely related to [Actor model](https://en.wikipedia.org/wiki/Actor_model) from computer science. There are many differences.
+Basically, actors are Docker containers with a documentation in README.md, input and output schema. nice user interface.
+
+Note that actors are only loosely related to the [Actor model](https://en.wikipedia.org/wiki/Actor_model) from computer science. There are many differences.
 
 ## Philosophy
 
@@ -114,13 +130,13 @@ Install Apify app for Slack.
 
 ## Programming interface
 
-The following commands are expected to be called from within the actor's Docker container, either on Apify Platform or the local environment.
+The following commands are expected to be called from within the actor's Docker container, either on Apify platform or the local environment.
 
 ### Get input
 
 Get access to the actor input object passed by the user. It is parsed from a JSON file, stored in the actor's default key-value store (typically called `INPUT`).
 
-**Node.js**
+#### Node.js
 
 ```jsx
 import { Actor } from 'apify';
@@ -130,11 +146,20 @@ import { Actor } from 'apify';
 
 const input = await Actor.getInput();
 console.log(input.option1);
+
+// prints: { "option1": "aaa", "option2": 456 }
 ```
 
-**CLI**
+#### Python
 
-When running on Apify Platform, this fetches the input.
+```python
+from apify import actor
+
+input = actor.get_input()
+print(input)
+```
+
+#### CLI
 
 ```
 # Emits a JSON object, which can be parsed using "jq" tool
@@ -144,16 +169,7 @@ apify actor get-input | jq
 > { "option1": "aaa", "option2": 456 }
 ```
 
-**Python**
-
-```python
-from apify import actor
-
-input = actor.get_input()
-print(input)
-```
-
-**UNIX equivalent**
+#### UNIX equivalent
 
 ```
 $ command --option1=aaa --option2=bbb
@@ -168,17 +184,18 @@ This is only a helper. **TODO**: Is this even needed? **PROBABLY NOT** Perhaps j
 
 Advantage of main() function: Kills actor even if you forgot setTimeout()
 
-**Node.js**
+#### Node.js
 
 ```jsx
 import { Actor } from 'apify';
 
 Actor.main(async () => {
-	const input = ...
+  const input = await Actor.getInput();
+  // ...
 });
 ```
 
-**UNIX equivalent**
+#### UNIX equivalent
 
 ```jsx
 int main (int argc, char *argv[]) {
@@ -188,15 +205,28 @@ int main (int argc, char *argv[]) {
 
 ### Push data to dataset
 
-Save larger results to append-only storage called Dataset. When an actor starts, by default it is associated with a newly-created empty dataset. The user can override when running the actor.
+Save larger results to append-only storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
+When an actor starts, by default it is associated with a newly-created empty dataset.
+The user can override when running the actor.
 
-**UNIX equivalent**
+#### Node.js
 
+```jsx
+await Actor.pushData({
+    someResult: 123,
+});
+
+const dataset = await Apify.openDataset('bob/poll-results-2019');
+await dataset.pushData({ someResult: 123 });
 ```
-$echo "Something" >> dataset.csv
+
+#### Python
+
+```python
+await actor.push_data({ some_result=123 })
 ```
 
-**CLI**
+#### CLI
 
 ```bash
 # Text format
@@ -215,41 +245,15 @@ $ apify actor push-data --dataset=bob/election-data someResult=123
 $ apify actor push-data --dataset=./my_dataset someResult=123
 ```
 
-**Node.js**
+#### UNIX equivalent
 
-```jsx
-await Actor.pushData({
-    someResult: 123,
-});
-
-const dataset = await Apify.openDataset('bob/poll-results-2019');
-await dataset.pushData({ someResult: 123 });
+```
+$echo "Something" >> dataset.csv
 ```
 
-**Python**
+### Exit the actor
 
-```python
-await actor.push_data({ some_result=123 })
-```
-
-**UNIX equivalent**
-
-```c
-// print to stdout
-printf("12 45");
-```
-
-### Exit an actor
-
-**CLI**
-
-```bash
-$ apify actor exit    # Success
-$ apify actor exit 1
-$ apify actor exit --message "Couldn't finish crawl" 1
-```
-
-**Node.js**
+#### Node.js
 
 ```jsx
 // Apify.actor.abort() or Apify.Actor.abort() ?
@@ -257,7 +261,22 @@ await Actor.exit(0, 'Succeeded, crawled 50 pages');
 await Actor.exit(1, `Couldn't finish crawl`);
 ```
 
-**UNIX equivalent**
+#### Python
+
+```python
+await actor.push_data({ some_result=123 })
+```
+
+#### CLI
+
+```bash
+$ apify actor exit    # Success
+$ apify actor exit 1
+$ apify actor exit --message "Couldn't finish crawl" 1
+```
+
+
+#### UNIX equivalent
 
 ```c
 exit()
