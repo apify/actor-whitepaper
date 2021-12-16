@@ -6,7 +6,6 @@ This is a work-in-progress document that contains the specification for Apify ac
 
 <!-- toc -->
 
-- [TODOs](#todos)
 - [Introduction](#introduction)
 - [Philosophy](#philosophy)
   * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
@@ -17,30 +16,11 @@ This is a work-in-progress document that contains the specification for Apify ac
   * [**Slack**](#slack)
 - [Programming interface](#programming-interface)
   * [Get input](#get-input)
-    + [Node.js](#nodejs)
-    + [Python](#python)
-    + [CLI](#cli)
-    + [UNIX equivalent](#unix-equivalent)
   * [Main function](#main-function)
-    + [Node.js](#nodejs-1)
-    + [UNIX equivalent](#unix-equivalent-1)
-  * [Push data to dataset](#push-data-to-dataset)
-    + [Node.js](#nodejs-2)
-    + [Python](#python-1)
-    + [CLI](#cli-1)
-    + [UNIX equivalent](#unix-equivalent-2)
+  * [Push results to dataset](#push-results-to-dataset)
   * [Exit actor](#exit-actor)
-    + [Node.js](#nodejs-3)
-    + [Python](#python-2)
-    + [CLI](#cli-2)
-    + [UNIX equivalent](#unix-equivalent-3)
-  * [Aborting an actor](#aborting-an-actor)
-    + [Node.js](#nodejs-4)
-    + [CLI](#cli-3)
-    + [UNIX equivalent](#unix-equivalent-4)
+  * [Aborting other actor](#aborting-other-actor)
   * [Update actor status](#update-actor-status)
-    + [CLI](#cli-4)
-    + [Node.js](#nodejs-5)
   * [Start an actor (without waiting for finish)](#start-an-actor-without-waiting-for-finish)
   * [Metamorph](#metamorph)
   * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
@@ -52,20 +32,14 @@ This is a work-in-progress document that contains the specification for Apify ac
   * [Actor specification file (`actor.json`)](#actor-specification-file-actorjson)
   * [Documentation (`README.md`)](#documentation-readmemd)
 - [Development](#development)
+  * [Local debugging](#local-debugging)
+  * [On Apify platform](#on-apify-platform)
 - [Sharing & Community](#sharing--community)
   * [User profile page](#user-profile-page)
   * [Shared actors](#shared-actors)
+- [TODOs](#todos)
 
 <!-- tocstop -->
-
-## TODOs
-
-- Define and articulate log for CLI/SDK convention. E.g. use `actor:xxx` only when specific thing is only related to an actor, but nothing else. General commands e.g. `apify publish` can be used for actors and storages, so no point to have `apify actor:publish` and `apify dataset:publish`. E.g. the “actor” prefix should be used whenever it’s related to a specific actor run, or maybe when you’re inside of the run.
-- How to show progress of actor run? Probably live view is best way to go!
-- Support use cases like e.g. one actor pushes data to dataset, so enable another actor to push the results to google sheet (probably using webhooks)
-- Cluster the operations into sections like Input/output, Chaining operations etc. For chaining, we have 3 ways: call, metamorhp, webhooks, describe the difference between them (e.g. first two need to be developed by author of the actor, the last one not)
-- Mention CI/CD, e.g. how to integrate with GiHub etc.
-- IDEA: How about having an "event log" for actors? They would be shown in UI, and tell user what happened in the actor. This can be done either in API or by special message to log, which will be parsed. Note - or notifications/messaging API
 
 ## Introduction
 
@@ -821,3 +795,15 @@ For example:
 ```
 https://apify.com/jancurn/some-scraper
 ```
+
+
+
+## TODOs
+
+- Define and articulate log for CLI/SDK convention. E.g. use `actor:xxx` only when specific thing is only related to an actor, but nothing else.
+- General commands e.g. `apify publish` can be used for actors and storages, so no point to have `apify actor:publish` and `apify dataset:publish`. E.g. the “actor” prefix should be used whenever it’s related to a specific actor run, or maybe when you’re inside of the run.
+- How to show progress of actor run? Probably live view is best way to go!
+- Support use cases like e.g. one actor pushes data to dataset, so enable another actor to push the results to google sheet (probably using webhooks)
+- Cluster the operations into sections like Input/output, Chaining operations etc. For chaining, we have 3 ways: call, metamorhp, webhooks, describe the difference between them (e.g. first two need to be developed by author of the actor, the last one not)
+- Mention CI/CD, e.g. how to integrate with GiHub etc.
+- IDEA: How about having an "event log" for actors? They would be shown in UI, and tell user what happened in the actor. This can be done either in API or by special message to log, which will be parsed. Note - or notifications/messaging API

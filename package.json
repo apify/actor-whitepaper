@@ -6,7 +6,7 @@
     "markdown-toc": "^1.2.0"
   },
   "scripts": {
-    "build-toc": "./node_modules/.bin/markdown-toc README.md -i"
+    "build-toc": "./node_modules/.bin/markdown-toc README.md -i --maxdepth 3"
   },
   "repository": {
     "type": "git",
