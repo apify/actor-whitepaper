@@ -1,6 +1,12 @@
 # Apify Actors Specification (WIP)
 
-This is a work-in-progress document that contains the specification for Apify actors. Note that some of the functionality is already implemented and available, but some features or integrations not. This is not documentation, it’s rather a lighthouse where we want to get. Once we get there, this document will turn into documentation.
+Written by: [Jan Čurn](https://apify.com/jancurn), [Marek Trunkát](https://apify.com/mtrunkat), [Ondra Urban](https://apify.com/mnmkng)
+
+This is a work-in-progress document that contains the specification for Apify actors.
+Note that some of the functionality is already implemented and available,
+but some features or integrations not.
+This is not documentation, it’s rather a lighthouse where we want to get over time.
+Once we get there, this document will turn into documentation.
 
 ## Table of Contents
 
@@ -115,7 +121,8 @@ The following commands are expected to be called from within the actor's Docker 
 
 ### Get input
 
-Get access to the actor input object passed by the user. It is parsed from a JSON file, stored in the actor's default key-value store (typically called `INPUT`).
+Get access to the actor input object passed by the user.
+It is parsed from a JSON file, stored in the actor's default key-value store (usually called `INPUT`).
 
 #### Node.js
 
