@@ -86,9 +86,12 @@ file system	| key-value store
 
 ## Installation and setup
 
-You can start using actors in [Apify Console](https://console.apify.com/actors) without installing any local client.
+Below are steps to start building actors, in various languages and environments.
 
-Below are steps to install Apify libraries and start using actors locally on your machine, in various languages and environemnts.
+### Apify platform
+
+You can develop and run actors in [Apify Console](https://console.apify.com/actors) without
+installing any software locally. Just create a free account, and start building in an online IDE.
 
 ### Node.js
 
@@ -102,20 +105,12 @@ $ npm install apify
 pip3 install apify
 ```
 
-```python
-from apify import actor 
-```
-
 ### Command-line interface (CLI)
 
 ```
 $ sudo npm install -g apify-cli
 $ apify --version
 ```
-
-### Slack
-
-Install Apify app for Slack.
 
 ## Programming interface
 
@@ -131,7 +126,7 @@ It is parsed from a JSON file, stored in the actor's default key-value store (us
 ```jsx
 import { Actor } from 'apify';
 
-// Ondra's razor: We should instantiate new object,
+// TODO: Ondra's razor - We should instantiate new object,
 //  to avoid require-time side-effects
 
 const input = await Actor.getInput();
@@ -170,7 +165,7 @@ int main (int argc, char *argv[])
 
 This is an optional helper to wrap the body of the actor.
 
-**TODO**: Is this even needed? **PROBABLY NOT** Perhaps just to call `Actor.exit(1, ‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see...
+**TODO**: Is this even needed? Perhaps just to call `Actor.exit(1, ‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see...
 How else would we initialize web server to listen for events? Maybe some "subscribe" function?**
 Advantage of `main()` function: Kills actor even if you forgot `setTimeout()`
 
@@ -187,7 +182,7 @@ Actor.main(async () => {
 
 #### UNIX equivalent
 
-```jsx
+```c
 int main (int argc, char *argv[]) {
   ...
 }
@@ -205,12 +200,12 @@ of objects are stored in them. See [Output schema](TODO) bellow for more details
 #### Node.js
 
 ```jsx
-# Append result object to the default dataset associated with the run
+// Append result object to the default dataset associated with the run
 await Actor.pushData({
     someResult: 123,
 });
 
-# Append result object to a specific named dataset
+// Append result object to a specific named dataset
 const dataset = await Actor.openDataset('bob/poll-results-2019');
 await dataset.pushData({ someResult: 123 });
 ```
@@ -218,10 +213,10 @@ await dataset.pushData({ someResult: 123 });
 #### Python
 
 ```python
-// Append result object to the default dataset associated with the run
+# Append result object to the default dataset associated with the run
 await actor.push_data({ some_result=123 })
 
-// Append result object to a specific named dataset
+# Append result object to a specific named dataset
 dataset = await actor.open_dataset('bob/poll-results-2019')
 await dataset.push_data({ some_result=123 })
 ```
@@ -247,27 +242,50 @@ $ apify actor push-data --dataset=./my_dataset someResult=123
 
 #### UNIX equivalent
 
+```c
+printf("Hello world\tColum 2\tColumn 3");
 ```
-$echo "Something" >> dataset.csv
-```
-
 
 
 ### Key-value store
 
-(aka File store)
+Write and read arbitrary files using a storage
+called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
+When an actor starts, by default it is associated with a newly-created key-value store,
+which only contains one file with input of the actor
+(key defined in the `ACTOR_INPUT_KEY` environment variable, usually it's `INPUT`).
 
+The user can override this behavior and specify another key-value store or input key
+when running the actor.
 
-**Node.js**
+#### Node.js
 
 ```jsx
+// Save object to store (stringified to JSON)
 await Actor.setValue('my-state', { something: 123 });
+
+// Save binary file to store with content type
 await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
 
+// Get record from store (automatically parsed from JSON)
 const value = await Actor.getValue('my-state');
 ```
 
-**UNIX**
+#### Python
+
+```python
+# Save object to store (stringified to JSON)
+await actor.set_value('my-state', { something=123 })
+
+# Save binary file to store with content type
+await actor.set_value('screenshot', buffer, { contentType='image/png' })
+
+# Get object from store (automatically parsed from JSON)
+dataset = await actor.get_value('my-state')
+
+```
+
+#### UNIX
 
 ```
 $ echo "hello world" > file.txt
@@ -275,36 +293,41 @@ $ cat file.txt
 ```
 
 
-
-
 ### Exit actor
 
-Terminate the actor and tell users what happened.
+Terminates the actor with a process exit code,
+and sets a message for users telling them what happened, and how they could fix it.
 
 #### Node.js
 
 ```jsx
+// Actor will finish in 'SUCCEEDED' state
 await Actor.exit(0, 'Succeeded, crawled 50 pages');
-await Actor.exit(1, `Couldn't finish the crawl`);
+
+// Actor will finish in 'FAILED' state
+await Actor.exit(1, `Could not finish the crawl, try increasing memory`);
 ```
 
 #### Python
 
 ```python
+# Actor will finish in 'SUCCEEDED' state
 await actor.exit(0, 'Generated 14 screenshots')
+
+# Actor will finish in 'FAILED' state
+await actor.exit(1, 'Could not finish the crawl, try increasing memory')
 ```
 
 #### CLI
 
 ```bash
-# Success
+# Actor will finish in 'SUCCEEDED' state
 $ apify actor exit
 $ apify actor exit --message "Email sent"
 
-# Actor failed 
+# Actor will finish in 'FAILED' state
 $ apify actor exit --code=1 --message "Couldn't fetch the URL"
 ```
-
 
 #### UNIX equivalent
 
