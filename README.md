@@ -37,8 +37,11 @@ Once we get there, this document will turn into documentation.
   * [Read environment variables](#read-environment-variables)
   * [Watch system events](#watch-system-events)
   * [Get memory information](#get-memory-information)
-  * [Actor specification file (`actor.json`)](#actor-specification-file-actorjson)
+- [Actor definition files](#actor-definition-files)
   * [Documentation (`README.md`)](#documentation-readmemd)
+  * [Actor specification directory (`.actor/`)](#actor-specification-directory-actor)
+  * [Actor specification file (`.actor/ACTOR.json`)](#actor-specification-file-actoractorjson)
+  * [Documentation (`README.md`)](#documentation-readmemd-1)
 - [Development](#development)
   * [Local debugging](#local-debugging)
   * [On Apify platform](#on-apify-platform)
@@ -76,7 +79,7 @@ There are some differences. You have been warned.
 
 Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)**,
 arguably one of the most important software engineering paradigms
-that ushered the computer revolution:
+that ushered the computer and internet revolution:
 
 1. **Make each program do one thing well**. To do a new job, build afresh rather than complicate old programs by adding new “features”.
 2. Expect the **output of every program to become the input to another**, as yet unknown, program. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
@@ -84,7 +87,9 @@ that ushered the computer revolution:
 4. **Use tools in preference to unskilled help** to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you’ve finished using them.
 
 Each actor should do just one thing and do it well.
-For complicated scenarios, combine more actors rather than building a large monolith.
+For complicated scenarios, combine multiple actors rather than building a large monolith
+that is hard to maintain.
+
 
 ### UNIX program vs. Apify actor
 
@@ -669,7 +674,17 @@ ps -a
 const memoryInfo = await Apify.getMemoryInfo();
 ```
 
-### Actor specification file (`actor.json`)
+## Actor definition files
+
+
+### Documentation (`README.md`)
+
+### Actor specification directory (`.actor/`)
+
+These are stored in a directory
+called `.actor` in the top-level directory where the actor is present.
+
+### Actor specification file (`.actor/ACTOR.json`)
 
 This is in `actor.json` file. It combines legacy `apify.json`, `INPUT_SCHEMA.json` and adds output schema.
 
