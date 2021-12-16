@@ -5,7 +5,7 @@ Written by: [Jan Čurn](https://apify.com/jancurn), [Marek Trunkát](https://api
 December 2021
 
 This is a work-in-progress document that contains the specification for Apify actors.
-Note that some of the functionality is already implemented and available,
+Note that some functionality is already implemented and available,
 but some features or integrations not.
 This is not documentation, it’s rather a lighthouse where we want to get over time.
 Once we get there, this document will turn into documentation.
@@ -195,25 +195,35 @@ int main (int argc, char *argv[]) {
 
 ### Push results to dataset
 
-Save larger results to append-only storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
+Save larger results to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an actor starts, by default it is associated with a newly-created empty dataset.
-The user can override when running the actor.
+The user can override this and specify another dataset when running the actor.
+
+Note that Datasets can optionally be equipped with schema that ensures only certain kinds
+of objects are stored in them. See [Output schema](TODO) bellow for more details.
 
 #### Node.js
 
 ```jsx
+# Append result object to the default dataset associated with the run
 await Actor.pushData({
     someResult: 123,
 });
 
-const dataset = await Apify.openDataset('bob/poll-results-2019');
+# Append result object to a specific named dataset
+const dataset = await Actor.openDataset('bob/poll-results-2019');
 await dataset.pushData({ someResult: 123 });
 ```
 
 #### Python
 
 ```python
+// Append result object to the default dataset associated with the run
 await actor.push_data({ some_result=123 })
+
+// Append result object to a specific named dataset
+dataset = await actor.open_dataset('bob/poll-results-2019')
+await dataset.push_data({ some_result=123 })
 ```
 
 #### CLI
@@ -240,6 +250,32 @@ $ apify actor push-data --dataset=./my_dataset someResult=123
 ```
 $echo "Something" >> dataset.csv
 ```
+
+
+
+### Key-value store
+
+(aka File store)
+
+
+**Node.js**
+
+```jsx
+await Actor.setValue('my-state', { something: 123 });
+await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
+
+const value = await Actor.getValue('my-state');
+```
+
+**UNIX**
+
+```
+$ echo "hello world" > file.txt
+$ cat file.txt
+```
+
+
+
 
 ### Exit actor
 
@@ -381,7 +417,7 @@ any time later
 **Node.js**
 
 ```
-// Maybe Apify.runActor() ? that's more consistent with rest
+// Maybe Actor.runActor() ? that's more consistent with rest
 // TODO: Actor should be for self, this is more like API client thing
 const run = await Actor.call(
     'apify/google-search-scraper',
@@ -432,7 +468,6 @@ $ apify actor metamorph --input=@input.json --json --memory=4096 \
 **Node.js**
 
 ```
-// Or Apify.metamorphActor() or Apify.ActorMetamorph() ?
 await Actor.metamorph(
     'apify/web-scraper',
     { startUrls: [ "http://example.com" ] },
@@ -594,24 +629,6 @@ ps -a
 
 ```
 const memoryInfo = await Apify.getMemoryInfo();
-```
-
-### Key-value store (aka File store)
-
-**UNIX**
-
-```
-$ echo "hello world" > file.txt
-$ cat file.txt
-```
-
-**Node.js**
-
-```
-await Actor.setValue('my-state', { something: 123 });
-await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
-
-const value = await Actor.getValue('my-state');
 ```
 
 ### Actor specification file (`actor.json`)
@@ -811,6 +828,8 @@ https://apify.com/jancurn/some-scraper
 
 ## TODOs
 
+- We need to stick to one convention of parameters, either named, or sequential, but just one type...
+  But we should be backwards compatible to work with Apify SDK
 - Define and articulate log for CLI/SDK convention. E.g. use `actor:xxx` only when specific thing is only related to an actor, but nothing else.
 - General commands e.g. `apify publish` can be used for actors and storages, so no point to have `apify actor:publish` and `apify dataset:publish`. E.g. the “actor” prefix should be used whenever it’s related to a specific actor run, or maybe when you’re inside of the run.
 - How to show progress of actor run? Probably live view is best way to go!
