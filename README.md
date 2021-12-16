@@ -10,10 +10,10 @@ This is a work-in-progress document that contains the specification for Apify ac
 - [Philosophy](#philosophy)
   * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
 - [Installation and setup](#installation-and-setup)
-  * [**Node.js**](#nodejs)
-  * [**Python**](#python)
-  * [**CLI**](#cli)
-  * [**Slack**](#slack)
+  * [Node.js](#nodejs)
+  * [Python](#python)
+  * [Command-line interface (CLI)](#command-line-interface-cli)
+  * [Slack](#slack)
 - [Programming interface](#programming-interface)
   * [Get input](#get-input)
   * [Main function](#main-function)
@@ -63,7 +63,7 @@ Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Uni
 
 Actors are programs running in Docker containers in the cloud. They take input, perform an action and generate an output. Good ones have documentation. Each actor should do just one thing and do it well. For complicated scenarios, combine more actors rather than building a large monolith.
 
-### UNIX program vs. Apify actor
+### UNIX program vs. Apify actor
 
 TODO: Add links to the texts in table
 
@@ -80,13 +80,15 @@ file system	| key-value store
 
 You can start using actors in [Apify Console](https://my.apify.com/actors) without installing any local client.
 
-### **Node.js**
+Below are steps to install Apify libraries and start using actors locally on your machine, in various languages and environemnts.
+
+### Node.js
 
 ```
 $ npm install apify
 ```
 
-### **Python**
+### Python
 
 ```python
 pip3 install apify
@@ -96,14 +98,14 @@ pip3 install apify
 from apify import actor 
 ```
 
-### **CLI**
+### Command-line interface (CLI)
 
 ```
 $ sudo npm install -g apify-cli
 $ apify --version
 ```
 
-### **Slack**
+### Slack
 
 Install Apify app for Slack.
 
