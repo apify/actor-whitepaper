@@ -18,14 +18,15 @@ Once we get there, this document will turn into documentation.
 - [Philosophy](#philosophy)
   * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
 - [Installation and setup](#installation-and-setup)
+  * [Apify platform](#apify-platform)
   * [Node.js](#nodejs)
   * [Python](#python)
   * [Command-line interface (CLI)](#command-line-interface-cli)
-  * [Slack](#slack)
 - [Programming interface](#programming-interface)
   * [Get input](#get-input)
   * [Main function](#main-function)
   * [Push results to dataset](#push-results-to-dataset)
+  * [Key-value store](#key-value-store)
   * [Exit actor](#exit-actor)
   * [Aborting other actor](#aborting-other-actor)
   * [Update actor status](#update-actor-status)
@@ -36,7 +37,6 @@ Once we get there, this document will turn into documentation.
   * [Read environment variables](#read-environment-variables)
   * [Watch system events](#watch-system-events)
   * [Get memory information](#get-memory-information)
-  * [Key-value store (aka File store)](#key-value-store-aka-file-store)
   * [Actor specification file (`actor.json`)](#actor-specification-file-actorjson)
   * [Documentation (`README.md`)](#documentation-readmemd)
 - [Development](#development)
@@ -51,38 +51,53 @@ Once we get there, this document will turn into documentation.
 
 ## Introduction
 
-Actors are serverless programs running in the cloud.
+Actors are micro-apps - serverless programs running in the cloud.
 They can run as short or as long as necessary, even forever.
 The actor can perform anything from a simple action such as
-filling out a web form or sending an email, to complex operations such as crawling an entire website or removing duplicates from a large dataset.
+filling out a web form or sending an email,
+to complex operations such as crawling an entire website,
+or removing duplicates from a large dataset.
 
-Basically, actors are Docker containers with a documentation in README.md, input and output schema. nice user interface.
+Basically, actors are Docker images that have:
+- Documentation in a form of README.md file
+- Input and output schema to enable generation of user interface and easy integration
+- 
 
-Note that actors are only loosely related to the [Actor model](https://en.wikipedia.org/wiki/Actor_model) from computer science. There are many differences.
+Actors are programs running in Docker containers in the cloud.
+They take input, perform an action and generate an output.
+
+
+
+Note that actors are only loosely related to
+the [Actor model](https://en.wikipedia.org/wiki/Actor_model) from computer science.
+There are some differences. You have been warned.
 
 ## Philosophy
 
-Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)**:
+Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)**,
+arguably one of the most important software engineering paradigms
+that ushered the computer revolution:
 
 1. **Make each program do one thing well**. To do a new job, build afresh rather than complicate old programs by adding new “features”.
 2. Expect the **output of every program to become the input to another**, as yet unknown, program. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
 3. Design and build software, even operating systems, to be **tried early**, ideally within weeks. Don’t hesitate to throw away the clumsy parts and rebuild them.
 4. **Use tools in preference to unskilled help** to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you’ve finished using them.
 
-Actors are programs running in Docker containers in the cloud. They take input, perform an action and generate an output. Good ones have documentation. Each actor should do just one thing and do it well. For complicated scenarios, combine more actors rather than building a large monolith.
+Each actor should do just one thing and do it well.
+For complicated scenarios, combine more actors rather than building a large monolith.
 
 ### UNIX program vs. Apify actor
 
 TODO: Add links to the texts in table
 
-------
+UNIX programs  | Actors 
+|---|---
 command-line options |	input object
 read stdin |	read from dataset
 write to stdout	| push data to dataset, update actor status
 write to stderr	| set exit message
 program exit code | 	actor exit code
 file system	| key-value store
---------
 
 ## Installation and setup
 
