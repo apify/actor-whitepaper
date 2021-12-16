@@ -2,6 +2,8 @@
 
 Written by: [Jan Čurn](https://apify.com/jancurn), [Marek Trunkát](https://apify.com/mtrunkat), [Ondra Urban](https://apify.com/mnmkng)
 
+December 2021
+
 This is a work-in-progress document that contains the specification for Apify actors.
 Note that some of the functionality is already implemented and available,
 but some features or integrations not.
