@@ -1,4 +1,4 @@
-# Apify Actors specification proposal (WIP)
+# Apify Actors Specification (WIP)
 
 This is a work-in-progress document that contains the specification for Apify actors. Note that some of the functionality is already implemented and available, but some features or integrations not. This is not documentation, it’s rather a lighthouse where we want to get. Once we get there, this document will turn into documentation.
 
@@ -183,11 +183,11 @@ int main (int argc, char *argv[])
 
 ### Main function
 
-This is only a helper. **TODO**: Is this even needed? **PROBABLY NOT** Perhaps just to call `Actor.exit(1, ‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see...
+This is an optional helper to wrap the body of the actor.
 
-**TODO: How else would we initialize web server to listen for events? Maybe some "subscribe" function?**
-
-Advantage of main() function: Kills actor even if you forgot setTimeout()
+**TODO**: Is this even needed? **PROBABLY NOT** Perhaps just to call `Actor.exit(1, ‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see...
+How else would we initialize web server to listen for events? Maybe some "subscribe" function?**
+Advantage of `main()` function: Kills actor even if you forgot `setTimeout()`
 
 #### Node.js
 
@@ -208,7 +208,7 @@ int main (int argc, char *argv[]) {
 }
 ```
 
-### Push data to dataset
+### Push results to dataset
 
 Save larger results to append-only storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an actor starts, by default it is associated with a newly-created empty dataset.
@@ -291,7 +291,7 @@ $ apify actor exit --code=1 --message "Couldn't fetch the URL"
 exit(1)
 ```
 
-### Aborting an actor
+### Aborting other actor
 
 Abort itself or other running actor on the Apify platform, setting it to `ABORTED` state. 
 
@@ -786,6 +786,17 @@ The README.md [Markdown](about:blank#vvv) file associated with the actor is used
 
 High-level overview how to build new actors.
 
+### Local debugging
+
+Actors can be developed and run locally. To support running other actors, we need to define mapping
+of `username/actor` to local directories with `.actor` sub-directory.
+
+TODO: Maybe using environment variable with the mapping?
+
+### On Apify platform
+
+....
+
 ## Sharing & Community
 
 ### User profile page
@@ -801,6 +812,7 @@ To improve user and community engagement, we should enable people to upload thei
 For example, for our help with the COVID-19 pandemic, we released a new page at https://apify.com/covid-19 with list of relevant actors and datasets. Why not let people do the same? Anyone could create a new team (e.g. called `covid-19`), change branding of the page a bit, upload a Markdown with text content, and the system will automatically show user’s published actors, datasets and key-value stores.
 
 On user account, there should be just one global setting called `Make profile public` instead of the current `Make profile picture publicly visible`
+
 
 ### Shared actors
 
