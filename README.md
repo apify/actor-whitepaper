@@ -78,7 +78,7 @@ file system	| key-value store
 
 ## Installation and setup
 
-You can start using actors in [Apify Console](https://my.apify.com/actors) without installing any local client.
+You can start using actors in [Apify Console](https://console.apify.com/actors) without installing any local client.
 
 Below are steps to install Apify libraries and start using actors locally on your machine, in various languages and environemnts.
 
