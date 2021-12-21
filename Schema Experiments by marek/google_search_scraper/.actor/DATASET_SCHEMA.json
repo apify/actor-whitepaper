@@ -43,10 +43,15 @@
     "views": {
         "default": {
             "name": "Organic results by page",
-            "fields": "searchQuery.term,hasNextPage,resultsTotal,results",
-            "omit": "results.$.siteLinks.$.description", // too long for default view
-            "descending": true,
-            "format": "html" // We could allow format as default override
+            "transformation": {
+                "fields": "searchQuery.term,hasNextPage,resultsTotal,results",
+                "omit": "results.$.siteLinks.$.description", // too long for default view
+                "descending": true,
+                // "format": "html" // We could allow format as default override
+            },
+            "renderer / visualisation": {
+                // From @milan's schema   
+            }
         },
         "ads": {
             "name": "Ads",
