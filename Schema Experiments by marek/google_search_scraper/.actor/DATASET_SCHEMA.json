@@ -43,7 +43,7 @@
     "views": {
         "default": {
             "name": "Organic results by page",
-            "transformation": {
+            "query": {
                 "fields": "searchQuery.term,hasNextPage,resultsTotal,results",
                 "omit": "results.$.siteLinks.$.description", // too long for default view
                 "descending": true,
