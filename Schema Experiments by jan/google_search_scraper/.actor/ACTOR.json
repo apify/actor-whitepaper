@@ -1,4 +1,5 @@
 {
+    "formatVersion": 2,
     // No username here, actor can be deployed to any account
     "name": "google-search-scraper",
     // We're pushing towards having human readable names shown for actors everywhere,

@@ -1,10 +1,17 @@
-# Apify Actors Specification (WIP)
+# Apify Actors Programming Model Specification [DRAFT]
 
-Written by: [Jan Čurn](https://apify.com/jancurn), [Marek Trunkát](https://apify.com/mtrunkat), [Ondra Urban](https://apify.com/mnmkng)
+**The new way to develop cloud programs that are easy to ship, use,
+integrate, and build upon.**
 
-December 2021
+Written by [Jan Čurn](https://apify.com/jancurn),
+[Marek Trunkát](https://apify.com/mtrunkat), and [Ondra Urban](https://apify.com/mnmkng),
+in January 2022.
+
+This document a specification of Apify's actor programming model,
+and new paradigm for building. 
 
 This is a work-in-progress document that contains the specification for Apify actors.
+
 Note that some functionality is already implemented and available,
 but some features or integrations not.
 This is not documentation, it’s rather a lighthouse where we want to get over time.
@@ -69,27 +76,28 @@ Basically, actors are Docker images that have:
 Actors are programs running in Docker containers in the cloud.
 They take input, perform an action and generate an output.
 
+While actors are currently only running on Apify, it is our intention
+to make it an open standard, a new standard way to build software automation tools.
 
-
-Note that actors are only loosely related to
-the [Actor model](https://en.wikipedia.org/wiki/Actor_model) from computer science.
-There are some differences. You have been warned.
 
 ## Philosophy
 
-Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)**,
-arguably one of the most important software engineering paradigms
-that ushered the computer and internet revolution:
+Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)**:
 
 1. **Make each program do one thing well**. To do a new job, build afresh rather than complicate old programs by adding new “features”.
 2. Expect the **output of every program to become the input to another**, as yet unknown, program. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
 3. Design and build software, even operating systems, to be **tried early**, ideally within weeks. Don’t hesitate to throw away the clumsy parts and rebuild them.
 4. **Use tools in preference to unskilled help** to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you’ve finished using them.
 
+The UNIX philosophy arguably one of the most important software engineering paradigms
+that ushered the computer and internet revolution. By decomposing
+complex system into smaller parts, it became possible to focus on a smaller part,
+and easily combine those into higher much more complex system.
+
+The idea of actors is to bring those ideas into the age of cloud software.
 Each actor should do just one thing and do it well.
 For complicated scenarios, combine multiple actors rather than building a large monolith
 that is hard to maintain.
-
 
 ### UNIX program vs. Apify actor
 
@@ -104,9 +112,34 @@ write to stderr	| set exit message
 program exit code | 	actor exit code
 file system	| key-value store
 
+### Motivation
+
+Make it really easy to use, i.e. generate the UI etc.
+
+### Relation to the Actor model
+
+Note that actors are only loosely related to
+the [Actor model](https://en.wikipedia.org/wiki/Actor_model) from computer science.
+There are some differences. You have been warned.
+
+### Why the name "actor" ?
+
+In movies and theater, an _actor_ is someone who gets a script
+and plays a role according to that script, pretending to be some other person. 
+
+Our actors also perform an act on someone's behalf, using a provided script.
+
+Coincidentally, it became common to call libraries in web automation world
+using names related to theater, such as Puppeteer or Playwright, so actor was quite matching.
+
+Last but no least, our idea of actors is similar
+to the Actor model known from the computer science.
+While not exactly the same, both concepts share 
+
+
 ## Installation and setup
 
-Below are steps to start building actors, in various languages and environments.
+Below are steps to start building actors with Apify, in various languages and environments.
 
 ### Apify platform
 
@@ -676,6 +709,7 @@ const memoryInfo = await Apify.getMemoryInfo();
 
 ## Actor definition files
 
+### Dockerfile (`Dockerfile`)
 
 ### Documentation (`README.md`)
 
