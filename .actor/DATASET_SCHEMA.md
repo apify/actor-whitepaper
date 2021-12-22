@@ -69,9 +69,9 @@ It's a pair of `template` and `properties` (according to the ReactJS language) t
 visualization: {
     template: 'grid',
     properties: {
-      image: '$image.href',
-      title: '$title',
-      url: '$field1.field2.url,
+        image: '$image.href',
+        title: '$title',
+        url: '$field1.field2.url,
     }
 }
 ```
