@@ -63,11 +63,14 @@ https://api.apify.com/v2/datasets/[ID]/items?format=[FORMAT]&fields=searchQuery,
 
 ### View's visualisation
 
-It's a pair of `template` and `properties` (according to the ReactJS language) that maps dataset fields to template property names.
+It's a triplet of `component`, `options` and `properties` (according to the ReactJS language) that maps dataset fields to template property names.
 
 ```
 visualization: {
-    template: 'grid',
+    component: 'grid',
+    options: {
+    	columns: 6,
+    },
     properties: {
         image: '$image.href',
         title: '$title',
@@ -79,3 +82,4 @@ visualization: {
 ### TODOs
 
 - Should one of the views be default?
+- Perhaps the visutalization's `properties` should be called `itemProperties` as it's not property of the whole component but one item
