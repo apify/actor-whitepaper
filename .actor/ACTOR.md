@@ -1,6 +1,7 @@
 # Actor
 
-```
+```js
+{
     "formatVersion": 2,
     // No username here, actor can be deployed to any account
     "name": "google-search-scraper",
@@ -16,4 +17,5 @@
         "MYSQL_USER": "my_username",
         "MYSQL_PASSWORD": "@mySecretPassword"
     }
+}
 ```
