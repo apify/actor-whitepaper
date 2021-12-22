@@ -52,3 +52,11 @@ like to embed to run view for user once the monitoring finished.
     records,
 }
 ```
+
+## API implications
+
+Enable user to list keys for certain prefixGroup:
+
+```
+https://api.apify.com/v2/key-value-stores/storeId/keys?prefixGroup=images&exclusiveStartKey=X
+```
