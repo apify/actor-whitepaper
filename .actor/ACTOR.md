@@ -1,0 +1,19 @@
+# Actor
+
+```
+    "formatVersion": 2,
+    // No username here, actor can be deployed to any account
+    "name": "google-search-scraper",
+    // We're pushing towards having human readable names shown for actors everywhere,
+    // so we should probably let users define it here, even if they run this code outside of Apify.
+    // But shall the text from here overwrite changes done manually by copywriter? Probably not,
+    // so what's the purpose of having these here?
+    "title": "Google Search Scraper",
+    "description": "The 200-char description",
+    "version": "0.0",
+    "buildTag": "latest",
+    "env": {
+        "MYSQL_USER": "my_username",
+        "MYSQL_PASSWORD": "@mySecretPassword"
+    }
+```
