@@ -69,3 +69,7 @@ So I think that ideally we need:
 I am not 100% convinced if this belongs to `OUTPUT_SCHEMA.json` or to `ACTOR.json`. But it could look like the following:
 
 TODO
+
+## Other notes
+
+- I'd make all schemas weak. I.e. for example some deduplication actor could require each dataset item to have a `uuid: 'string'` field but does not care about anything else. And similarly for key-value stores - schema expects something to be there but does not care about other values.
