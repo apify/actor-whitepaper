@@ -21,41 +21,69 @@ Once we get there, this document will turn into documentation.
 
 <!-- toc -->
 
-- [Introduction](#introduction)
-- [Philosophy](#philosophy)
-  * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
-- [Installation and setup](#installation-and-setup)
-  * [Apify platform](#apify-platform)
-  * [Node.js](#nodejs)
-  * [Python](#python)
-  * [Command-line interface (CLI)](#command-line-interface-cli)
-- [Programming interface](#programming-interface)
-  * [Get input](#get-input)
-  * [Main function](#main-function)
-  * [Push results to dataset](#push-results-to-dataset)
-  * [Key-value store](#key-value-store)
-  * [Exit actor](#exit-actor)
-  * [Aborting other actor](#aborting-other-actor)
-  * [Update actor status](#update-actor-status)
-  * [Start an actor (without waiting for finish)](#start-an-actor-without-waiting-for-finish)
-  * [Metamorph](#metamorph)
-  * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
-  * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
-  * [Read environment variables](#read-environment-variables)
-  * [Watch system events](#watch-system-events)
-  * [Get memory information](#get-memory-information)
-- [Actor definition files](#actor-definition-files)
-  * [Documentation (`README.md`)](#documentation-readmemd)
-  * [Actor specification directory (`.actor/`)](#actor-specification-directory-actor)
-  * [Actor specification file (`.actor/ACTOR.json`)](#actor-specification-file-actoractorjson)
-  * [Documentation (`README.md`)](#documentation-readmemd-1)
-- [Development](#development)
-  * [Local debugging](#local-debugging)
-  * [On Apify platform](#on-apify-platform)
-- [Sharing & Community](#sharing--community)
-  * [User profile page](#user-profile-page)
-  * [Shared actors](#shared-actors)
-- [TODOs](#todos)
+- [Apify Actors Programming Model Specification [DRAFT]](#apify-actors-programming-model-specification-draft)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Philosophy](#philosophy)
+    - [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
+    - [Motivation](#motivation)
+    - [Relation to the Actor model](#relation-to-the-actor-model)
+    - [Why the name "actor" ?](#why-the-name-actor-)
+  - [Installation and setup](#installation-and-setup)
+    - [Apify platform](#apify-platform)
+    - [Node.js](#nodejs)
+    - [Python](#python)
+    - [Command-line interface (CLI)](#command-line-interface-cli)
+  - [Programming interface](#programming-interface)
+    - [Get input](#get-input)
+      - [Node.js](#nodejs-1)
+      - [Python](#python-1)
+      - [CLI](#cli)
+      - [UNIX equivalent](#unix-equivalent)
+    - [Main function](#main-function)
+      - [Node.js](#nodejs-2)
+      - [UNIX equivalent](#unix-equivalent-1)
+    - [Push results to dataset](#push-results-to-dataset)
+      - [Node.js](#nodejs-3)
+      - [Python](#python-2)
+      - [CLI](#cli-1)
+      - [UNIX equivalent](#unix-equivalent-2)
+    - [Key-value store](#key-value-store)
+      - [Node.js](#nodejs-4)
+      - [Python](#python-3)
+      - [UNIX](#unix)
+    - [Exit actor](#exit-actor)
+      - [Node.js](#nodejs-5)
+      - [Python](#python-4)
+      - [CLI](#cli-2)
+      - [UNIX equivalent](#unix-equivalent-3)
+    - [Aborting other actor](#aborting-other-actor)
+      - [Node.js](#nodejs-6)
+      - [CLI](#cli-3)
+      - [UNIX equivalent](#unix-equivalent-4)
+    - [Update actor status](#update-actor-status)
+      - [CLI](#cli-4)
+      - [Node.js](#nodejs-7)
+    - [Start an actor (without waiting for finish)](#start-an-actor-without-waiting-for-finish)
+    - [Metamorph](#metamorph)
+    - [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
+    - [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
+    - [Read environment variables](#read-environment-variables)
+    - [Watch system events](#watch-system-events)
+    - [Get memory information](#get-memory-information)
+  - [Actor definition files](#actor-definition-files)
+    - [Dockerfile (`Dockerfile`)](#dockerfile-dockerfile)
+    - [Documentation (`README.md`)](#documentation-readmemd)
+    - [Actor specification directory (`.actor/`)](#actor-specification-directory-actor)
+    - [Actor specification file (`.actor/ACTOR.json`)](#actor-specification-file-actoractorjson)
+    - [Documentation (`README.md`)](#documentation-readmemd-1)
+  - [Development](#development)
+    - [Local debugging](#local-debugging)
+    - [On Apify platform](#on-apify-platform)
+  - [Sharing & Community](#sharing--community)
+    - [User profile page](#user-profile-page)
+    - [Shared actors](#shared-actors)
+  - [TODOs](#todos)
 
 <!-- tocstop -->
 
@@ -101,7 +129,7 @@ that is hard to maintain.
 
 ### UNIX program vs. Apify actor
 
-TODO: Add links to the texts in table
+TODO: Add links to the texts in table.
 
 UNIX programs  | Actors 
 |---|---
@@ -180,7 +208,7 @@ It is parsed from a JSON file, stored in the actor's default key-value store (us
 import { Actor } from 'apify';
 
 // TODO: Ondra's razor - We should instantiate new object,
-//  to avoid require-time side-effects
+//  to avoid require-time side-effects.
 
 const input = await Actor.getInput();
 console.log(input.option1);
@@ -218,7 +246,7 @@ int main (int argc, char *argv[])
 
 This is an optional helper to wrap the body of the actor.
 
-**TODO**: Is this even needed? Perhaps just to call `Actor.exit(1, ‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see...
+**TODO**: Is this even needed? Perhaps just to call `Actor.exit(1, ‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see... .
 How else would we initialize web server to listen for events? Maybe some "subscribe" function?**
 Advantage of `main()` function: Kills actor even if you forgot `setTimeout()`
 
@@ -439,9 +467,9 @@ and e.g. forwarding the data to another named dataset,
 that will be consumed by another actor.
 Maybe the dataset should enable removal of records from beginning? Currently, actors need to implement it themselves.
 
-**TODO:** We should have consistent naming, “call” is bit confusing, “run” is what it si. But will that work together with “apify run” that runs locally? In the new client we have "start"
+**TODO:** We should have consistent naming, “call” is bit confusing, “run” is what it si. But will that work together with “apify run” that runs locally? In the new client we have "start".
 
-**TODO:** Enable overriding of dataset to use by the actor? Perhaps it’s enough to have an utility actor (e.g. `apify/publish-dataset`), you will webhook it to actor run, and on finish, it will take the default dataset, publish it and atomically rename it (e.g. `jancurn/london-denstists`). But this way we’d lose all dataset settings (e.g. permissions, name, description), maybe Datasets should have an operation “swap” that would enable atomic replace of dataset data while keeping its ID and settings.
+**TODO:** Enable overriding of the dataset to use by the actor? Perhaps it’s enough to have an utility actor (e.g. `apify/publish-dataset`), you will webhook it to actor run, and on finish, it will take the default dataset, publish it and atomically rename it (e.g. `jancurn/london-denstists`). But this way we’d lose all dataset settings (e.g. permissions, name, description), maybe Datasets should have an operation “swap” that would enable atomic replace of dataset data while keeping its ID and settings.
 
 **UNIX equivalent**
 
@@ -461,7 +489,7 @@ posix_spawn()
 # TODO: Currently this doesn't work!
 #  apify call --memory=1024 --build=beta apify/google-search-scraper
 #   Error: ENOENT: no such file or directory, scandir 'apify_storage/key_value_stores/default'
-# TODO: maybe keep "apify actor:call" or just "actor run" ?
+# TODO: maybe keep "apify actor:call" or just "actor run"?
 
 $ apify actor:start apify/google-search-scraper queries='test\ntest2' \
   countryCode='US'
@@ -494,14 +522,14 @@ any time later
 
 ```
 // Maybe Actor.runActor() ? that's more consistent with rest
-// TODO: Actor should be for self, this is more like API client thing
+// TODO: Actor should be for self, this is more like API client thing:
 const run = await Actor.call(
     'apify/google-search-scraper',
     { queries: 'test' },
     { memoryMbytes: 2048 },
 );
 console.log(`Received message: ${run.output.body.message}`);
-// TODO: This would look better
+// TODO: This would look better:
 // console.log(`Received message: ${run.output.results}`);
 
 const run = await Actor.callTask(
@@ -550,7 +578,7 @@ await Actor.metamorph(
     { memoryMbytes: 4096 },
 );
 
-// TODO: Or maybe this way?
+// TODO: Or maybe better this way?
 await Actor.metamorph({
     actor: 'apify/web-scraper',
     input: {
@@ -598,8 +626,7 @@ apify actor:add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail
 // Or Apify.addWebhook() ?
 await Actor.addWebhook({
     eventType: ['SUCCEEDED', 'FAILED'],
-    // TODO: We don't have this now but we should,
-    // to enable adding webhooks to other runs
+    // TODO: We don't have this now but we should to enable adding webhooks to other runs:
     attachToActorRunId: 'RUN_ID',
     requestUrl: 'http://api.example.com?something=123',
     payloadTemplate: `{
@@ -637,7 +664,7 @@ Another option is having a new storage called Pipe - one actor would push from o
 NOTE: Probably it doesn't make sense to support the co-running actors in parallel, it would be too inefficient.
 
 ```
-// TODO: Support creating chains like this
+// TODO: Support creating chains like this:
 // XXX:   actor call apify/google-search-scraper
   => actor call apify/send-email queryTerms="aaa\nbbb"
 // XXX:   actor call apify/web-scraper
@@ -665,7 +692,7 @@ $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
 **Node.js**
 
 ```
-// TODO: Maybe we don't need this, use process.env
+// TODO: Maybe we don't need this, use process.env:
 const env = await Actor.getEnv();
 console.log(env.actorRunId);
 ```
@@ -724,9 +751,9 @@ This is in `actor.json` file. It combines legacy `apify.json`, `INPUT_SCHEMA.jso
 
 **TODO**: The biggest question here is whether we should apply description, name and options from `actor.json` file and how (e.g. this is how NPM does it) or rather let people to update these things only manually (e.g. GitHub repo description or Docker Hub image info). The latter usually leads to outdated info, but e.g. allows admins to easily update things without access to source code and necessity to rebuild the actor.
 
-**TODO**: Some (most) people argue that having one long JSON file is hell to edit. An option is to use directory (e.g. `/.actor`) that could contains several JSON files, e.g. INPUT_SCHEMA.json, OUTPUT_SCHEMA.json and ACTOR.json)... Let's discuss
+**TODO**: Some (most) people argue that having one long JSON file is hell to edit. An option is to use directory (e.g. `/.actor`) that could contains several JSON files, e.g. INPUT_SCHEMA.json, OUTPUT_SCHEMA.json and ACTOR.json)... Let's discuss.
 
-**TODO**: Consider how it will work with metamorph, the second actor can set output. Mara says workflows and actor connections can replace metamorph in many cases
+**TODO**: Consider how it will work with metamorph, the second actor can set output. Mara says workflows and actor connections can replace metamorph in many cases.
 
 **NOTE**: Devs should only call setOutput once, and we need to be able to show something to users right after start of actor before actor starts and setOutput has a chance to run, hence calling setOutput in loop doesn't make sense, plus it's slow. The output schema needs to provide info how to render output right away, basically pre-generate OUTPUT on the fly. The dev might not even need to call setOutput, and we generate it ourselves from output schema.
 
@@ -741,7 +768,7 @@ This file should be added to the source control, and links your project with an 
         "MYSQL_USER": "my_username",
         "MYSQL_PASSWORD": "@mySecretPassword"
     },
-    // TODO: Do we need this? "template": "basic",
+    // TODO: Do we need this? `"template": "basic",`
     // Optional. If omitted, there is not input schema and checks.
     "input": {
         "description": "To update crawler to another site you need to change startUrls and pageFunction options!",
@@ -880,7 +907,7 @@ High-level overview how to build new actors.
 Actors can be developed and run locally. To support running other actors, we need to define mapping
 of `username/actor` to local directories with `.actor` sub-directory.
 
-TODO: Maybe using environment variable with the mapping?
+TODO: Maybe using environment variable with the mapping??
 
 ### On Apify platform
 
