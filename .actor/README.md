@@ -1,16 +1,21 @@
-# Contents of the `.actor` directory
+# Main `.actor` directory
 
-Please first check the following files for the context:
-- [ACTOR.md](./ACTOR.md) description of `.actor/ACTOR.json`
-- [DATASET_SCHEMA.md](./DATASET_SCHEMA.md)
-- [KEY_VALUE_STORE_SCHEMA.md](./KEY_VALUE_STORE_SCHEMA.md)
-- [REQUEST_QUEUE_SCHEMA.md](./REQUEST_QUEUE_SCHEMA.md)
+Directory `./actor` must be placed at actor's top-level directory and contains the specification of the actor:
+- Main properties such as name or description
+- The input
+- The output
 
-These files describes the main `.actor/ACTOR.json` and format for storage schemas. Each actor has one `.actor/ACTOR.json` file and
-may have any number of storage schema files. What is missing now is the description of input and output of the actor described by
+The only required file is `.actor/ACTOR.json,` and all the other files are optional. In addition to `ACTOR.json`, most actors also implement `INPUT_SCHEMA.json`, `OUTPUT_SCHEMA.json`, and a couple of storage schemas.
 
-- `.actor/INPUT_SCHEMA.json` (see [ACTOR.md](./INPUT_SCHEMA.md)) - not done yet
-- `.actor/OUTPUT_SCHEMA.json` (see [OUTPUT_SCHEMA.md](./OUTPUT_SCHEMA.md)) - not done yet
+For file specifying actor iself, see:
+- [ACTOR.json](./ACTOR.md)
+- [INPUT_SCHEMA.json](./INPUT_SCHEMA.md)
+- [OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
+
+And for storage schemas see:
+- [DATASET_SCHEMA.json](./DATASET_SCHEMA.md)
+- [KEY_VALUE_STORE_SCHEMA.json](./KEY_VALUE_STORE_SCHEMA.md)
+- [REQUEST_QUEUE_SCHEMA.json](./REQUEST_QUEUE_SCHEMA.md)
 
 ## Input schema
 
