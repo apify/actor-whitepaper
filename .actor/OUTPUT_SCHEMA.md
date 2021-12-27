@@ -1,28 +1,51 @@
 
 # OUTPUT_SCHEMA.json
 
+```js
+{
+    "formatVersion": 1,
+    "outputs": {
+        // Default dataset contains all the scraped products
+        "currentProducts": {
+            "id": "@default",
+            "type": "dataset",
+            "schema": "./PRODUCTS_DATASET_SCHEMA"
+        },
 
+        // Actor uses persistent request queue and named dataset to store all historical products
+        "historicalProducts": {
+            "id": "~historical-products",
+            "type": "dataset",
+            "schema": "./PRODUCTS_DATASET_SCHEMA"
+        },
+        "historicalProductsQueue": {
+            "id": "~historical-products",
+            "type": "requestQueue"
+            // Does not enforce a schema for this storage
+        },
 
+        "productImages": {
+            "type": "keyValueStore",
+            "schema": "./PRODUCT_IMAGES_KEY_VALUE_STORE_SCHEMA.json"
+        }
 
+        // Actor can link also schema published by other actor as its input or output
+        "images": {
+            "id": "@default",
+            "type": "keyValueStore",
+            "schema": "actor:mtrunkat~image-processor/input.imagesKeyValueStore"
+        },
 
+        // Live view
+        "apiServer": {
+            "type": "liveView",
+            "schema": "TODO" // We should perhaps link a swagger file describing the API somehow?
+        }
+    }
+}
+```
 
-
-
-Is a list of different output types of the actor consiting of:
-
-- dataset defined by schema (default, some named that is being reused, in the future another unnamed linked to the run)
-- key-value store defined by schema (-||-)
-- request queue defined by schema (-||-)
-- live-view which should say if it's HTML page or API defined by Swagger doc or other
-- log (do we need it here?)
-- ... maybe more in the future
-
-With format close to Honza's https://github.com/apify/actor-specs/blob/master/Schema%20Experiments%20by%20jan/google_search_scraper/.actor/OUTPUT_SCHEMA.json
-
-
-## Run UI in Apify Console
-
-Now what is missing is the description of the main run view tab. What do we need here?
+## Examples of ideal actor run UI
 
 - For the majority of actors we want to see the dataset with new records being added in realtime
 - For [Google Spreadsheet Import](https://apify.com/lukaskrivka/google-sheets) we want to first display Live View for user to set up OAUTH and once 
@@ -32,11 +55,14 @@ this is set up then we want to display the log next time.
 - For [Monitoring](https://apify.com/apify/monitoring-runner) it's log during the runtime and single HTML record in iframe in the end
 - For actor that has failed it's log
 
-So I think that ideally we need:
-- Default value
-- Optionally the value for different states
+## How to define actor run UI
+
+I think that ideally we need:
+- Default setup, i.e. what output components should be displayed at default run tab
+- Optionally the setup for different states
 - Be able to pragmatically changes this using API by actor itself
 
-I am not 100% convinced if this belongs to `OUTPUT_SCHEMA.json` or to `ACTOR.json`. But it could look like the following:
-
 TODO
+
+## TODOs
+- We have a `title` and `description` in schemas. Perhaps it's not needed there and we can have it just here?

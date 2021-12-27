@@ -82,7 +82,7 @@ visualization: {
 }
 ```
 
-### TODOs
+## TODOs
 
 - Do we need `description` and `name` here? Shouldn't we assign it a name when the schema is referenced in the `OUTPUT_SCHEMA.json`?
 - Should one of the views be default?
