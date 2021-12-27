@@ -1,6 +1,6 @@
-# Actors Programming Model Specification by Apify [DRAFT]
+# Actor Programming Model Specification by Apify [DRAFT]
 
-**The new way to develop cloud programs
+**The new way to develop cloud programs called _actors_
 that are easy to ship to users,
 integrate, and build upon.**
 
