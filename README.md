@@ -1,21 +1,17 @@
-# Apify Actors Programming Model Specification [DRAFT]
+# Actors Programming Model Specification by Apify [DRAFT]
 
-**The new way to develop cloud programs that are easy to ship, use,
+**The new way to develop cloud programs
+that are easy to ship to target users,
 integrate, and build upon.**
 
 Written by [Jan Čurn](https://apify.com/jancurn),
-[Marek Trunkát](https://apify.com/mtrunkat), and [Ondra Urban](https://apify.com/mnmkng),
+[Marek Trunkát](https://apify.com/mtrunkat),
+[Ondra Urban](https://apify.com/mnmkng),
+and Milan Lepík,
 in January 2022.
 
-This document a specification of Apify's actor programming model,
-and new paradigm for building. 
 
-This is a work-in-progress document that contains the specification for Apify actors.
-
-Note that some functionality is already implemented and available,
-but some features or integrations not.
-This is not documentation, it’s rather a lighthouse where we want to get over time.
-Once we get there, this document will turn into documentation.
+**WARNING:** Note that currently many of the things are not implemented yet.
 
 ## Table of Contents
 
@@ -24,6 +20,9 @@ Once we get there, this document will turn into documentation.
 - [Introduction](#introduction)
 - [Philosophy](#philosophy)
   * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
+  * [Design goals](#design-goals)
+  * [Relation to the Actor model](#relation-to-the-actor-model)
+  * [Why the name "actor" ?](#why-the-name-actor-)
 - [Installation and setup](#installation-and-setup)
   * [Apify platform](#apify-platform)
   * [Node.js](#nodejs)
@@ -45,6 +44,7 @@ Once we get there, this document will turn into documentation.
   * [Watch system events](#watch-system-events)
   * [Get memory information](#get-memory-information)
 - [Actor definition files](#actor-definition-files)
+  * [Dockerfile (`Dockerfile`)](#dockerfile-dockerfile)
   * [Documentation (`README.md`)](#documentation-readmemd)
   * [Actor specification directory (`.actor/`)](#actor-specification-directory-actor)
   * [Actor specification file (`.actor/ACTOR.json`)](#actor-specification-file-actoractorjson)
@@ -60,6 +60,24 @@ Once we get there, this document will turn into documentation.
 <!-- tocstop -->
 
 ## Introduction
+
+This document shows how to build _actors_,
+a new kind of serverless micro-apps
+
+
+and new paradigm for building serverless micro-apps.
+The main design goal
+
+This is based on 3 years of experience in [Apify](https://apify.com/store)..
+While this model has been used over past 3 years
+
+This is a work-in-progress document that contains the specification for Apify actors.
+
+Note that some functionality is already implemented and available,
+but some features or integrations not.
+This is not documentation, it’s rather a lighthouse where we want to get over time.
+Once we get there, this document will turn into documentation.
+
 
 Actors are micro-apps - serverless programs running in the cloud.
 They can run as short or as long as necessary, even forever.
@@ -112,7 +130,7 @@ write to stderr	| set exit message
 program exit code | 	actor exit code
 file system	| key-value store
 
-### Motivation
+### Design goals
 
 Make it really easy to use, i.e. generate the UI etc.
 
@@ -165,9 +183,28 @@ $ sudo npm install -g apify-cli
 $ apify --version
 ```
 
+Note that the `apify` command supports more operations,
+than just for building actors. The operations for developing actors
+are available in the `actor` subcommand.
+You can get a full list of operations using:
+
+```
+apify help actor 
+```
+
+
 ## Programming interface
 
-The following commands are expected to be called from within the actor's Docker container, either on Apify platform or the local environment.
+By default, the following commands are expected to be called from within the actor's
+Docker container, either on Apify platform or the local environment.
+The information about the current run is taken from `APIFY_ACTOR_RUN_ID`
+environment variable. However, for **all** commands,
+it can be overridden in options.
+
+For example, in Node.js the options object in all commands has `actorRunId`
+field. And CLI has `--actor-run-id` flag.
+
+
 
 ### Get input
 
@@ -441,7 +478,13 @@ Maybe the dataset should enable removal of records from beginning? Currently, ac
 
 **TODO:** We should have consistent naming, “call” is bit confusing, “run” is what it si. But will that work together with “apify run” that runs locally? In the new client we have "start"
 
+DECISION (add explanation): "run" is for initiating the run, call is for "run" and wait.
+See https://github.com/apify/actor-specs/pull/5#discussion_r775381024
+
 **TODO:** Enable overriding of dataset to use by the actor? Perhaps it’s enough to have an utility actor (e.g. `apify/publish-dataset`), you will webhook it to actor run, and on finish, it will take the default dataset, publish it and atomically rename it (e.g. `jancurn/london-denstists`). But this way we’d lose all dataset settings (e.g. permissions, name, description), maybe Datasets should have an operation “swap” that would enable atomic replace of dataset data while keeping its ID and settings.
+
+DECISION: We will allow users to override default dataset. Atomic rename will be a seperate feature. 
+See https://github.com/apify/actor-specs/pull/5#discussion_r775382312
 
 **UNIX equivalent**
 
@@ -462,6 +505,7 @@ posix_spawn()
 #  apify call --memory=1024 --build=beta apify/google-search-scraper
 #   Error: ENOENT: no such file or directory, scandir 'apify_storage/key_value_stores/default'
 # TODO: maybe keep "apify actor:call" or just "actor run" ?
+#  Decision "apify actor xxx" !!!
 
 $ apify actor:start apify/google-search-scraper queries='test\ntest2' \
   countryCode='US'
@@ -549,17 +593,6 @@ await Actor.metamorph(
     { startUrls: [ "http://example.com" ] },
     { memoryMbytes: 4096 },
 );
-
-// TODO: Or maybe this way?
-await Actor.metamorph({
-    actor: 'apify/web-scraper',
-    input: {
-        startUrls: []
-    },
-    options: {
-        memoryMbytes: 4096,
-    }
-});
 ```
 
 ### Attach webhook to an actor run
@@ -600,7 +633,7 @@ await Actor.addWebhook({
     eventType: ['SUCCEEDED', 'FAILED'],
     // TODO: We don't have this now but we should,
     // to enable adding webhooks to other runs
-    attachToActorRunId: 'RUN_ID',
+    actorRunId: 'RUN_ID',
     requestUrl: 'http://api.example.com?something=123',
     payloadTemplate: `{
         "userId": {{userId}},
@@ -644,6 +677,9 @@ NOTE: Probably it doesn't make sense to support the co-running actors in paralle
   => actor call lukaskrivka/upload-google-sheets sheeetId="abc"
 ```
 
+See note from Marek: https://github.com/apify/actor-specs/pull/5#discussion_r775390067 
+
+
 ### Read environment variables
 
 **UNIX equivalent:**
@@ -664,8 +700,10 @@ $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
 
 **Node.js**
 
+For convenience, rather than using env vars directly, we provide a helper function
+that returns an object, with TypeScript-defined type. 
+
 ```
-// TODO: Maybe we don't need this, use process.env
 const env = await Actor.getEnv();
 console.log(env.actorRunId);
 ```
@@ -725,6 +763,7 @@ This is in `actor.json` file. It combines legacy `apify.json`, `INPUT_SCHEMA.jso
 **TODO**: The biggest question here is whether we should apply description, name and options from `actor.json` file and how (e.g. this is how NPM does it) or rather let people to update these things only manually (e.g. GitHub repo description or Docker Hub image info). The latter usually leads to outdated info, but e.g. allows admins to easily update things without access to source code and necessity to rebuild the actor.
 
 **TODO**: Some (most) people argue that having one long JSON file is hell to edit. An option is to use directory (e.g. `/.actor`) that could contains several JSON files, e.g. INPUT_SCHEMA.json, OUTPUT_SCHEMA.json and ACTOR.json)... Let's discuss
+DECISION: .actor it is!
 
 **TODO**: Consider how it will work with metamorph, the second actor can set output. Mara says workflows and actor connections can replace metamorph in many cases
 
@@ -741,7 +780,6 @@ This file should be added to the source control, and links your project with an 
         "MYSQL_USER": "my_username",
         "MYSQL_PASSWORD": "@mySecretPassword"
     },
-    // TODO: Do we need this? "template": "basic",
     // Optional. If omitted, there is not input schema and checks.
     "input": {
         "description": "To update crawler to another site you need to change startUrls and pageFunction options!",
