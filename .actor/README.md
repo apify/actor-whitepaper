@@ -73,3 +73,4 @@ TODO
 ## Other notes
 
 - I'd make all schemas weak. I.e. for example some deduplication actor could require each dataset item to have a `uuid: 'string'` field but does not care about anything else. And similarly for key-value stores - schema expects something to be there but does not care about other values.
+- How to integrate output schema with `const { output } = await Apify.call(...)`?
