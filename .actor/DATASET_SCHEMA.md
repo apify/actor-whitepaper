@@ -7,6 +7,9 @@ Dataset schema describes:
 - Different views on how we can look at the data, aka transformations
 - Visualization of the view using predefined components (grid, table, ...) which improves the run view interface at Apify Console
   and also provides better interface for dasets shared by Apify users
+  
+![obrazek](https://user-images.githubusercontent.com/594801/147474979-a224008c-8cba-43a6-8d2e-c24f6b0d5b37.png)
+
 
 Basic properties:
 - It's immutable
