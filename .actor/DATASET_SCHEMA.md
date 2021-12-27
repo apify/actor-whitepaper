@@ -5,7 +5,8 @@
 Dataset schema describes:
 - Content of the dataset
 - Different views on how we can look at the data, aka transformations
-- Visualization in the UI. This is also good when sharing the data
+- Visualization of the view using predefined components (grid, table, ...) which improves the run view interface at Apify Console
+  and also provides better interface for dasets shared by Apify users
 
 Basic properties:
 - It's immutable
@@ -14,8 +15,10 @@ Basic properties:
     - You can always push there additional properties but schema will enasure that all the listed once are there with a correct type
     - This is to make actors more compatible, i.e. some actor expects dataset to contain certain fields but does not care about the additional ones
 
-There are two ways how to create a dataset with schema. First you can start actor that has dataset schema linked from its
-[OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md). Second you can do it pragmatically via API (`datasetSchema` base64 encoded parameter) or using the SDK:
+There are two ways how to create a dataset with schema:
+- User can start the actor that has dataset schema linked from its
+[OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
+- Or user can do it pragmatically via API (`?schema=...` base64 encoded parameter) or using the SDK:
 
 ```js
 const dataset = await Apify.openDataset('my-new-dataset', { schema });
@@ -81,5 +84,6 @@ visualization: {
 
 ### TODOs
 
+- Do we need `description` and `name` here? Shouldn't we assign it a name when the schema is referenced in the `OUTPUT_SCHEMA.json`?
 - Should one of the views be default?
-- Perhaps the visutalization's `properties` should be called `itemProperties` as it's not property of the whole component but one item
+- Perhaps the visualization's `properties` should be called `itemProperties` as it's not property of the whole component but one item
