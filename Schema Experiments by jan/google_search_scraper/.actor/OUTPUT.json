@@ -6,5 +6,7 @@
 
     "pageHtmlSnapshots": "https://api.apify.com/v2/key-value-stores/[DEFAULT_DATASET_ID]/records?prefix=[PREFIX]",
 
-    "pageScreenshots": "https://api.apify.com/v2/key-value-stores/[DEFAULT_DATASET_ID]/records?prefix=[FORMAT]"
+    "pageScreenshots": "https://api.apify.com/v2/key-value-stores/[DEFAULT_DATASET_ID]/records?prefix=[FORMAT]",
+
+    "demo": "liveviewUrl when actor runs"
 }
