@@ -1,7 +1,7 @@
 # Actors Programming Model Specification by Apify [DRAFT]
 
 **The new way to develop cloud programs
-that are easy to ship to target users,
+that are easy to ship to users,
 integrate, and build upon.**
 
 Written by [Jan Čurn](https://apify.com/jancurn),
@@ -11,13 +11,12 @@ and Milan Lepík,
 in January 2022.
 
 
-**WARNING:** Note that currently many of the things are not implemented yet.
-
-## Table of Contents
+### Table of Contents
 
 <!-- toc -->
 
 - [Introduction](#introduction)
+  * [Word of warning](#word-of-warning)
 - [Philosophy](#philosophy)
   * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
   * [Design goals](#design-goals)
@@ -61,23 +60,34 @@ in January 2022.
 
 ## Introduction
 
-This document shows how to build _actors_,
-a new kind of serverless micro-apps
+This document explains how to develop _actors_,
+a new kind of serverless microapps for general-purpose language-agnostic computing and automation jobs.
+The main design goal for actors is to make it easy for developers build and ship reusable
+cloud software tools, which are also easy to run
+and integrate by their potentially not-too-technical users.
 
+The actors were first introduced by [Apify](https://apify.com/store) in late 2017,
+as a way to easily build, package, and ship web scraping and web automation tools to customers.
+Over the four years, we kept developing the concept and applied
+it successfully to thousands of real-world use cases in many business areas,
+well beyond the domain of web scraping.
 
-and new paradigm for building serverless micro-apps.
-The main design goal
+Drawing on our experience,
+we're now releasing this formal specification of the actor programming model,
+in a hope that it will help the community to more effectively build and ship cloud software tools,
+as well as encourage new implementations of the SDK in other programming languages.
 
-This is based on 3 years of experience in [Apify](https://apify.com/store)..
-While this model has been used over past 3 years
+### Word of warning
 
-This is a work-in-progress document that contains the specification for Apify actors.
+Currently, the only implementation of the actor model is provided
+by [Apify SDK for Node.js](https://sdk.apify.com), but it uses a legacy API and syntax
+that is not described here.
+The goal of this document is to provide a north star how Apify's and other implementations
+of actor programming model should look like. Once we release the new implementations
+for Node.js, Python or CLI, we'll release this document to the public
+and make it part of Apify documentation.
 
-Note that some functionality is already implemented and available,
-but some features or integrations not.
-This is not documentation, it’s rather a lighthouse where we want to get over time.
-Once we get there, this document will turn into documentation.
-
+## Philosophy
 
 Actors are micro-apps - serverless programs running in the cloud.
 They can run as short or as long as necessary, even forever.
@@ -89,7 +99,7 @@ or removing duplicates from a large dataset.
 Basically, actors are Docker images that have:
 - Documentation in a form of README.md file
 - Input and output schema to enable generation of user interface and easy integration
-- 
+-
 
 Actors are programs running in Docker containers in the cloud.
 They take input, perform an action and generate an output.
@@ -97,8 +107,11 @@ They take input, perform an action and generate an output.
 While actors are currently only running on Apify, it is our intention
 to make it an open standard, a new standard way to build software automation tools.
 
+Actors are **not** suitable for all cloud workloads. For example,
+for running databases.
 
-## Philosophy
+
+
 
 Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)**:
 
