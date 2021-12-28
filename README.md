@@ -1,8 +1,9 @@
 # Actor Programming Model Specification by Apify [DRAFT]
 
-**The new way to develop cloud programs called _actors_
+**The new way to develop serverless microapss called _actors_
 that are easy to ship to users,
-integrate, and build upon.**
+integrate, and build upon. Actors are a reincarnation of the UNIX philosophy
+for programs running in the cloud.**
 
 Written by [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
@@ -75,41 +76,64 @@ well beyond the domain of web scraping.
 
 Drawing on our experience,
 we're now releasing this formal specification of the actor programming model,
-in a hope to make it a standard and thus help the community to more effectively
-build and ship cloud software tools,
-as well as encourage new implementations of the model in more programming languages.
+in a hope to make it a new standard and help community to more effectively
+build and ship software automation tools,
+as well as encourage new implementations of the model in other programming languages.
 
 ### Basic concept
 
-TODO: Finish this
-
-Actors are micro-apps - serverless programs running in the cloud.
-They can run as short or as long as necessary, even forever.
-The actor can perform anything from a simple action such as
+Actors are serverless programs running in the cloud,
+best suited for execution of batch operations.
+They can perform anything from simple actions such as
 filling out a web form or sending an email,
 to complex operations such as crawling an entire website,
 or removing duplicates from a large dataset.
+Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
 
-Basically, actors are Docker images that have:
-- Documentation in a form of README.md file
-- Input and output schema to enable generation of user interface and easy integration
+Basically, actors are Docker images that additionally have:
+- Documentation in a form of README.md file.
+- Input and output schemas that describe what input the actor requires,
+  and what results it produces.
+- Access to an out-of-box storage system for results and files
+- Metadata such as the actor name, description, author and version.
 
-Actors are programs running in Docker containers in the cloud.
-They take input, perform an action and generate an output.
+The documentation and input/output schemas are the key ingredients
+that make it possible for people to easily understand what the actor does,
+enter the required inputs, and integrate the results of the actor into their other workflows.
 
-While actors are currently only running on Apify, it is our intention
-to make it an open standard, a new standard way to build software automation tools.
+The actors can be published
+on the [Apify platform](https://apify.com/store),
+which automatically generates a rich website with documentation
+and a practical user interface to encourage people to try the actor right away.
+The platform takes care of hosting the actors' Docker containers
+and scaling the computing, storage and network resources as needed,
+so neither actor developers nor the users need to deal with the infrastructure.
+It just works.
 
-Actors are **not** suitable for all cloud workloads. For example,
-for running databases.
+The Apify platform provides an open API, webhooks
+and [integrations](https://apify.com/integrations)
+to services such as Zapier or Integromat, which make it easy for users
+to integrate actors into their existing workflows. Additionally, the actor developers
+can set a price tag for use of their actors, and thus make
+[passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-actors-b0392278d085/)
+to have an incentive to keep developing and improving the actor for the users.
 
+The ultimate goal of the actor programming model is to make it as simple as possible
+for people to develop, run and integrate software automation tools.
+
+### What actors are not
+
+Actors are best suited for batch operations that take an input, perform an isolated job for a user,
+and potentially produce some results.
+However, actors are currently not ideally suited for continuous computing or storage workloads, such
+as running a live website, API backend, or database.
 
 ### Word of warning
 
-Currently, the only available implementation of the actor model is available in
+Currently, the only available implementation of the actor model is provided by
 [Apify SDK for Node.js](https://sdk.apify.com), but it uses a legacy API and syntax
-that is not described here.
-The goal of this document is to provide a north star how Apify's and other implementations
+that is not described in this document.
+The goal of this document is to define the north star how Apify's and other implementations
 of actor programming model should look like. Once we release the new implementations
 for Node.js, Python or CLI, we'll release this document to the public
 and make it part of Apify documentation.
@@ -934,6 +958,8 @@ High-level overview how to build new actors.
 
 Actors can be developed and run locally. To support running other actors, we need to define mapping
 of `username/actor` to local directories with `.actor` sub-directory.
+
+Explain basic workflow with "apify" - create, run, push etc.
 
 TODO: Maybe using environment variable with the mapping?
 
