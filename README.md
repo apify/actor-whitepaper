@@ -465,7 +465,7 @@ Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
 When an actor starts, by default it is associated with a newly-created key-value store,
 which only contains one file with input of the actor
-(key defined in the `ACTOR_INPUT_KEY` environment variable, usually it's `INPUT`).
+(usually called `INPUT`, the exact key is defined in the `ACTOR_INPUT_KEY` environment variable).
 
 The user can override this behavior and specify another key-value store or input key
 when running the actor.
@@ -494,7 +494,6 @@ await actor.set_value('screenshot', buffer, { contentType='image/png' })
 
 # Get object from store (automatically parsed from JSON)
 dataset = await actor.get_value('my-state')
-
 ```
 
 #### UNIX
@@ -588,7 +587,7 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 await Actor.setStatusMessage('Crawled 45 of 100 pages');
 
 // Setting status message to other actor externally is also possible
-await Actor.setStatusMessage('Everyone is well', { runId: 123 });
+await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
 ```
 
 ### Start an actor (without waiting for finish)
@@ -608,64 +607,16 @@ See https://github.com/apify/actor-specs/pull/5#discussion_r775381024
 DECISION: We will allow users to override default dataset. Atomic rename will be a seperate feature. 
 See https://github.com/apify/actor-specs/pull/5#discussion_r775382312
 
-**UNIX equivalent**
+#### Node.js
 
-```
-# Run a program in the background
-$ command <arg1>, <arg2>, … &
-
-// Spawn another process
-posix_spawn()
-```
-
-**CLI**
-
-```
-# On stdout, the commands emit actor run object (in text or JSON format),
-# we shouldn't wait for finish, for that it should be e.g. "execute"
-# TODO: Currently this doesn't work!
-#  apify call --memory=1024 --build=beta apify/google-search-scraper
-#   Error: ENOENT: no such file or directory, scandir 'apify_storage/key_value_stores/default'
-# TODO: maybe keep "apify actor:call" or just "actor run" ?
-#  Decision "apify actor xxx" !!!
-
-$ apify actor:start apify/google-search-scraper queries='test\ntest2' \
-  countryCode='US'
-$ apify actor:start --json apify/google-search-scraper '{ "queries": }'
-$ apify actor:start --input=@data.json --json apify/google-search-scraper
-$ apify actor:start --memory=1024m --build=beta apify/google-search-scraper
-$ apify actor:start --output-record-key=SCREENSHOT apify/google-search-scraper
-
-# Pass input from stdin
-$ cat input.json | apify actor:start apify/google-search-scraper --json
-
-# Call local actor during development
-$ apify actor:start file:../some-dir someInput='xxx'
-
-// Old TODOs:
-// $ command <input.txt >my_output.txt 2>error_file
-// $ actor call user/actor-name
-// $ apify call user/actor-name | ???
-```
-
-**Slack**
-
-```
-NOTE: In Slack it just starts the actor, and then prints the message to channel,
-any time later
-/apify start apify/google-search-scraper startUrl=afff
-```
-
-**Node.js**
-
-```
-// Maybe Actor.runActor() ? that's more consistent with rest
-// TODO: Actor should be for self, this is more like API client thing
+```js
+// Run actor and wait for it to finish
 const run = await Actor.call(
     'apify/google-search-scraper',
     { queries: 'test' },
     { memoryMbytes: 2048 },
 );
+
 console.log(`Received message: ${run.output.body.message}`);
 // TODO: This would look better
 // console.log(`Received message: ${run.output.results}`);
@@ -677,7 +628,41 @@ const run = await Actor.callTask(
 );
 ```
 
-**API**
+#### CLI
+
+```
+# On stdout, the commands emit actor run object (in text or JSON format),
+# we shouldn't wait for finish, for that it should be e.g. "execute"
+# TODO: Currently this doesn't work!
+#  apify call --memory=1024 --build=beta apify/google-search-scraper
+#   Error: ENOENT: no such file or directory, scandir 'apify_storage/key_value_stores/default'
+# TODO: maybe keep "apify actor:call" or just "actor run" ?
+#  Decision "apify actor xxx" !!!
+
+$ apify actor call apify/google-search-scraper queries='test\ntest2' \
+  countryCode='US'
+$ apify actor call --json apify/google-search-scraper '{ "queries": }'
+$ apify actor call --input=@data.json --json apify/google-search-scraper
+$ apify actor call --memory=1024m --build=beta apify/google-search-scraper
+$ apify actor call --output-record-key=SCREENSHOT apify/google-search-scraper
+
+# Pass input from stdin
+$ cat input.json | apify actor:start apify/google-search-scraper --json
+
+# Call local actor during development
+$ apify actor:start file:../some-dir someInput='xxx'
+```
+
+#### Slack
+
+It will also be possible to run actors from Slack app.
+The following command starts the actor, and then prints the messages to a Slack channel.
+
+```
+/apify run bob/google-search-scraper startUrl=afff
+```
+
+#### API
 
 ```
 [POST] https://api.apify.com/v2/actors/apify~google-search-scraper/run
@@ -686,24 +671,34 @@ const run = await Actor.callTask(
   token=rWLaYmvZeK55uatRrZib4xbZs&
   outputRecordKey=OUTPUT
   returnDataset=true
-  Allow all dataset arguments: &format=json&clean=false&offset=0&limit=99&fields=myValue%2CmyOtherValue&omit=myValue%2CmyOtherValue&unwind=myValue&desc=true&attachment=true&delimiter=%3B&bom=false&xmlRoot=items&xmlRow=item&skipHeaderRow=true&skipHidden=false&skipEmpty=false&simplified=false&skipFailedPages=false
+```
+
+#### UNIX equivalent
+
+```
+# Run a program in the background
+$ command <arg1>, <arg2>, … &
+
+// Spawn another process
+posix_spawn()
 ```
 
 ### Metamorph
 
 Replace running actor’s Docker image with another.
 This is useful e.g. for repurposing an actor as a new actor with its own settings and documentation.
-Note that the originating actor can [set the output](#set-actor-output) before metamorphing
-(TODO: is this correct?)
 
 When metamorphing into another actor, the system checks
-that the other actor has compatible input/output schemas, and throws an error if not.
+that the other actor has compatible input/output schemas,
+and throws an error if not.
+
+The target actor inherits the default storages used by the calling actor.
 
 #### Node.js
 
 ```
 await Actor.metamorph(
-    'apify/web-scraper',
+    'bob/web-scraper',
     { startUrls: [ "http://example.com" ] },
     { memoryMbytes: 4096 },
 );
@@ -712,11 +707,10 @@ await Actor.metamorph(
 #### CLI
 
 ```
-$ apify actor metamorph apify/web-scraper startUrls=http://example.com
+$ apify actor metamorph bob/web-scraper startUrls=http://example.com
 $ apify actor metamorph --input=@input.json --json --memory=4096 \
-  apify/web-scraper
+  bob/web-scraper
 ```
-
 
 #### UNIX equivalent
 
@@ -731,13 +725,9 @@ Run another actor or an external HTTP API endpoint after actor run finishes or f
 
 #### Node.js
 
-```
-// Or Apify.addWebhook() ?
+```js
 await Actor.addWebhook({
     eventType: ['SUCCEEDED', 'FAILED'],
-    // TODO: We don't have this now but we should,
-    // to enable adding webhooks to other runs
-    actorRunId: 'RUN_ID',
     requestUrl: 'http://api.example.com?something=123',
     payloadTemplate: `{
         "userId": {{userId}},
@@ -745,35 +735,27 @@ await Actor.addWebhook({
         "eventType": {{eventType}},
         "eventData": {{eventData}},
         "resource": {{resource}}
-    }`});
-
-await Actor.addWebhook({
-    eventType: ['SUCCEEDED', 'FAILED'],
-    // Instead of requestUrl, we can call an actor.
-    // Internally, it's translated to requestUrl anyway.
-    request: {
-        actor: 'apify/send-email',
-        options: {
-            memoryMbytes: 512,
-            token: null, // By default, using the Actor.addWebhook() 
-              // caller's token        },        webhook: { }, // TODO: Recursively set other webhooks, to enable chaining    },    payloadTemplate: `{        "to": "bob@example.com",        "cc": {{user.email}},        "html": "Hi there,<br><br>Here are Google Search results: {{resource.output.flatResults[format=html,limit=50]}}",    }`,    // TODO: Maybe in the future?    payload: {        body: 'xxxx',        contentType: 'image/png'    }});
+    }`,
+    // Again, it's possible to attach webhook to another running actor.
+    actorRunId: 'RUN_ID',
+});
 ```
 
 #### CLI
 
 ```
-apify add-webhook --actor-run-id=RUN_ID \\
+apify actor add-webhook --actor-run-id=RUN_ID \\
   --event-types=SUCCEEDED,FAILED \\
   --request-url=https://api.example.com \\
   --payload-template='{ "test": 123" }'
 
-apify add-webhook --event-types=SUCCEEDED \\
+apify actor add-webhook --event-types=SUCCEEDED \\
   --request-actor=apify/send-mail \\
   --memory=4096 --build=beta \\
   --payload-template=@template.json
 
 # Or maybe have a simpler API for self-actor?
-apify actor:add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail 
+apify actor add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail 
 ```
 
 #### UNIX equivalent
@@ -789,17 +771,21 @@ apify actor:add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail
 
 ### Pipe result of an actor to another (aka chaining)
 
-**UNIX equivalent**
+Actor can start other actors and
+pass them its own dataset or key-value store.
+For example, the main actor can produce files
+and the spawned others can consume them, from the same storages.
+
+In the future, we could let datasets be cleaned up from the beginning,
+effectively creating a pipe, with custom rolling window.
+Webhooks can be attached to storage operations,
+and so launch other actors to consume newly added items or files.
+
+#### UNIX equivalent
 
 ```
 $ ls -l | grep "something" | wc -l
 ```
-
-Apify has no direct equivalent, workaround is possible - spin all 3 actors, and then pass messages between them.
-
-Another option is having a new storage called Pipe - one actor would push from one side, second would consume, it would only be launched on consumption side (like SQS + Lambda)
-
-NOTE: Probably it doesn't make sense to support the co-running actors in parallel, it would be too inefficient.
 
 ```
 // TODO: Support creating chains like this
@@ -877,7 +863,8 @@ signal(SIGINT, handle_sigint);
 ### Get memory information
 
 Get information about the total and available memory of the actor’s container or local system.
-
+For example, this is useful to auto-scale a pool
+of workers used for crawling large websites.
 
 #### Node.js
 
@@ -912,12 +899,11 @@ Good documentation makes good programmers!
 
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
-### Actor definition directory (`./ACTOR`)
+### Actor directory (`./ACTOR`)
 
-This is the main directory that 
-contains definition files of the actor.
-The entire directory should be added to the source control.
+This is the main directory with definition files of the actor.
 It links your source code with an Apify actor in the cloud.
+The entire directory should be added to the source control.
 
 Files in this directory are used by Apify CLI to get defaults for the `apify push` command.
 
@@ -985,12 +971,7 @@ https://apify.com/jancurn/some-scraper
 
 ## TODOs
 
-- We need to stick to one convention of parameters, either named, or sequential, but just one type...
-  But we should be backwards compatible to work with Apify SDK
-- Define and articulate log for CLI/SDK convention. E.g. use `actor:xxx` only when specific thing is only related to an actor, but nothing else.
-- General commands e.g. `apify publish` can be used for actors and storages, so no point to have `apify actor:publish` and `apify dataset:publish`. E.g. the “actor” prefix should be used whenever it’s related to a specific actor run, or maybe when you’re inside of the run.
-- How to show progress of actor run? Probably live view is best way to go!
-- Support use cases like e.g. one actor pushes data to dataset, so enable another actor to push the results to google sheet (probably using webhooks)
 - Cluster the operations into sections like Input/output, Chaining operations etc. For chaining, we have 3 ways: call, metamorhp, webhooks, describe the difference between them (e.g. first two need to be developed by author of the actor, the last one not)
 - Mention CI/CD, e.g. how to integrate with GiHub etc.
-- IDEA: How about having an "event log" for actors? They would be shown in UI, and tell user what happened in the actor. This can be done either in API or by special message to log, which will be parsed. Note - or notifications/messaging API
+- IDEA: How about having an "event log" for actors?
+  They would be shown in UI, and tell user what happened in the actor. This can be done either in API or by special message to log, which will be parsed. **Or with the notifications/messaging API**
