@@ -277,26 +277,39 @@ pip3 install apify
 
 ### Command-line interface (CLI)
 
-Actors can also be developed using a CLI. This is especially useful
-for packaging existing software written in an arbitrary language as an actor.
-
+For local development of actors and management of the Apify platform,
+it is useful to install Apify CLI.
 You just need to install [Node.js](https://nodejs.org/en/download/)
-and then the [apify-cli](https://www.npmjs.com/package/apify-cli) NPM package:
+and then the [apify-cli](https://www.npmjs.com/package/apify-cli) NPM package globally as follows:
 
 ```
 $ sudo npm install -g apify-cli
-$ apify --version
 ```
 
-Note that the `apify` CLI command supports various functions.
-The functions necessary for developing actors
-are available in the `actor` subcommand.
-You can get a full list of operations using:
+To confirm the installation succeeded and to login to the Apify platform
+with your username and API token, run the `login` command as follows:
 
 ```
-apify help actor 
+$ apify login
 ```
 
+The Apify CLI provides a number of commands, which can aid with actor development in two ways:
+
+1. When developing actors using Node.js or Python, the CLI makes it easy to run the actors locally 
+   or deploy them to the Apify platform, using commands such as `run` and `push`.
+   For details, see [Local development](#local-development).
+2. You can use the `actor` command to implement the actor logic in a shell script.
+   This is especially useful for repackaging existing software tools written in an
+   arbitrary language as an actor. You simply write a shell script that transforms 
+   the actor input to command-line options needed by the existing software, launch it,
+   and then store results as actor output.
+   For details, see [Repackaging existing software as actors](#repackaging-existing-software-as-actors).
+   
+To get a help for a specific command, run:
+
+ ```
+$ apify help <command>
+ ```
 
 ## Programming interface
 
@@ -1018,7 +1031,7 @@ The README.md [Markdown](about:blank#vvv) file associated with the actor is used
 
 High-level overview how to build new actors.
 
-### Local debugging
+### Local development
 
 Actors can be developed and run locally. To support running other actors, we need to define mapping
 of `username/actor` to local directories with `.actor` sub-directory.
@@ -1027,9 +1040,13 @@ Explain basic workflow with "apify" - create, run, push etc.
 
 TODO: Maybe using environment variable with the mapping?
 
-### On Apify platform
+### Development on Apify platform
 
 ....
+
+### Repackaging existing software as actors
+
+
 
 ## Sharing & Community
 
