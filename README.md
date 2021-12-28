@@ -897,11 +897,6 @@ $ ps -a
 
 Besides the standard `Dockerfile` and `README.md`.
 
-Actor definition files are stored in a directory called `.ACTOR` in the main actor's directory.
-
-This entire directory should be added to the source control.
-It links your source code with an Apify actor in the cloud.
-
 ### Docker build instructions (`./Dockerfile`)
 
 Instructions for the platform how to build the actor Docker image and run it.
@@ -917,6 +912,13 @@ Good documentation makes good programmers!
 
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
+### Actor definition directory (`./ACTOR`)
+
+Actor definition files are stored in a directory called `.ACTOR` in the main actor's directory.
+
+This entire directory should be added to the source control.
+It links your source code with an Apify actor in the cloud.
+
 ### Actor specification file (`.ACTOR/actor.json`)
 
 This replaces the legacy `actor.json` file,
@@ -925,6 +927,7 @@ and defines references to input and output schemas.
 For details, see [.ACTOR/actor.json](./pages/ACTOR.md)
 
 ### Schemas (`.ACTOR/*.json`)
+
 
 
 OUTPUT schema

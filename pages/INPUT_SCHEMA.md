@@ -1,5 +1,8 @@
 # ./actor/INPUT_SCHEMA.json
 
+Defines structure of the input object accepted by the actor.
+It is stored in the default key-value store associated with the run.
+
 Changes to the previous version:
 - `formatVersion` instead of `schemaVersion`
 - define what is required at field level instead of having a separate property `"required": ["startUrls", "pageFunction"]`
@@ -34,6 +37,8 @@ The basic structure of the input schema is:
     ]
 }
 ```
+
+**TODO: This is really just a schema for a file inside some key-value store, isn't? Then why such special treatment **
 
 We have currently five input types:
 - String
