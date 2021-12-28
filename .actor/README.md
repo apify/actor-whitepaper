@@ -19,15 +19,6 @@ And for storage schemas see:
 
 One common attribute for each of these files is `formatVersion`, which allows making format changes without breaking older code.
 
-## Storage schema referencing
-
-In both `INPUT_SCHEMA.json` and `OUTPUT_SCHEMA.json` you can reference storage schemas. There are 3 ways how to reference a schema:
-- Local file: `./MY_DATASET_SCHEMA.json`
-- Schema of existing dataset: `dataset:mtrunkat/my-datasey` or `dataset:jkq3Smioe54dcqp4b`
-- Dataset from output or input schema of an actor: `actor:mtrunkat/my-actor/output.defaultDataset` or certain build `actor:mtrunkat/my-actor@1.2.4/input.adsDataset`
-
-The prefixes such as `dataset:` are not nice but unfortunately we don't have names unique actors all user resources.
-
 ## Other notes
 
 - I'd make all the storage schemas "weak" (allowing more fields to be added) as for example some deduplication actor could require each dataset
