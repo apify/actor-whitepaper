@@ -55,5 +55,5 @@ restricted by the referenced schema to make sure that selected storage is compat
     },
 ```
 
-TODO:
+## TODOs
 - We should properly reconsider our current format. For example, the way we write string enum is suboptimal as the user has to separately name keys and values instead of a simple map that is error-prone.
