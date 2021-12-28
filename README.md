@@ -202,6 +202,7 @@ File system	| Key-value store
 Make it really easy to use, i.e. generate the UI etc.
 
 - Keep it as simple as possible, but not simpler
+- Each actor should do just one thing, and have everything to run on its own
 - TODO...
 
 ### Relation to the Actor model
@@ -808,7 +809,7 @@ NOTE: Probably it doesn't make sense to support the co-running actors in paralle
 See note from Marek: https://github.com/apify/actor-specs/pull/5#discussion_r775390067 
 
 
-### Read environment variables
+### Environment variables
 
 Actors have access to standard process environment variables.
 
@@ -818,9 +819,9 @@ see the [Apify documentation](https://docs.apify.com/actors/development/environm
 
 <!-- TODO: We should provide the full list here eventually, for a complete reference. -->
 
-2. Custom-defined environment variables (potentially secured with encryption)
+Custom-defined environment variables (potentially secured with encryption)
 that are then passed to the actor process both on Apify platform and in local development.
-For details, see [.actor/ACTOR.json](#TODO) file.
+These are defined in the [.actor/ACTOR.json](/pages/ACTOR.md) file.
 
 **Node.js**
 
@@ -839,7 +840,7 @@ $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
 ```
 
 
-**UNIX equivalent:**
+#### UNIX equivalent:
 
 ```
 $ echo $ACTOR_RUN_ID
@@ -856,13 +857,7 @@ Receive system events e.g. CPU statistics of the running container or informati
 
 Perhaps we could add custom events in the future.
 
-**UNIX equivalent**
-
-```
-signal(SIGINT, handle_sigint);
-```
-
-**Node.js**
+#### Node.js
 
 ```
 Actor.events.on('cpuInfo', data => {
@@ -870,22 +865,30 @@ Actor.events.on('cpuInfo', data => {
 });
 ```
 
+#### UNIX equivalent
+
+```
+signal(SIGINT, handle_sigint);
+```
+
 ### Get memory information
 
 Get information about the total and available memory of the actor’s container or local system.
 
-**UNIX equivalent:**
+
+#### Node.js
+
+```
+const memoryInfo = await Apify.getMemoryInfo();
+```
+
+#### UNIX equivalent
 
 ```
 # Print memory usage of programs
 ps -a
 ```
 
-**Node.js**
-
-```
-const memoryInfo = await Apify.getMemoryInfo();
-```
 
 ## Actor definition files
 
