@@ -3,19 +3,19 @@
 ## Basic properties
 
 Dataset schema describes:
-- Content of the dataset, i.e. schema of objects that are allowed to be added
+- Content of the dataset, i.e., the schema of objects that are allowed to be added
 - Different views on how we can look at the data, AKA transformations
-- Visualization of the view using predefined components (grid, table, ...) which improves the run view interface at Apify Console
-  and also provides better interface for dasets shared by Apify users
+- Visualization of the View using predefined components (grid, table, ...), which improves the run view interface at Apify Console
+  and also provides a better interface for datasets shared by Apify users
 
 <img src="https://user-images.githubusercontent.com/594801/147474979-a224008c-8cba-43a6-8d2e-c24f6b0d5b37.png" width="500">
 
 Basic properties:
 - It's immutable
-    - If you want to change the structure then you need to create a new dataset
+    - If you want to change the structure, then you need to create a new dataset
 - It's weak
-    - You can always push there additional properties but schema will enasure that all the listed once are there with a correct type
-    - This is to make actors more compatible, i.e. some actor expects dataset to contain certain fields but does not care about the additional ones
+    - You can always push their additional properties, but schema will ensure that all the listed once are there with a correct type
+    - This is to make actors more compatible, i.e., some actor expects dataset to contain certain fields but does not care about the additional ones
 
 There are two ways how to create a dataset with schema:
 - User can start the actor that has dataset schema linked from its
@@ -28,7 +28,7 @@ There are two ways how to create a dataset with schema:
 const dataset = await Apify.openDataset('my-new-dataset', { schema });
 ```
 
-This also esnures that you are opening dataset that is compatible with the actor as otherwise you get an error:
+This also ensures that you are opening a dataset that is compatible with the actor as otherwise, you get an error:
 
 ```
 Uncaught Error: Dataset schema is not compatible with a given schema
@@ -36,19 +36,19 @@ Uncaught Error: Dataset schema is not compatible with a given schema
 
 ## Structure
 
-```js
+```JSON
 {
     "formatVersion": 2,
     "name": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
     "fields": {
-        "title": "String",	
-        "priceUsd": "Number",	
+        "title": "String",  
+        "priceUsd": "Number", 
         "manufacturer": "Object",
-        "manufacturer.title": "String",	
+        "manufacturer.title": "String", 
         "manufacturer.url": "Number",
         "productVariants": "Array",
-        "productVariants.color": "String",	
+        "productVariants.color": "String",  
         ...
     },
     "views": {
@@ -95,11 +95,79 @@ Uncaught Error: Dataset schema is not compatible with a given schema
 }
 ```
 
+## Fields
+
+One big TODO: What schema definition are we going to support? The most powerful and standardized but
+slow to write is [JSON Schema](https://json-schema.org/). We could start with
+the [Easy JSON Schema](https://github.com/easy-json-schema/easy-json-schema) and add support for JSON
+Schema later, but in this case, we will need another property saying what schema is used.
+
+Here is a comparison of JSON Schema and Easy JSON Schema:
+
+```JSON
+{
+  "id": "string",
+  "*name": "string",
+  "*email": "string",
+  "arr": [{
+    "site": "string",
+    "url": "string"
+  }]
+}
+```
+
+```JSON
+{
+  "type": "object",
+  "required": [
+    "name",
+    "email"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "arr": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "site": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Views
+
+Dataset view enables the user to explore certain data ways. For example the
+[Google Search Scraper](https://apify.com/apify/google-search-scraper) enables the user to View 
+the results in multiple ways:
+- One item = one page with two embed arrays of organic results and ads
+- One item = one organic results
+- One item = one search result
+
+The first View in the list is considered to be a default one.
+
 ### Views's transformation
 
 Transformation is a combination of a 
 [GET dataset items](https://docs.apify.com/api#/reference/datasets/item-collection/get-items)
-API endpoint parameters. This makes view usable in both UI and API
+API endpoint parameters. This makes View usable in both UI and API
 where the users can use it to preset the parameters easily, for example:
 
 ```
@@ -112,15 +180,27 @@ instead of this complicated URL in the case of [Google Search Scraper](https://a
 https://api.apify.com/v2/datasets/[ID]/items?format=[FORMAT]&fields=searchQuery,organicResults&unwind=organicResults
 ```
 
-### View's visualisation
+And here is the description from the dataset schema:
 
-It's a triplet of `component`, `options` and `properties` (according to the ReactJS language) that maps dataset fields to template property names.
+```json
+  "transformation": {
+      "fields": [
+          "searchQuery",
+          "organicResults"
+      ],
+      "unwind": "organicResults"
+  },
+```
+
+### View's visualization
+
+It's a triplet of `component`, `options`, and `properties` (according to the ReactJS language) that maps dataset fields to template property names.
 
 ```
 visualization: {
     component: 'grid',
     options: {
-    	columns: 6,
+      columns: 6,
     },
     properties: {
         image: '$image.href',
@@ -132,6 +212,5 @@ visualization: {
 
 ## TODOs
 
-- Do we need `description` and `name` here? Shouldn't we assign it a name when the schema is referenced in the `OUTPUT_SCHEMA.json`?
-- Should one of the views be default?
-- Perhaps the visualization's `properties` should be called `itemProperties` as it's not property of the whole component but one item
+- Perhaps the visualization's `properties` should be called `itemProperties` as it's not the property of the whole component but one item
+- JSON schema specification (full or simple) above
