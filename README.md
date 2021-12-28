@@ -5,7 +5,8 @@ that are easy to ship to users,
 integrate, and build upon. Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
-**This document is a proposal of the model, not a documentation of an existing system.
+**Note that this document is a specification of not-yet-existing model,
+not a documentation of an existing implementation.
 [Learn more](#word-of-warning)**
 
 By [Jan Čurn](https://apify.com/jancurn),
