@@ -36,7 +36,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
 
 ## Structure
 
-```JSON
+```json
 {
     "formatVersion": 2,
     "name": "Eshop products",
@@ -104,7 +104,7 @@ Schema later, but in this case, we will need another property saying what schema
 
 Here is a comparison of JSON Schema and Easy JSON Schema:
 
-```JSON
+```json
 {
   "id": "string",
   "*name": "string",
@@ -116,7 +116,7 @@ Here is a comparison of JSON Schema and Easy JSON Schema:
 }
 ```
 
-```JSON
+```json
 {
   "type": "object",
   "required": [

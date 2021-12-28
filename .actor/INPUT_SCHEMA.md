@@ -1,9 +1,7 @@
 # ./actor/INPUT_SCHEMA.json
 
 Changes to the previous version:
-- `title` removed as it's not used anywhere
-- `description` removed as there is no point in placing it at the top if we add a markdown text that can be placed
-  add any position between the inputs. Or is it useful for internal notes?
+- `formatVersion` instead of `schemaVersion`
 - define what is required at field level instead of having a separate property `"required": ["startUrls", "pageFunction"]`
 
 The basic structure of the input schema is:
@@ -11,6 +9,8 @@ The basic structure of the input schema is:
 ```json
 {
     "formatVersion": "2",
+    "title": "My actor schema",
+    "description": "....",
     "properties": [
         "startUrls": {
             "title": "Start URLs",
@@ -35,15 +35,16 @@ The basic structure of the input schema is:
 }
 ```
 
-We have currently 5 input types:
+We have currently five input types:
 - String
 - Boolean
 - Integer
 - Object
 - Array
 
-and in order to make actors easy to pipeline we should also add `log`, `dataset`, `keyValueStore` and `requestQueue` types each optionally
-restricted by referenced schema. For example:
+And in order to make actors easy to pipeline, we should also add `actor`, `actorRun` types and also
+`dataset`, `keyValueStore` and `requestQueue` types, each optionally
+restricted by the referenced schema to make sure that selected storage is compatible. For example:
 
 ```
     "inputDataset": {
@@ -54,4 +55,5 @@ restricted by referenced schema. For example:
     },
 ```
 
-There are more reference types described in [README.md](./README.md).
+TODO:
+- We should properly reconsider our current format. For example, the way we write string enum is suboptimal as the user has to separately name keys and values instead of a simple map that is error-prone.
