@@ -1,4 +1,4 @@
-# Actor Programming Model Specification by Apify [DRAFT]
+# Actor Programming Model Specification [DRAFT]
 
 **The new way to develop serverless microapss called _actors_
 that are easy to ship to users,
@@ -18,9 +18,10 @@ in January 2022.
 
 - [Introduction](#introduction)
   * [Basic concept](#basic-concept)
+  * [What actors are not](#what-actors-are-not)
   * [Word of warning](#word-of-warning)
 - [Philosophy](#philosophy)
-  * [UNIX program vs. Apify actor](#unix-program-vs-apify-actor)
+  * [UNIX programs vs. actors](#unix-programs-vs-actors)
   * [Design goals](#design-goals)
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "actor" ?](#why-the-name-actor-)
@@ -68,7 +69,7 @@ The main design goal for actors is to make it easy for developers build and ship
 cloud software tools, which are also easy to run
 and integrate by their potentially not-too-technical users.
 
-The actors were first introduced by [Apify](https://apify.com/store) in late 2017,
+The actors were first introduced by [Apify](https://apify.com/) in late 2017,
 as a way to easily build, package, and ship web scraping and web automation tools to customers.
 Over the four years, we kept developing the concept and applied
 it successfully to thousands of real-world use cases in many business areas,
@@ -91,15 +92,17 @@ or removing duplicates from a large dataset.
 Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
 
 Basically, actors are Docker images that additionally have:
-- Documentation in a form of README.md file.
-- Input and output schemas that describe what input the actor requires,
+- **Documentation** in a form of README.md file.
+- **Input and output schemas** that describe what input the actor requires,
   and what results it produces.
-- Access to an out-of-box storage system for results and files
-- Metadata such as the actor name, description, author and version.
+- Access to an out-of-box **storage system** for actor data, results, and files
+- **Metadata** such as the actor name, description, author and version.
 
 The documentation and input/output schemas are the key ingredients
 that make it possible for people to easily understand what the actor does,
 enter the required inputs, and integrate the results of the actor into their other workflows.
+Actors can easily call and interact with each other, enabling building more complex
+tools on top of simple ones.
 
 The actors can be published
 on the [Apify platform](https://apify.com/store),
@@ -114,7 +117,7 @@ The Apify platform provides an open API, webhooks
 and [integrations](https://apify.com/integrations)
 to services such as Zapier or Integromat, which make it easy for users
 to integrate actors into their existing workflows. Additionally, the actor developers
-can set a price tag for use of their actors, and thus make
+can set a price tag for the usage of their actors, and thus make
 [passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-actors-b0392278d085/)
 to have an incentive to keep developing and improving the actor for the users.
 
@@ -140,36 +143,55 @@ and make it part of Apify documentation.
 
 ## Philosophy
 
-Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)**:
+Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)** from the 1970s:
 
 1. **Make each program do one thing well**. To do a new job, build afresh rather than complicate old programs by adding new “features”.
 2. Expect the **output of every program to become the input to another**, as yet unknown, program. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
 3. Design and build software, even operating systems, to be **tried early**, ideally within weeks. Don’t hesitate to throw away the clumsy parts and rebuild them.
 4. **Use tools in preference to unskilled help** to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you’ve finished using them.
 
-The UNIX philosophy arguably one of the most important software engineering paradigms
-that ushered the computer and internet revolution. By decomposing
-complex system into smaller parts, it became possible to focus on a smaller part,
-and easily combine those into higher much more complex system.
+The UNIX philosophy is arguably one of the most important software engineering paradigms
+which, together with other favorable design choices of UNIX operating systems,
+ushered the computer and internet revolution.
+By combining smaller parts (programs)
+that can be developed and used independently,
+it suddenly became possible to build, manage and gradually evolve ever more complex computing systems.
+Even today's modern mobile devices are effectively UNIX-based machines that run a lot of programs
+interacting with each other, and provide a terminal
+which looks very much like early UNIX terminals (actually terminal is just another program).
 
-The idea of actors is to bring those ideas into the age of cloud software.
+The UNIX-style programs represent a great way to package software for usage
+on a local computer. The programs can be easily used stand-alone,
+but also in combination and in scripts
+in order to perform much more complex tasks than an individual program ever could,
+which in turn can be packaged as new programs.
+
+The idea of actors is to bring benefits of UNIX-style programs
+from a local computer into an environment of cloud
+where programs run on multiple computers
+communicating over a network that is subject to latency and partitioning,
+there is no global atomic filesystem,
+and where programs are invoked via API calls rather than system calls.
+
 Each actor should do just one thing and do it well.
-For complicated scenarios, combine multiple actors rather than building a large monolith
-that is hard to maintain.
+Actors can be used stand-alone, as well as combined or scripted into more complex
+systems, which in turn can become new actors.
+Actors provide a simple user interface and documentation to help users interact with them.
 
+### UNIX programs vs. actors
 
-### UNIX program vs. Apify actor
+The following table shows equivalents of key concepts of UNIX programs and actors.
 
-TODO: Add links to the texts in table
+**TODO:** Add to the table links to the texts below
 
 UNIX programs  | Actors 
 |---|---
-command-line options |	input object
-read stdin |	read from dataset
-write to stdout	| push data to dataset, update actor status
-write to stderr	| set exit message
-program exit code | 	actor exit code
-file system	| key-value store
+Command-line options |	Input object
+Read stdin |	Read from a dataset
+Write to stdout	| Push data to dataset, update actor status
+Write to stderr	| Set exit message
+Program exit code | Actor exit code
+File system	| Key-value store
 
 ### Design goals
 
@@ -178,7 +200,7 @@ Make it really easy to use, i.e. generate the UI etc.
 ### Relation to the Actor model
 
 Note that actors are only loosely related to
-the [Actor model](https://en.wikipedia.org/wiki/Actor_model) from computer science.
+the [Actor model](https://en.wikipedia.org/wiki/Actor_model) known from computer science.
 There are some differences. You have been warned.
 
 ### Why the name "actor" ?
