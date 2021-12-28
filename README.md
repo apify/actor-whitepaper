@@ -1,11 +1,11 @@
-# Actor Programming Model Specification [DRAFT]
+# Apify's Actor Programming Model Specification [DRAFT]
 
 **The new way to develop serverless microapss called _actors_
 that are easy to ship to users,
 integrate, and build upon. Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
-**Note that this document is a specification of not-yet-existing model,
+**Note that this document is a specification of not-yet-existing framework,
 not a documentation of an existing implementation.
 [Learn more](#word-of-warning)**
 
@@ -112,7 +112,7 @@ The actors can be published
 on the [Apify platform](https://apify.com/store),
 which automatically generates a rich website with documentation
 and a practical user interface to encourage people to try the actor right away.
-The platform takes care of hosting the actors' Docker containers
+The platform takes care of securely hosting the actors' Docker containers
 and scaling the computing, storage and network resources as needed,
 so neither actor developers nor the users need to deal with the infrastructure.
 It just works.
@@ -201,7 +201,8 @@ File system	| Key-value store
 
 Make it really easy to use, i.e. generate the UI etc.
 
-- 
+- Keep it as simple as possible, but not simpler
+- TODO...
 
 ### Relation to the Actor model
 
@@ -219,16 +220,16 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Actor_model):
 
 While the theoretical actor model is conceptually very similar to "our" actor programming model,
 this similarity is rather coincidental. 
-Our primary focus was always on practical programming utility, not an
-implementation of a theoretical mathematical model.
+Our primary focus was always on practical software engineering utility, not an
+implementation of a formal mathematical model.
 
 For example, our actors
 do not provide any standard message passing mechanism. The actors might communicate together
 directly via HTTP requests (see live view - **TODO: Add link**),
 manipulate each other's operation using the Apify platform API (e.g. abort another actor),
-or affect each other by sharing some state or storage.
-The actors simply do not have any artificial restrictions,
-can do whatever they please and access external systems without any limitations.
+or affect each other by sharing some internal state or storage.
+The actors simply do not have any formal restrictions,
+and they can access whichever external systems they want.
 
 ### Why the name "actor" ?
 
@@ -295,11 +296,11 @@ $ apify login
 
 The Apify CLI provides a number of commands, which can aid with actor development in two ways:
 
-1. When developing actors using Node.js or Python, the CLI makes it easy to run the actors locally 
+1. When developing actors using **Node.js or Python**, the CLI makes it easy to run the actors locally 
    or deploy them to the Apify platform, using commands such as `run` and `push`.
    For details, see [Local development](#local-development).
-2. You can use the `actor` command to implement the actor logic in a shell script.
-   This is especially useful for repackaging existing software tools written in an
+2. You can use the `actor` command to implement the actor logic in a **shell script**.
+   This is useful for repackaging existing software tools written in an
    arbitrary language as an actor. You simply write a shell script that transforms 
    the actor input to command-line options needed by the existing software, launch it,
    and then store results as actor output.
@@ -314,20 +315,23 @@ $ apify help <command>
 ## Programming interface
 
 By default, the following commands are expected to be called from within the actor's
-Docker container, either on Apify platform or the local environment.
+context, either on Apify platform or the local environment.
 The information about the current run is taken from `APIFY_ACTOR_RUN_ID`
-environment variable. However, for **all** commands,
-it can be overridden in options.
+environment variable.
 
+For all commands,
+this behavior can be overridden in options.
 For example, in Node.js the options object in all commands has `actorRunId`
-field. And CLI has `--actor-run-id` flag.
-
+field. And CLI has the `--actor-run-id` flag.
 
 
 ### Get input
 
 Get access to the actor input object passed by the user.
-It is parsed from a JSON file, stored in the actor's default key-value store (usually called `INPUT`).
+It is parsed from a JSON file, which is stored by the system in the actor's default key-value store
+(usually called `INPUT`).
+The input is an object with properties.
+If the actor defines the [Input schema](#input-schema), the input object is guaranteed to conform to it.
 
 #### Node.js
 
@@ -355,9 +359,8 @@ print(input)
 #### CLI
 
 ```
-# Emits a JSON object, which can be parsed using "jq" tool
-
-apify actor get-input | jq
+# Emits a JSON object, which can be parsed e.g. using the "jq" tool
+$ apify actor get-input | jq
 
 > { "option1": "aaa", "option2": 456 }
 ```
@@ -398,12 +401,12 @@ int main (int argc, char *argv[]) {
 
 ### Push results to dataset
 
-Save larger results to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
+Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an actor starts, by default it is associated with a newly-created empty dataset.
-The user can override this and specify another dataset when running the actor.
+The user can override it and specify another dataset when running the actor.
 
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
-of objects are stored in them. See [Output schema](TODO) bellow for more details.
+of objects are stored in them. See [Dataset schema](#dataset-schema) bellow for more details.
 
 #### Node.js
 
@@ -687,23 +690,12 @@ const run = await Actor.callTask(
 
 ### Metamorph
 
-Replace running actor’s Docker image with another. This is useful e.g. for repackaging an actor as a new actor with its own settings and documentation. Note that the originating actor can [set the output](about:blank#set-actor-output) before metamorphing.
+Replace running actor’s Docker image with another.
+This is useful e.g. for repurposing an actor as a new actor with its own settings and documentation.
+Note that the originating actor can [set the output](#set-actor-output) before metamorphing
+(TODO: is this correct?)
 
-**UNIX equivalent**
-
-```
-$ exec /bin/bash
-```
-
-**CLI**
-
-```
-$ apify actor metamorph apify/web-scraper startUrls=http://example.com
-$ apify actor metamorph --input=@input.json --json --memory=4096 \
-  apify/web-scraper
-```
-
-**Node.js**
+#### Node.js
 
 ```
 await Actor.metamorph(
@@ -713,37 +705,27 @@ await Actor.metamorph(
 );
 ```
 
+#### CLI
+
+```
+$ apify actor metamorph apify/web-scraper startUrls=http://example.com
+$ apify actor metamorph --input=@input.json --json --memory=4096 \
+  apify/web-scraper
+```
+
+
+#### UNIX equivalent
+
+```
+$ exec /bin/bash
+```
+
 ### Attach webhook to an actor run
 
 Run another actor or an external HTTP API endpoint after actor run finishes or fails.
 
-**UNIX equivalent**
 
-```
-# Execute commands sequentially, based on their status
-// $ command1; command2 (command separator)
-// $ command1 && command2 ("andf" symbol)
-// $ command1 || command2 ("orf" symbol)
-```
-
-**CLI**
-
-```
-apify add-webhook --actor-run-id=RUN_ID \\
-  --event-types=SUCCEEDED,FAILED \\
-  --request-url=https://api.example.com \\
-  --payload-template='{ "test": 123" }'
-
-apify add-webhook --event-types=SUCCEEDED \\
-  --request-actor=apify/send-mail \\
-  --memory=4096 --build=beta \\
-  --payload-template=@template.json
-
-# Or maybe have a simpler API for self-actor?
-apify actor:add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail 
-```
-
-**Node.js**
+#### Node.js
 
 ```
 // Or Apify.addWebhook() ?
@@ -773,6 +755,34 @@ await Actor.addWebhook({
               // caller's token        },        webhook: { }, // TODO: Recursively set other webhooks, to enable chaining    },    payloadTemplate: `{        "to": "bob@example.com",        "cc": {{user.email}},        "html": "Hi there,<br><br>Here are Google Search results: {{resource.output.flatResults[format=html,limit=50]}}",    }`,    // TODO: Maybe in the future?    payload: {        body: 'xxxx',        contentType: 'image/png'    }});
 ```
 
+#### CLI
+
+```
+apify add-webhook --actor-run-id=RUN_ID \\
+  --event-types=SUCCEEDED,FAILED \\
+  --request-url=https://api.example.com \\
+  --payload-template='{ "test": 123" }'
+
+apify add-webhook --event-types=SUCCEEDED \\
+  --request-actor=apify/send-mail \\
+  --memory=4096 --build=beta \\
+  --payload-template=@template.json
+
+# Or maybe have a simpler API for self-actor?
+apify actor:add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail 
+```
+
+#### UNIX equivalent
+
+```
+# Execute commands sequentially, based on their status
+// $ command1; command2 (command separator)
+// $ command1 && command2 ("andf" symbol)
+// $ command1 || command2 ("orf" symbol)
+```
+
+
+
 ### Pipe result of an actor to another (aka chaining)
 
 **UNIX equivalent**
@@ -800,6 +810,35 @@ See note from Marek: https://github.com/apify/actor-specs/pull/5#discussion_r775
 
 ### Read environment variables
 
+Actors have access to standard process environment variables.
+
+The platform sets information about the actor execution context through
+environment variables such as `APIFY_TOKEN` or `APIFY_ACTOR_RUN_ID` -
+see the [Apify documentation](https://docs.apify.com/actors/development/environment-variables) for the full list.
+
+<!-- TODO: We should provide the full list here eventually, for a complete reference. -->
+
+2. Custom-defined environment variables (potentially secured with encryption)
+that are then passed to the actor process both on Apify platform and in local development.
+For details, see [.actor/ACTOR.json](#TODO) file.
+
+**Node.js**
+
+For convenience, rather than using environment vars directly, we provide a helper function
+that returns an object, with TypeScript-defined type.
+
+```
+const env = await Actor.getEnv();
+console.log(env.actorRunId);
+```
+
+**CLI**
+
+```
+$ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
+```
+
+
 **UNIX equivalent:**
 
 ```
@@ -810,21 +849,6 @@ Apify NOTE: These can be defined by actor owner during build, but unlike traditi
 
 See [Environment variables](about:blank#) in Actor documentation.
 
-**CLI**
-
-```
-$ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
-```
-
-**Node.js**
-
-For convenience, rather than using env vars directly, we provide a helper function
-that returns an object, with TypeScript-defined type. 
-
-```
-const env = await Actor.getEnv();
-console.log(env.actorRunId);
-```
 
 ### Watch system events
 
