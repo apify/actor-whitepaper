@@ -5,14 +5,17 @@ that are easy to ship to users,
 integrate, and build upon. Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
-Written by [Jan Čurn](https://apify.com/jancurn),
+**This document is a proposal of the model, not a documentation of an existing system.
+[Learn more](#word-of-warning)**
+
+By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
 [Ondra Urban](https://apify.com/mnmkng),
-and Milan Lepík,
-in January 2022.
+and Milan Lepík.
+January 2022.
 
 
-### Table of Contents
+### Contents
 
 <!-- toc -->
 
@@ -197,37 +200,66 @@ File system	| Key-value store
 
 Make it really easy to use, i.e. generate the UI etc.
 
+- 
+
 ### Relation to the Actor model
 
 Note that actors are only loosely related to
-the [Actor model](https://en.wikipedia.org/wiki/Actor_model) known from computer science.
-There are some differences. You have been warned.
+the **actor model** known from computer science.
+According to [Wikipedia](https://en.wikipedia.org/wiki/Actor_model):
+
+> The actor model in computer science is a mathematical model of concurrent computation
+> that treats actor as the universal primitive of concurrent computation.
+> In response to a message it receives, an actor can: make local decisions,
+> create more actors, send more messages, and determine how to respond to the
+> next message received. Actors may modify their own private state,
+> but can only affect each other indirectly through messaging
+> (removing the need for lock-based synchronization).
+
+While the theoretical actor model is conceptually very similar to "our" actor programming model,
+this similarity is rather coincidental. 
+Our primary focus was always on practical programming utility, not an
+implementation of a theoretical mathematical model.
+
+For example, our actors
+do not provide any standard message passing mechanism. The actors might communicate together
+directly via HTTP requests (see live view - **TODO: Add link**),
+manipulate each other's operation using the Apify platform API (e.g. abort another actor),
+or affect each other by sharing some state or storage.
+The actors simply do not have any artificial restrictions,
+can do whatever they please and access external systems without any limitations.
 
 ### Why the name "actor" ?
 
 In movies and theater, an _actor_ is someone who gets a script
-and plays a role according to that script, pretending to be some other person. 
+and plays a role according to that script. 
+Our actors also perform an act on someone's behalf, using a provided script,
+and thus we considered the name "actor" as a good description.
+Also, an "actor" evokes an idea of a person, which is a helpful way to think of and talk about
+actors as independent entities.
 
-Our actors also perform an act on someone's behalf, using a provided script.
-
-Coincidentally, it became common to call libraries in web automation world
-using names related to theater, such as Puppeteer or Playwright, so actor was quite matching.
-
-Last but no least, our idea of actors is similar
-to the Actor model known from the computer science.
-While not exactly the same, both concepts share 
+Coincidentally, in the web automation world it became common to call libraries
+using names related to theater, such as Puppeteer or Playwright,
+confirming "actor" was a good choice.
+Last but no least, our model of actors is similar
+to the actor model known from the computer science.
 
 
 ## Installation and setup
 
-Below are steps to start building actors with Apify, in various languages and environments.
+Below are steps to start building actors in various languages and environments.
 
 ### Apify platform
 
 You can develop and run actors in [Apify Console](https://console.apify.com/actors) without
-installing any software locally. Just create a free account, and start building in an online IDE.
+installing any software locally. Just create a free account, and start building actors
+in an online IDE.
 
 ### Node.js
+
+To [apify](https://www.npmjs.com/package/apify) NPM package contains everything
+that you need to start building actors locally in Node.js.
+Just install the package to your project by running: 
 
 ```
 $ npm install apify
@@ -235,19 +267,28 @@ $ npm install apify
 
 ### Python
 
+To build actors in Python, simply install the [apify](https://pypi.org/project/apify/) PyPi package
+to your project:
+
 ```python
 pip3 install apify
 ```
 
 ### Command-line interface (CLI)
 
+Actors can also be developed using a CLI. This is especially useful
+for packaging existing software written in an arbitrary language as an actor.
+
+You just need to install [Node.js](https://nodejs.org/en/download/)
+and then the [apify-cli](https://www.npmjs.com/package/apify-cli) NPM package:
+
 ```
 $ sudo npm install -g apify-cli
 $ apify --version
 ```
 
-Note that the `apify` command supports more operations,
-than just for building actors. The operations for developing actors
+Note that the `apify` CLI command supports various functions.
+The functions necessary for developing actors
 are available in the `actor` subcommand.
 You can get a full list of operations using:
 
