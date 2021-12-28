@@ -696,6 +696,9 @@ This is useful e.g. for repurposing an actor as a new actor with its own setting
 Note that the originating actor can [set the output](#set-actor-output) before metamorphing
 (TODO: is this correct?)
 
+When metamorphing into another actor, the system checks
+that the other actor has compatible input/output schemas, and throws an error if not.
+
 #### Node.js
 
 ```
@@ -855,7 +858,7 @@ See [Environment variables](about:blank#) in Actor documentation.
 
 Receive system events e.g. CPU statistics of the running container or information about imminent [migration to another server](about:blank#xxx).
 
-Perhaps we could add custom events in the future.
+In the future, this can be extended to custom events and messages.
 
 #### Node.js
 
@@ -879,180 +882,53 @@ Get information about the total and available memory of the actor’s container 
 #### Node.js
 
 ```
-const memoryInfo = await Apify.getMemoryInfo();
+const memoryInfo = await Actor.getMemoryInfo();
 ```
 
 #### UNIX equivalent
 
 ```
 # Print memory usage of programs
-ps -a
+$ ps -a
 ```
 
 
 ## Actor definition files
 
-### Dockerfile (`Dockerfile`)
+Besides the standard `Dockerfile` and `README.md`.
 
-### Documentation (`README.md`)
+Actor definition files are stored in a directory called `.ACTOR` in the main actor's directory.
 
-### Actor specification directory (`.actor/`)
+This entire directory should be added to the source control.
+It links your source code with an Apify actor in the cloud.
 
-These are stored in a directory
-called `.actor` in the top-level directory where the actor is present.
+### Docker build instructions (`./Dockerfile`)
 
-### Actor specification file (`.actor/ACTOR.json`)
+Instructions for the platform how to build the actor Docker image and run it.
+This is how actors are started.
 
-This is in `actor.json` file. It combines legacy `apify.json`, `INPUT_SCHEMA.json` and adds output schema.
+### Documentation (`./README.md`)
 
-**TODO**: The biggest question here is whether we should apply description, name and options from `actor.json` file and how (e.g. this is how NPM does it) or rather let people to update these things only manually (e.g. GitHub repo description or Docker Hub image info). The latter usually leads to outdated info, but e.g. allows admins to easily update things without access to source code and necessity to rebuild the actor.
+The README.md [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) file associated with the actor
+is used as its documentation page.
 
-**TODO**: Some (most) people argue that having one long JSON file is hell to edit. An option is to use directory (e.g. `/.actor`) that could contains several JSON files, e.g. INPUT_SCHEMA.json, OUTPUT_SCHEMA.json and ACTOR.json)... Let's discuss
-DECISION: .actor it is!
+A great explanation for users what the actor does and how it works.
+Good documentation makes good programmers!
 
-**TODO**: Consider how it will work with metamorph, the second actor can set output. Mara says workflows and actor connections can replace metamorph in many cases
+[Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
-**NOTE**: Devs should only call setOutput once, and we need to be able to show something to users right after start of actor before actor starts and setOutput has a chance to run, hence calling setOutput in loop doesn't make sense, plus it's slow. The output schema needs to provide info how to render output right away, basically pre-generate OUTPUT on the fly. The dev might not even need to call setOutput, and we generate it ourselves from output schema.
+### Actor specification file (`.ACTOR/actor.json`)
 
-This file should be added to the source control, and links your project with an Apify actor in the cloud.
+This replaces the legacy `actor.json` file,
+and defines references to input and output schemas.
 
-```jsx
-{
-    "name": "bob/dataset-to-mysql",
-    "version": "0.1",
-    "buildTag": "latest",
-    "env": {
-        "MYSQL_USER": "my_username",
-        "MYSQL_PASSWORD": "@mySecretPassword"
-    },
-    // Optional. If omitted, there is not input schema and checks.
-    "input": {
-        "description": "To update crawler to another site you need to change startUrls and pageFunction options!",
-        // "type": "object",
-        // "schemaVersion": 1,
-        "properties": {
-            "startUrls": {
-                "title": "Start URLs",
-                "type": "array",
-                "description": "URLs to start with",
-                "prefill": [
-                    { "url": "http://example.com" },
-                    { "url": "http://example.com/some-path" }
-                ],
-                "editor": "requestListSources"
-            },
-            "pageFunction": {
-                "title": "Page function",
-                "type": "string",
-                "description": "Function executed for each request",
-                "prefill": "async () => {\n  return $('title').text();\n\n}",
-                "editor": "javascript"
-            }
-        },
-        "required": ["startUrls", "pageFunction"]
-    },
-    // Optional. If omitted, there is no output schema.
-    "output": {
-        "properties": {
-            "flatResultsUrl": {
-                "title": "All organic results",
-                "description": "Shows all organic Google Search results",
-                "type": "string",
-								"datasetViewParams": {
-                  "unwind": ...
-                  "defaultDataset",
-								}
-                // This says the app to render Dataset viewer for this info
-                "viewer": "dataset"
-            },
-            "fullResultsUrl": {
-                "title": "SERPs grouped by page",
-                "type": "string",
-                "viewer": "dataset",
-                "groupCaption": "Advanced",
-            },
-						"screenshotUrl": {
-							  "xxx": "{DEFAULT_KEY_VALUE_STORE}/screenshot.png"
-								
-						}
-        },
-    },
-};
-```
+For details, see [.ACTOR/actor.json](./pages/ACTOR.md)
+
+### Schemas (`.ACTOR/*.json`)
+
 
 OUTPUT schema
 
-```jsx
-{     
-   
-    "products": {
-      mainView: true,
-      "title": "Foudn product",
-      "type": "Dataset",
-
-	    "datasetSchema": {
-	        // dataset field
-	        "price": {
-	           "_type": "number|null",
-	           "amount": {},
-	           "currency": {}, 
-	        },
-	        "productSummary": {
-						
-	        } 
-	
-	        "url": { },
-	
-	         // "files":
-	     }
-     },
-
-"status": {
-   mainView: true,
-   title: "View status of crawler",
-   type: "liveview",
-   
-
-},
-
-"files": {
-}
-	
-"LiveView"
-  
- 
-        "flatResultsUrl": {
-            "title": "All organic results",
-            "description": "Shows all organic Google Search results",
-            "type": "dataset",
-            "fields": {
-              "price": "number",
-              "...": ...
-            ],
-						"datasetViewParams": {
-              "unwind": ...
-              "defaultDataset",
-						}
-            // This says the app to render Dataset viewer for this info
-            "viewer": "dataset"
-        },
-        "fullResultsUrl": {
-            "title": "SERPs grouped by page",
-            "type": "string",
-            "viewer": "dataset",
-            "groupCaption": "Advanced",
-        },
-				"screenshotUrl": {
-					  "xxx": "{DEFAULT_KEY_VALUE_STORE}/screenshot.png"
-						
-				}
-    },
-};
-```
-
-### Documentation (`README.md`)
-
-The README.md [Markdown](about:blank#vvv) file associated with the actor is used as its documentation page. Good documentation makes good programmers!
 
 ## Development
 
