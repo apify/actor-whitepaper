@@ -10,7 +10,7 @@ The basic structure of the input schema is:
 
 ```json
 {
-    "versionFormat": "2",
+    "formatVersion": "2",
     "properties": [
         "startUrls": {
             "title": "Start URLs",

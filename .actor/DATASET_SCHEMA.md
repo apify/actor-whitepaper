@@ -3,13 +3,12 @@
 ## Basic properties
 
 Dataset schema describes:
-- Content of the dataset
-- Different views on how we can look at the data, aka transformations
+- Content of the dataset, i.e. schema of objects that are allowed to be added
+- Different views on how we can look at the data, AKA transformations
 - Visualization of the view using predefined components (grid, table, ...) which improves the run view interface at Apify Console
   and also provides better interface for dasets shared by Apify users
-  
-![obrazek](https://user-images.githubusercontent.com/594801/147474979-a224008c-8cba-43a6-8d2e-c24f6b0d5b37.png)
 
+<img src="https://user-images.githubusercontent.com/594801/147474979-a224008c-8cba-43a6-8d2e-c24f6b0d5b37.png" width="500">
 
 Basic properties:
 - It's immutable
@@ -21,7 +20,9 @@ Basic properties:
 There are two ways how to create a dataset with schema:
 - User can start the actor that has dataset schema linked from its
 [OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
-- Or user can do it pragmatically via API (`?schema=...` base64 encoded parameter) or using the SDK:
+- Or user can do it pragmatically via API by
+  - either passing schema as payload to [create dataset](https://docs.apify.com/api#/reference/datasets/dataset-collection/create-dataset) API endpoint
+  - or using the SDK:
 
 ```js
 const dataset = await Apify.openDataset('my-new-dataset', { schema });
@@ -37,25 +38,69 @@ Uncaught Error: Dataset schema is not compatible with a given schema
 
 ```js
 {
-	formatVersion,
-	name,
-	description,
-	fields: {},
-	views: {
-		myView: {
-			name,
-			description,
-			transformation,
-			visualisation,
-		}
-	},
+    "formatVersion": 2,
+    "name": "Eshop products",
+    "description": "Dataset containing the whole product catalog including prices and stock availability.",
+    "fields": {
+        "title": "String",	
+        "priceUsd": "Number",	
+        "manufacturer": "Object",
+        "manufacturer.title": "String",	
+        "manufacturer.url": "Number",
+        "productVariants": "Array",
+        "productVariants.color": "String",	
+        ...
+    },
+    "views": {
+        "overview": {
+            "name": "Products overview",
+            "description": "Displays only basic fields such as title and price",
+            "transformation": {
+                // Comma separated arrays such as "fields" and "pick" will be written as arrays
+                "fields": [
+                    "title",
+                    "price",
+                    "picture"
+                ]
+            },
+            "visualisation": {
+                "component": "grid",
+                "options": { "width": 6 },
+                "properties": {
+                    "title": "$title",
+                    // We will need some templating here
+                    "description": "${price} USD",
+                    "pictureUrl": "$picture"
+                }
+            }
+        }
+        "productVariants": {
+            "name": "Product variants",
+            "description": "Each product expanded into item per variant",
+            "transformation": {
+                "fields": [
+                    "title",
+                    "price",
+                    "productVariants"
+                ],
+                "unwind": "productVariants"
+
+            },
+            "visualisation": {
+                // Simply renders all the available fields
+                "component": "table"
+            }
+        }
+    },
 }
 ```
 
 ### Views's transformation
 
-Transformation is basically a combination of a GET dataset items API endpoint parameters.
-So the users could use it to preset the parameters easily, for example:
+Transformation is a combination of a 
+[GET dataset items](https://docs.apify.com/api#/reference/datasets/item-collection/get-items)
+API endpoint parameters. This makes view usable in both UI and API
+where the users can use it to preset the parameters easily, for example:
 
 ```
 https://api.apify.com/v2/datasets/[ID]/items?format=[FORMAT]&view=searchResults
