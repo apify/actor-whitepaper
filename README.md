@@ -11,8 +11,7 @@ not a documentation of an existing implementation.
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng),
-and Milan Lepík.
+[Ondra Urban](https://apify.com/mnmkng), Milan Lepík, and team.
 January 2022.
 
 
@@ -896,12 +895,12 @@ $ ps -a
 
 ## Actor definition files
 
-Besides the standard `Dockerfile` and `README.md`.
+The actor platform supports the following special files.
 
 ### Docker build instructions (`./Dockerfile`)
 
 Instructions for the platform how to build the actor Docker image and run it.
-This is how actors are started.
+This is how actors are started. [Learn more](https://docs.docker.com/engine/reference/builder/) about Dockerfiles.
 
 ### Documentation (`./README.md`)
 
@@ -915,10 +914,12 @@ Good documentation makes good programmers!
 
 ### Actor definition directory (`./ACTOR`)
 
-Actor definition files are stored in a directory called `.ACTOR` in the main actor's directory.
-
-This entire directory should be added to the source control.
+This is the main directory that 
+contains definition files of the actor.
+The entire directory should be added to the source control.
 It links your source code with an Apify actor in the cloud.
+
+Files in this directory are used by Apify CLI to get defaults for the `apify push` command.
 
 ### Actor specification file (`.ACTOR/actor.json`)
 
