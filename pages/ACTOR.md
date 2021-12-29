@@ -54,7 +54,7 @@ Here are the notes comparing the format to the previous version:
   other one. Note that paths in Dockerfile are ALWAYS relative to the Dockerfile's location.
   When calling `apify run`, the system runs the actor using the Dockerfile.
 - `env` was renamed to `environmentVariables` for more clarity.
-
+- The `dockerfile` and `readme` directives are mandatory, this is the bare minimum required from actors!
 
 TODOs:
 - `datasetSchema` and `keyValueStoreSchema` link to the schema objects required

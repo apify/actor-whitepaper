@@ -55,6 +55,7 @@ January 2022.
   * [Dockerfile](#dockerfile)
   * [README](#readme)
   * [Schema files](#schema-files)
+  * [Backward compatibility](#backward-compatibility)
 - [Development](#development)
   * [Local development](#local-development)
   * [Development to Apify platform](#development-to-apify-platform)
@@ -957,7 +958,6 @@ as well as when building actors on the Apify platform.
 
 This is the main definition file of the actor in JSON format,
 and it always must be present at `.ACTOR/actor.json`.
-
 This file contains references to all other necessary files.
 
 For details, see [.ACTOR/actor.json](./pages/ACTOR.md)
@@ -973,9 +973,6 @@ setting, and typically stored at `.ACTOR/Dockerfile`.
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
 Learn more about Dockerfiles in [Docker documentation](https://docs.docker.com/engine/reference/builder/).
 
-For backwards compatibility, if the `dockerfile` setting is not present in the Actor file,
-the system looks for `Dockerfile` in the actor's top-level directory.
-
 
 ### README
 
@@ -986,9 +983,6 @@ and it should contain great explanation what the actor does and how to use it.
 
 The README file is referenced from the [Actor file](#actor-file) using the `readme`
 setting, and typically stored at `.ACTOR/README.md`.
-
-For backwards compatibility, if the `readme` setting is not present in the Actor file,
-the system looks for `Dockerfile` in the actor's top-level directory.
 
 Good documentation makes good programmers!
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
@@ -1018,7 +1012,11 @@ And for storage schemas see:
   - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
   - `output` will be a property of run object generated from `OUTPUT_SCHEMA.json`
 
+### Backward compatibility
 
+If the `.ACTOR/actor.json` file is missing,
+the system falls back and looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
+files in the actor's top-level directory, and uses them instead.
 
 ## Development
 
