@@ -368,8 +368,11 @@ $ apify actor get-input | jq
 
 #### UNIX equivalent
 
-```
+```bash
 $ command --option1=aaa --option2=bbb
+```
+
+```c
 int main (int argc, char *argv[])
 ```
 
@@ -589,7 +592,7 @@ $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
 
 #### UNIX equivalent
 
-```
+```bash
 $ echo $ACTOR_RUN_ID
 ```
 
@@ -657,7 +660,7 @@ Actor.events.on('cpuInfo', data => {
 
 #### UNIX equivalent
 
-```
+```c
 signal(SIGINT, handle_sigint);
 ```
 
@@ -675,7 +678,7 @@ const memoryInfo = await Actor.getMemoryInfo();
 
 #### UNIX equivalent
 
-```
+```bash
 # Print memory usage of programs
 $ ps -a
 ```
@@ -769,10 +772,12 @@ The following command starts the actor, and then prints the messages to a Slack 
 
 #### UNIX equivalent
 
-```
+```bash
 # Run a program in the background
 $ command <arg1>, <arg2>, … &
+```
 
+```c
 // Spawn another process
 posix_spawn()
 ```
@@ -812,7 +817,7 @@ $ apify actor metamorph --input=@input.json --json --memory=4096 \
 
 #### UNIX equivalent
 
-```
+```bash
 $ exec /bin/bash
 ```
 
@@ -858,7 +863,7 @@ apify actor add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail
 
 #### UNIX equivalent
 
-```
+```bash
 # Execute commands sequentially, based on their status
 // $ command1; command2 (command separator)
 // $ command1 && command2 ("andf" symbol)
@@ -879,7 +884,7 @@ and so launch other actors to consume newly added items or files.
 
 #### UNIX equivalent
 
-```
+```bash
 $ ls -l | grep "something" | wc -l
 ```
 
@@ -912,7 +917,7 @@ $ apify actor abort --run=[RUN_ID] --token=123
 
 #### UNIX equivalent
 
-```
+```bash
 # Terminate a program
 $ kill <pid>
 ```
