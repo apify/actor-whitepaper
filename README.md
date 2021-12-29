@@ -49,9 +49,9 @@ January 2022.
   * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
   * [Aborting other actor](#aborting-other-actor)
 - [Actor definition files](#actor-definition-files)
-  * [Actor specification file (`.ACTOR/actor.json`)](#actor-specification-file-actoractorjson)
-  * [Docker image instructions (`Dockerfile`)](#docker-image-instructions-dockerfile)
-  * [Documentation (`./README.md`)](#documentation-readmemd)
+  * [Actor file](#actor-file)
+  * [Dockerfile](#dockerfile)
+  * [README](#readme)
   * [Schemas (`.ACTOR/*.json`)](#schemas-actorjson)
 - [Development](#development)
   * [Local development](#local-development)
@@ -921,50 +921,53 @@ $ kill <pid>
 The actor system uses several special files that define actor metadata, documentation,
 instructions how to build and run it, input/output schema, etc.
 
-These definition files are typically present in a special directory `.ACTOR`
-places in actor's top-level directory.
-These files are used by Apify CLI to get defaults for the `apify push` command,
-as well as when building actors from git repositories on the Apify platform.
-
+These files are typically stored in the `.ACTOR` directory
+placed in actor's top-level directory.
 **The entire `.ACTOR` directory should be added to the source control.**
 
+These files are used by the `apify push` or `apify run` commands,
+as well as when building actors on the Apify platform.
 The only required files are `.ACTOR/actor.json` and Dockerfile, all the other files are optional.
 
 
-### Actor specification file (`.ACTOR/actor.json`)
+### Actor file
 
-This is the main definition file of the actor,
-which effectively links its source code with the actor in the cloud,
-and contains references to all other necessary files.
+This is the main definition file of the actor in JSON format,
+and it always must be present at `.ACTOR/actor.json`.
+
+This file contains references to all other necessary files.
 
 For details, see [.ACTOR/actor.json](./pages/ACTOR.md)
 
 
-### Docker image instructions (`Dockerfile`)
+### Dockerfile
 
 This file contains instructions for the system how to build the actor Docker image and how to run it.
 This is how actors are started locally by the `apify run` command, as well as on the Apify platform.
 
-The Dockerfile is referenced from the actor specification file (`.ACTOR/actor.json`) using the `dockerfile`
-setting, and typically stored as `.ACTOR/Dockerfile`.
-This setting is useful if the source code repository has some
-other Dockerfile in the top-level directory, to separate actor Docker image from
-the other one. Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
-
-If the `dockerfile` setting is not present, for backwards compatibility,
-the system looks for `Dockerfile` in the actor's top-level directory.
-
+The Dockerfile is referenced from the [Actor file](#actor-file) using the `dockerfile`
+setting, and typically stored at `.ACTOR/Dockerfile`.
+Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
 Learn more about Dockerfiles in [Docker documentation](https://docs.docker.com/engine/reference/builder/).
 
+For backwards compatibility, if the `dockerfile` setting is not present in the Actor file,
+the system looks for `Dockerfile` in the actor's top-level directory.
 
-### Documentation (`./README.md`)
 
-The README.md [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) file associated with the actor
-is used as its documentation page.
+### README
 
-A great explanation for users what the actor does and how it works.
+The README file contains actor documentation written
+in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+It is used to generate its web page,
+and it should contain great explanation what the actor does and how to use it.
+
+The README file is referenced from the [Actor file](#actor-file) using the `readme`
+setting, and typically stored at `.ACTOR/README.md`.
+
+For backwards compatibility, if the `readme` setting is not present in the Actor file,
+the system looks for `Dockerfile` in the actor's top-level directory.
+
 Good documentation makes good programmers!
-
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
 
@@ -977,7 +980,7 @@ OUTPUT schema
 
 ## Development
 
-High-level overview how to build new actors.
+TODO: Write a high-level overview how to build new actors.
 
 ### Local development
 
@@ -1037,33 +1040,7 @@ https://apify.com/jancurn/some-scraper
 
 ## TODOs
 
-- Cluster the operations into sections like Input/output, Chaining operations etc.
-  For chaining, we have 3 ways: call, metamorhp, webhooks, describe the difference between them (e.g. first two need to be developed by author of the actor, the last one not)
 - Mention CI/CD, e.g. how to integrate with GiHub etc.
 - IDEA: How about having an "event log" for actors?
   They would be shown in UI, and tell user what happened in the actor. This can be done either in API or by special message to log, which will be parsed. **Or with the notifications/messaging API**
 - Add ideas for the permission system
-
-
-
-- Basic operations
-Get input
-  Main function
-Push results to dataset
-Key-value store
-Exit actor
-Update actor status
-
-
-- Execution environment
-  Environment variables
-  System events
-  Get memory information
-
-
-- Interaction with other actors
-Start an actor (without waiting for finish)
-Metamorph
-Attach webhook to an actor run
-Pipe result of an actor to another (aka chaining)
-Aborting other actor

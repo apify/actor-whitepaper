@@ -1,4 +1,4 @@
-# `.ACTOR/actor.json`
+# Actor file `.ACTOR/actor.json`
 
 This JSON file is the main definition of the actor.
 
