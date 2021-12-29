@@ -5,12 +5,17 @@ actor (see [Input and Output](../README.md#input-and-output) for details).
 The file is referenced from the main [actor file](ACTOR.md) using the `outputSchema` directive,
 and it is typically stored in `.ACTOR/output_schema.json`.
 
+NOTEs:
+- The output schema should enable developers to define schema for the 
+  default dataset and key-value store. That means the API needs to support assigning schema
+  to created (empty) storages.
+
 
 ## Structure
 
 ```json
 {
-  "outputSchemaVersion": 1,
+  "actorOutputSchemaVersion": 1,
   "description": "Text that is shown in the Output UI",
   "properties": {
     // Default dataset contains all the scraped products
@@ -40,7 +45,9 @@ and it is typically stored in `.ACTOR/output_schema.json`.
     // Live view
     "apiServer": {
       "type": "liveView",
-      "schema": "TODO" // We should perhaps link a swagger file describing the API somehow?
+      // We should perhaps link a swagger file describing the API somehow?
+      // JC: I don't think this is realistic, how would we even enforce the API schema?
+      "schema": "TODO"
     }
   }
 }
@@ -49,12 +56,14 @@ and it is typically stored in `.ACTOR/output_schema.json`.
 ## Examples of ideal actor run UI
 
 - For the majority of actors, we want to see the dataset with new records being added in realtime
-- For [Google Spreadsheet Import](https://apify.com/lukaskrivka/google-sheets), we want to first display Live View for the user to set up OAUTH, and once 
-this is set up, then we want to display the log next time.
-- For technical actors, it's log
+- For [Google Spreadsheet Import](https://apify.com/lukaskrivka/google-sheets),
+  we want to first display Live View for the user to set up OAUTH, and once 
+   this is set up, then we want to display the log next time.
+- For technical actors, it might be a log
 - For [HTML to PDF convertor](https://apify.com/jancurn/url-to-pdf) it's a single record from key-value store
 - For [Monitoring](https://apify.com/apify/monitoring-runner) it's log during the runtime and a single HTML record in an iframe in the end
 - For an actor that has failed, it's the log
+  (JC: Really? I'd want to see incomplete results. I can check log anytime)
 
 ## How to define actor run UI
 
@@ -62,8 +71,10 @@ this is set up, then we want to display the log next time.
 
 There will be a new tab on actor run detail for every actor with output schema called "Output".
 This tab will be at the first position and displayed by default. Tab will show the following:
-- Items from output schema with property `visible: true` will be rendered in the same order as they are in schema
-- The live view will be displayed only when it's active
+- Items from output schema with property `visible: true` will be rendered in the same order
+  as they are in schema
+- The live view will be displayed only when it has `visible: true` and when it's active.
+  Otherwise we should show just a short message "This show is over".
 - If the dataset has more views then we should have some select or tabs to select the view
 
 ### Ideal most comprehensive state
@@ -73,7 +84,5 @@ This tab will be at the first position and displayed by default. Tab will show t
 - Be able to pragmatically changes this using API by actor itself
 
 ## TODOs
-- We have a `title` and `description` in schemas. Perhaps it's not needed there, and we can have it just here?
-  JC: I'd keep it, it can be displayed 
 - Should we enforce users to have at least one item with `visible: true`? Or what about doing it the opposite
 way and letting the user choose what should not be visible?

@@ -10,7 +10,7 @@ the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/d
 
 Changes to the legacy `INPUT_SCHEMA.json`:
 - We removed `title`, it is largely useless.
-- Using `inputSchemaVersion` instead of `schemaVersion`, to make it clear what is this file,
+- Using `actorInputSchemaVersion` instead of `schemaVersion`, to make it clear what is this file,
   as file names can be arbitrary.
 - define what is required at field level instead of having a separate
   property `"required": ["startUrls", "pageFunction"]`.
@@ -19,7 +19,7 @@ The basic structure of the input schema is:
 
 ```json
 {
-    "inputSchemaVersion": 2,
+    "actorInputSchemaVersion": 2,
     "description": "Text that is shown in the Input UI",
     "properties": {
         "startUrls": {
@@ -70,6 +70,10 @@ For example:
 This example would be rendered in Input UI as a search/dropdown that would only list named
 datasets with matching schema. This feature will make it easy to integrate actors,
 and pipe results from one to another.
+
+Note that the actor's default dataset cannot be used as input, as it doesn't exist before the 
+actor is started. That's quite logical. But it also means that if the actor wants
+the default dataset to be set certain schema, this needs to be done in Output schema.
 
 ## TODOs
 - JC: Not sure how `actor` and `actorRun` are supposed to work? For example, if `actor`

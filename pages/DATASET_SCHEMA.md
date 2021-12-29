@@ -28,7 +28,7 @@ using the API.
 There are two ways how to create a dataset with schema:
 - User can start the actor that has dataset schema linked from its
 [OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
-- Or user can do it pragmatically via API by
+- Or user can do it pragmatically via API (for empty dataset) by
   - either passing schema as payload to [create dataset](https://docs.apify.com/api#/reference/datasets/dataset-collection/create-dataset) API endpoint
   - or using the SDK:
 
