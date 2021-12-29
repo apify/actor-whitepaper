@@ -195,8 +195,9 @@ Command-line options |	Input object
 Read stdin |	Read from a dataset
 Write to stdout	| Push data to dataset, update actor status
 Write to stderr	| Set exit message
-Program exit code | Actor exit code
 File system	| Key-value store
+Process ID (PID) | Actor run ID
+Process exit code | Actor exit code
 
 ### Design goals
 
@@ -342,8 +343,9 @@ field, and `apify actor` CLI command has the `--actor-run-id` flag.
 ### Get input
 
 Get access to the actor input object passed by the user.
-It is parsed from a JSON file, which is stored by the system in the actor's default key-value store
-(usually called `INPUT`).
+It is parsed from a JSON file, which is stored by the system in the actor's default key-value store,
+Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_INPUT_KEY` environment variable.
+
 The input is an object with properties.
 If the actor defines the input schema, the input object is guaranteed to conform to it.
 For details, see [Input and output](#input-and-output).
@@ -480,8 +482,7 @@ printf("Hello world\tColum 2\tColumn 3");
 Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
 When an actor starts, by default it is associated with a newly-created key-value store,
-which only contains one file with input of the actor
-(usually called `INPUT`, the exact key is defined in the `ACTOR_INPUT_KEY` environment variable).
+which only contains one file with input of the actor (see [Get input](#get-input)).
 
 The user can override this behavior and specify another key-value store or input key
 when running the actor.
@@ -886,9 +887,9 @@ apify actor add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail
 
 ```bash
 # Execute commands sequentially, based on their status
-// $ command1; command2 (command separator)
-// $ command1 && command2 ("andf" symbol)
-// $ command1 || command2 ("orf" symbol)
+$ command1; command2    # (command separator)
+$ command1 && command2  # ("andf" symbol)
+$ command1 || command2  # ("orf" symbol)
 ```
 
 ### Pipe result of an actor to another (aka chaining)
@@ -909,7 +910,9 @@ and so launch other actors to consume newly added items or files.
 $ ls -l | grep "something" | wc -l
 ```
 
-**TODO:** We could have a special CLI support for creating actor chains using pipe operator, like this: 
+**TODO:** We could have a special CLI support for creating actor chains using pipe operator,
+like this:
+
 ```
 $ apify call apify/google-search-scraper | apify call apify/send-email queryTerms="aaa\nbbb"
 ```
