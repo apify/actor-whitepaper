@@ -1,7 +1,7 @@
 # Input schema
 
 A JSON object that defines structure of the input object accepted by the
-actor (see [Get input](../README.md#get-input) for details).
+actor (see [Input and Output](../README.md#input-and-output) for details).
 The file is referenced from the main [actor file](ACTOR.md) using the `inputSchema` directive,
 and it is typically stored in `./ACTOR/input_schema.json`.
 
@@ -9,16 +9,18 @@ and it is typically stored in `./ACTOR/input_schema.json`.
 the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/development/input-schema) in actor's top-level directory (if present).
 
 Changes to the legacy `INPUT_SCHEMA.json`:
-- `inputSchemaVersion` instead of `schemaVersion`, to make it clear what is this file, as file names can be arbitrary.
-- define what is required at field level instead of having a separate property `"required": ["startUrls", "pageFunction"]`
+- We removed `title`, it is largely useless.
+- Using `inputSchemaVersion` instead of `schemaVersion`, to make it clear what is this file,
+  as file names can be arbitrary.
+- define what is required at field level instead of having a separate
+  property `"required": ["startUrls", "pageFunction"]`.
 
 The basic structure of the input schema is:
 
 ```json
 {
-    "inputSchemaVersion": "2",
-    "title": "My actor schema",
-    "description": "....",
+    "inputSchemaVersion": 2,
+    "description": "Text that is shown in the Input UI",
     "properties": {
         "startUrls": {
             "title": "Start URLs",
@@ -52,20 +54,24 @@ We have currently five input types:
 
 And in order to make actors easy to pipeline, we should also add `actor`, `actorRun` types and also
 `dataset`, `keyValueStore` and `requestQueue` types, each optionally
-restricted by the referenced schema to make sure that selected storage is compatible. For example:
+restricted by the referenced schema to make sure that selected storage is compatible.
 
+For example:
+
+```json
+  "inputDataset": {
+      "title": "Input dataset,
+      "type": "dataset",
+      "description": "Select a dataset you want to process",
+      "schema": "./input_dataset_schema.json"
+  }
 ```
-    "inputDataset": {
-        "title": "Input dataset,
-        "type": "dataset",
-        "description": "Select a dataset you want to process",
-        "schema": "./INPUT_DATASET_SCHEMA.json"
-    },
-```
+
+This example would be rendered in Input UI as a search/dropdown that would only list named
+datasets with matching schema. This feature will make it easy to integrate actors,
+and pipe results from one to another.
 
 ## TODOs
-- JC: Do we really need `title`? What for? I'd skip it and keep just `description`, which is shown in the Input UI.
-  Equally, for the output schema do the same...
-- We should properly reconsider our current format.
+- We should properly reconsider our current schema format.
   For example, the way we write string enum is suboptimal as the user has to separately
   name keys and values instead of a simple map that is error-prone. (JC: Yes please!)
