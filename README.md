@@ -320,11 +320,10 @@ By default, the following commands are expected to be called from within the act
 context, either on Apify platform or the local environment.
 The information about the current run is taken from `APIFY_ACTOR_RUN_ID`
 environment variable.
-
 For all commands,
 this behavior can be overridden in options.
 For example, in Node.js the options object in all commands has `actorRunId`
-field. And CLI has the `--actor-run-id` flag.
+field, and `apify actor` CLI command has the `--actor-run-id` flag.
 
 ### Get input
 
@@ -332,7 +331,7 @@ Get access to the actor input object passed by the user.
 It is parsed from a JSON file, which is stored by the system in the actor's default key-value store
 (usually called `INPUT`).
 The input is an object with properties.
-If the actor defines the [Input schema](#input-schema), the input object is guaranteed to conform to it.
+If the actor defines the [Input schema](#input-and-output-schema), the input object is guaranteed to conform to it.
 
 #### Node.js
 
@@ -373,7 +372,7 @@ $ command --option1=aaa --option2=bbb
 ```
 
 ```c
-int main (int argc, char *argv[])
+int main (int argc, char *argv[]) {}
 ```
 
 ### Main function
@@ -554,7 +553,7 @@ $ apify actor exit --code=1 --message "Couldn't fetch the URL"
 #### UNIX equivalent
 
 ```c
-exit(1)
+exit(1);
 ```
 
 
@@ -779,7 +778,7 @@ $ command <arg1>, <arg2>, … &
 
 ```c
 // Spawn another process
-posix_spawn()
+posix_spawn();
 ```
 
 ### Metamorph
