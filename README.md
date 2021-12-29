@@ -592,10 +592,6 @@ $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
 $ echo $ACTOR_RUN_ID
 ```
 
-Apify NOTE: These can be defined by actor owner during build, but unlike traditional processes, they are not passed when calling another actor. System passes various runtime info to actor using env vars.
-
-See [Environment variables](about:blank#) in Actor documentation.
-
 ### Actor status
 
 Each actor run has a status (the `status` field), which can be one of the following values:
@@ -923,12 +919,41 @@ $ kill <pid>
 
 ## Actor definition files
 
-The actor platform supports the following special files.
+The actor system uses several special files tha.
 
-### Docker build instructions (`./Dockerfile`)
+### Actor directory (`./ACTOR`)
 
-Instructions for the platform how to build the actor Docker image and run it.
-This is how actors are started. [Learn more](https://docs.docker.com/engine/reference/builder/) about Dockerfiles.
+This is the main directory with definition files of the actor.
+It links your source code with an Apify actor in the cloud.
+The entire directory should be added to the source control.
+
+Files in this directory are used by Apify CLI to get defaults for the `apify push` command,
+as well as when building actors from git repositories on the Apify platform.
+
+
+### Actor specification file (`.ACTOR/actor.json`)
+
+This replaces the legacy `actor.json` file,
+and defines references to input and output schemas.
+
+For details, see [.ACTOR/actor.json](./pages/ACTOR.md)
+
+
+### Docker image instructions (`Dockerfile`)
+
+Contains instructions for the system how to build the actor Docker image and how to run it.
+This is how actors are started by `apify run` or on the Apify platform.
+
+This file is referenced from the actor specification file (`.ACTOR/actor.json`) using the `dockerfile`
+directive. This setting is useful if the source code repository has some
+other Dockerfile in the top-level directory, to separate actor Docker image from
+some other one. Note that paths in Dockerfile are ALWAYS relative to the Dockerfile's location.
+
+If the `dockerfile` setting is not present, for backwards compatibility,
+the system looks for Dockerfile in the actor's top-level directory (i.e. `./Dockerfile`)`.
+
+Learn more about Dockerfiles in [Docker documentation](https://docs.docker.com/engine/reference/builder/).
+
 
 ### Documentation (`./README.md`)
 
@@ -940,20 +965,6 @@ Good documentation makes good programmers!
 
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
-### Actor directory (`./ACTOR`)
-
-This is the main directory with definition files of the actor.
-It links your source code with an Apify actor in the cloud.
-The entire directory should be added to the source control.
-
-Files in this directory are used by Apify CLI to get defaults for the `apify push` command.
-
-### Actor specification file (`.ACTOR/actor.json`)
-
-This replaces the legacy `actor.json` file,
-and defines references to input and output schemas.
-
-For details, see [.ACTOR/actor.json](./pages/ACTOR.md)
 
 ### Schemas (`.ACTOR/*.json`)
 
