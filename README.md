@@ -250,17 +250,15 @@ to the actor model known from the computer science.
 
 ## Input and output
 
+TODO: write this text, include examples of input and output objects, possibly also API
 
-TODO: ...
-
-
-- TODO: How to integrate output schema with `const { output } = await Apify.call(...)`?
-  - @jancurn:
-
-  > Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format. There would be properties like in the output_schema.json file, with e.g. URL to dataset, log file, kv-store, live view etc. So it would be an auto-generated field "output" that we can add to JSON returned by the Run API enpoints (e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
-  - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
-  - `output` will be a property of run object generated from `OUTPUT_SCHEMA.json`
-
+Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format.
+There would be properties like in the output_schema.json file, with e.g. URL to dataset,
+log file, kv-store, live view etc. So it would be an auto-generated field "output"
+that we can add to JSON returned by the Run API enpoints
+(e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
+- Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
+- `output` will be a property of run object generated from `OUTPUT_SCHEMA.json`
 
 
 ## Installation and setup
@@ -729,19 +727,19 @@ const run = await Actor.call(
   },
 );
 
-console.log(`Received message: ${run.output.body.message}`);
-// TODO: This would look better
-// console.log(`Received message: ${run.output.results}`);
-
 // Run actor and don't wait for it to finish
-const run = await Actor.run(
+const run2 = await Actor.run(
   'apify/google-search-scraper',
   { queries: 'test' },
   { memoryMbytes: 2048 },
 );
+
+// Note that the output object is always available,
+// and contains links to results generated according to the output schema
+console.log(`Output object: ${run2.output}`);
 ```
 
-TODO: See note about naming (`start`) at https://github.com/apify/actor-specs/pull/5#discussion_r775385311
+TODO: Review note about naming (`start`) at https://github.com/apify/actor-specs/pull/5#discussion_r775385311
 
 #### CLI
 
@@ -1119,3 +1117,5 @@ https://apify.com/jancurn/some-scraper
   **Or with the notifications/messaging API**
 - Add ideas for the permission system
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
+- Maybe we should add "API" section to all the programming interface sections,
+  so that this is a complete reference. Would be useful also to understand the actor output.
