@@ -965,6 +965,10 @@ all the other files are optional.
 
 The actor definition files are used by the `apify push` and `apify run` commands,
 as well as when building actors on the Apify platform.
+The motivation to keep the files in a separate directory
+is to keep the source code repository tidy, and to prevent interactions with other source files,
+in particular for existing software tool
+repositories which were wrapped as actor only ex post.
 
 
 ### Actor file
@@ -973,7 +977,7 @@ This is the main definition file of the actor in JSON format,
 and it always must be present at `.ACTOR/actor.json`.
 This file contains references to all other necessary files.
 
-For details, see [.ACTOR/actor.json](./pages/ACTOR.md)
+For details, see the [Actor file](./pages/ACTOR.md) page.
 
 
 ### Dockerfile
@@ -984,14 +988,14 @@ This is how actors are started locally by the `apify run` command, as well as on
 The Dockerfile is referenced from the [Actor file](#actor-file) using the `dockerfile`
 setting, and typically stored at `.ACTOR/Dockerfile`.
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
-Learn more about Dockerfiles in [Docker documentation](https://docs.docker.com/engine/reference/builder/).
+Learn more in the official [Dockerfile reference](https://docs.docker.com/engine/reference/builder/).
 
 
-### README
+### README file
 
 The README file contains actor documentation written
 in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-It is used to generate its web page,
+It is used to generate its web page on Apify,
 and it should contain great explanation what the actor does and how to use it.
 
 The README file is referenced from the [Actor file](#actor-file) using the `readme`
