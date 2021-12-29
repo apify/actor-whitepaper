@@ -28,6 +28,7 @@ January 2022.
   * [Design goals](#design-goals)
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "actor" ?](#why-the-name-actor-)
+- [Input and output](#input-and-output)
 - [Installation and setup](#installation-and-setup)
   * [Apify platform](#apify-platform)
   * [Node.js](#nodejs)
@@ -47,9 +48,7 @@ January 2022.
   * [Metamorph](#metamorph)
   * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
   * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
-  * [Aborting other actor](#aborting-other-actor)
-- [Input and output schema](#input-and-output-schema)
-  * [Storage schemas](#storage-schemas)
+  * [Abort another actor](#abort-another-actor)
 - [Actor definition files](#actor-definition-files)
   * [Actor file](#actor-file)
   * [Dockerfile](#dockerfile)
@@ -58,7 +57,7 @@ January 2022.
   * [Backward compatibility](#backward-compatibility)
 - [Development](#development)
   * [Local development](#local-development)
-  * [Development to Apify platform](#development-to-apify-platform)
+  * [Deployment to Apify platform](#deployment-to-apify-platform)
   * [Repackaging existing software as actors](#repackaging-existing-software-as-actors)
 - [Sharing & Community](#sharing--community)
   * [User profile page](#user-profile-page)
@@ -248,6 +247,25 @@ using names related to theater, such as Puppeteer or Playwright,
 confirming "actor" was a good choice.
 Last but no least, our model of actors is similar
 to the actor model known from the computer science.
+
+## Input and output
+
+All the storage schemas are "weak" (allowing more fields to be added) as for example
+some deduplication actor could require each dataset item to have a uuid:
+'string' field but does not care about anything else.
+And similarly, for key-value stores - schema expects something to be there but does not
+care about other values.
+
+TODO: ...
+
+
+- TODO: How to integrate output schema with `const { output } = await Apify.call(...)`?
+  - @jancurn:
+
+  > Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format. There would be properties like in the output_schema.json file, with e.g. URL to dataset, log file, kv-store, live view etc. So it would be an auto-generated field "output" that we can add to JSON returned by the Run API enpoints (e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
+  - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
+  - `output` will be a property of run object generated from `OUTPUT_SCHEMA.json`
+
 
 
 ## Installation and setup
@@ -908,20 +926,21 @@ or use some mapping like:
 --input-dataset-id="$output.defaultDatasetId" --dataset-name="xxx"
 ``` 
 
-### Aborting other actor
+### Abort another actor
 
-Abort itself or other running actor on the Apify platform, setting it to `ABORTED` state.
+Abort itself or other running actor on the Apify platform,
+changing its [status](#actor-status) to `ABORTED`.
 
 #### Node.js
 
 ```jsx
-await Actor.abort({ message: 'Job was done,', runId: 'RUN_ID' });
+await Actor.abort({ message: 'Job was done,', actorRunId: 'RUN_ID' });
 ```
 
 #### CLI
 
 ```bash
-$ apify actor abort --run=[RUN_ID] --token=123 
+$ apify actor abort --actor-run-id=[RUN_ID] --token=123 
 ```
 
 
@@ -932,19 +951,6 @@ $ apify actor abort --run=[RUN_ID] --token=123
 $ kill <pid>
 ```
 
-## Input and output schema
-
-All the storage schemas are "weak" (allowing more fields to be added) as for example
-some deduplication actor could require each dataset item to have a uuid:
-'string' field but does not care about anything else.
-And similarly, for key-value stores - schema expects something to be there but does not
-care about other values.
-
-TODO: ...
-
-### Storage schemas
-
-...
 
 ## Actor definition files
 
@@ -997,37 +1003,28 @@ Good documentation makes good programmers!
 
 ### Schema files
 
-TODO: Finish this...
+TODO: ...
 
-One common attribute for each of these files is `formatVersion`, which allows making format changes without breaking older code.
-
-For file specifying actor iself, see:
-- [ACTOR.json](./ACTOR.md)
-- [INPUT_SCHEMA.json](./INPUT_SCHEMA.md)
-- [OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
+- [Input schema](./pages/INPUT_SCHEMA.md)
+- [Output schema](./pages/OUTPUT_SCHEMA.md)
 
 And for storage schemas see:
-- [DATASET_SCHEMA.json](./DATASET_SCHEMA.md)
-- [KEY_VALUE_STORE_SCHEMA.json](./KEY_VALUE_STORE_SCHEMA.md)
-- [REQUEST_QUEUE_SCHEMA.json](./REQUEST_QUEUE_SCHEMA.md)
+- [DATASET_SCHEMA.json](./pages/DATASET_SCHEMA.md)
+- [KEY_VALUE_STORE_SCHEMA.json](./pages/KEY_VALUE_STORE_SCHEMA.md)
+- [REQUEST_QUEUE_SCHEMA.json](./pages/REQUEST_QUEUE_SCHEMA.md)
 
 
-- TODO: How to integrate output schema with `const { output } = await Apify.call(...)`?
-  - @jancurn:
-
-  > Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format. There would be properties like in the output_schema.json file, with e.g. URL to dataset, log file, kv-store, live view etc. So it would be an auto-generated field "output" that we can add to JSON returned by the Run API enpoints (e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
-  - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
-  - `output` will be a property of run object generated from `OUTPUT_SCHEMA.json`
 
 ### Backward compatibility
 
 If the `.ACTOR/actor.json` file is missing,
-the system falls back and looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
+the system falls back to legacy mode, looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
 files in the actor's top-level directory, and uses them instead.
 
 ## Development
 
-TODO: Write a high-level overview how to build new actors.
+TODO: Write a high-level overview how to build new actors. Provide links 
+how to build directly on Apify+screenshots.
 
 ### Local development
 
@@ -1043,7 +1040,7 @@ referenced from `.ACTOR/actor.json` or Dockerfile in the actor top-level directo
 (if the first is not present)
 
 
-### Development to Apify platform
+### Deployment to Apify platform
 
 `apify push` - uses info from `.ACTOR/actor.json`
 New flags:
@@ -1091,5 +1088,8 @@ https://apify.com/jancurn/some-scraper
 
 - Mention CI/CD, e.g. how to integrate with GiHub etc.
 - IDEA: How about having an "event log" for actors?
-  They would be shown in UI, and tell user what happened in the actor. This can be done either in API or by special message to log, which will be parsed. **Or with the notifications/messaging API**
+  They would be shown in UI, and tell user what happened in the actor.
+  This can be done either in API or by special message to log, which will be parsed.
+  **Or with the notifications/messaging API**
 - Add ideas for the permission system
+- Add more pictures
