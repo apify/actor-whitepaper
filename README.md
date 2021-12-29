@@ -558,15 +558,16 @@ exit(1)
 
 Actors have access to standard process environment variables.
 
-The platform sets information about the actor execution context through
+The Apify platform sets information about the actor execution context through
 environment variables such as `APIFY_TOKEN` or `APIFY_ACTOR_RUN_ID` -
 see the [Apify documentation](https://docs.apify.com/actors/development/environment-variables) for the full list.
 
 <!-- TODO: We should provide the full list here eventually, for a complete reference. -->
 
-Custom-defined environment variables (potentially secured with encryption)
-that are then passed to the actor process both on Apify platform and in local development.
-These are defined in the [.actor/ACTOR.json](/pages/ACTOR.md) file.
+Additionally, the actor developer can define custom environment variables
+that are then passed to the actor process both on Apify platform and in local development environment.
+The variables can be secured, to protect API keys and passwords, and avoid committing them to the source code.
+These variables are defined in the [.ACTOR/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive.
 
 #### Node.js
 
@@ -585,7 +586,7 @@ $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
 ```
 
 
-#### UNIX equivalent:
+#### UNIX equivalent
 
 ```
 $ echo $ACTOR_RUN_ID
