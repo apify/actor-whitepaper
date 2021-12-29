@@ -250,11 +250,6 @@ to the actor model known from the computer science.
 
 ## Input and output
 
-All the storage schemas are "weak" (allowing more fields to be added) as for example
-some deduplication actor could require each dataset item to have a uuid:
-'string' field but does not care about anything else.
-And similarly, for key-value stores - schema expects something to be there but does not
-care about other values.
 
 TODO: ...
 
@@ -991,7 +986,7 @@ Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's 
 Learn more in the official [Dockerfile reference](https://docs.docker.com/engine/reference/builder/).
 
 
-### README file
+### README
 
 The README file contains actor documentation written
 in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
@@ -1007,16 +1002,39 @@ Good documentation makes good programmers!
 
 ### Schema files
 
-TODO: ...
+The structure of actor's [input and output](#input-and-output) can optionally be
+dictated by the input and output schema files.
+These files list names, types and other details
+about properties accepted by actor on input, and properties that the actor produces on output,
+respectively.
+The input and output schema files are used to render a user interface
+for people to make it easy to run the actor,
+to generate API documentation, and render the view of actor's output.
+
+The input and output schema is defined by two JSON files that are referenced 
+from the [Actor file](#actor-file):
 
 - [Input schema](./pages/INPUT_SCHEMA.md)
 - [Output schema](./pages/OUTPUT_SCHEMA.md)
 
-And for storage schemas see:
+Both input and output schemas can reference schema files 
+for specific storages:
+
 - [DATASET_SCHEMA.json](./pages/DATASET_SCHEMA.md)
 - [KEY_VALUE_STORE_SCHEMA.json](./pages/KEY_VALUE_STORE_SCHEMA.md)
 - [REQUEST_QUEUE_SCHEMA.json](./pages/REQUEST_QUEUE_SCHEMA.md)
 
+These storage schemas are used to ensure that stored objects or files 
+fulfil certain criteria, their fields have certain types etc.
+The schemas can be applied to the storages directly,
+without actors.
+
+All the storage schemas are weak, in a sense that if the schema doesn't define a property,
+such property can be added to the storage and have an arbitrary type.
+Only properties explicitly mentioned by the schema
+are validated. This is an important feature which allows extensibility.
+For example, a data deduplication actor might require on input datasets
+that have `uuid: String` field in objects, but not care about anything else.
 
 
 ### Backward compatibility
