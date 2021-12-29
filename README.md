@@ -11,7 +11,7 @@ not a documentation of an existing implementation.
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), Milan Lepík, and team.
+[Ondra Urban](https://apify.com/mnmkng), Milan Lepík, and the Apify team.
 January 2022.
 
 
@@ -847,7 +847,7 @@ Apify NOTE: These can be defined by actor owner during build, but unlike traditi
 See [Environment variables](about:blank#) in Actor documentation.
 
 
-### Watch system events
+### System events
 
 Receive system events e.g. CPU statistics of the running container or information about imminent [migration to another server](about:blank#xxx).
 
