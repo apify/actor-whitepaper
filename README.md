@@ -279,7 +279,7 @@ To [apify](https://www.npmjs.com/package/apify) NPM package contains everything
 that you need to start building actors locally in Node.js.
 Just install the package to your project by running: 
 
-```
+```bash
 $ npm install apify
 ```
 
@@ -288,8 +288,8 @@ $ npm install apify
 To build actors in Python, simply install the [apify](https://pypi.org/project/apify/) PyPi package
 to your project:
 
-```python
-pip3 install apify
+```bash
+$ pip3 install apify
 ```
 
 ### Command-line interface (CLI)
@@ -299,7 +299,7 @@ it is useful to install Apify CLI.
 You just need to install [Node.js](https://nodejs.org/en/download/)
 and then the [apify-cli](https://www.npmjs.com/package/apify-cli) NPM package globally as follows:
 
-```
+```bash
 $ sudo npm install -g apify-cli
 ```
 
@@ -330,8 +330,8 @@ $ apify help <command>
 
 ## Programming interface
 
-By default, the following commands are expected to be called from within the actor's
-context, either on Apify platform or the local environment.
+By default, the following commands are expected to be called from within a context
+of a running actor, both in local environment or on the Apify platform.
 The information about the current run is taken from `APIFY_ACTOR_RUN_ID`
 environment variable.
 For all commands,
@@ -345,11 +345,12 @@ Get access to the actor input object passed by the user.
 It is parsed from a JSON file, which is stored by the system in the actor's default key-value store
 (usually called `INPUT`).
 The input is an object with properties.
-If the actor defines the [Input schema](#input-and-output-schema), the input object is guaranteed to conform to it.
+If the actor defines the input schema, the input object is guaranteed to conform to it.
+For details, see [Input and output](#input-and-output).
 
 #### Node.js
 
-```jsx
+```js
 import { Actor } from 'apify';
 
 // TODO: Ondra's razor - We should instantiate new object,
@@ -399,7 +400,7 @@ Advantage of `main()` function: Kills actor even if you forgot `setTimeout()`
 
 #### Node.js
 
-```jsx
+```js
 import { Actor } from 'apify';
 
 Actor.main(async () => {
@@ -423,11 +424,11 @@ When an actor starts, by default it is associated with a newly-created empty dat
 The user can override it and specify another dataset when running the actor.
 
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
-of objects are stored in them. See [Dataset schema](#dataset-schema) bellow for more details.
+of objects are stored in them. See [Schema files](#schema-files) for more details.
 
 #### Node.js
 
-```jsx
+```js
 // Append result object to the default dataset associated with the run
 await Actor.pushData({
     someResult: 123,
@@ -452,14 +453,14 @@ await dataset.push_data({ some_result=123 })
 #### CLI
 
 ```bash
-# Text format
-$ echo "someResult=123" | apify actor push-data
-$ apify actor push-data someResult=123
-
-# JSON format
+# Push data to default dataset, in JSON format
 $ echo '{ "someResult": 123 }' | actor push-data --json
 $ apify actor push-data --json='{ "someResult": 123 }'
 $ apify actor push-data --json=@result.json
+
+# Push data to default dataset, in text format
+$ echo "someResult=123" | apify actor push-data
+$ apify actor push-data someResult=123
 
 # Push to a specific dataset in the cloud
 $ apify actor push-data --dataset=bob/election-data someResult=123
@@ -487,7 +488,7 @@ when running the actor.
 
 #### Node.js
 
-```jsx
+```js
 // Save object to store (stringified to JSON)
 await Actor.setValue('my-state', { something: 123 });
 
@@ -513,7 +514,7 @@ dataset = await actor.get_value('my-state')
 
 #### UNIX
 
-```
+```bash
 $ echo "hello world" > file.txt
 $ cat file.txt
 ```
@@ -535,7 +536,7 @@ This can greatly improve user experience.
 
 #### Node.js
 
-```jsx
+```js
 // Actor will finish with 'SUCCEEDED' status
 await Actor.exit(0, 'Succeeded, crawled 50 pages');
 
@@ -638,7 +639,7 @@ to keep users informed and happy:
 
 #### Node.js
 
-```jsx
+```js
 await Actor.setStatusMessage('Crawled 45 of 100 pages');
 
 // Setting status message to other actor externally is also possible
@@ -928,7 +929,7 @@ changing its [status](#actor-status) to `ABORTED`.
 
 #### Node.js
 
-```jsx
+```js
 await Actor.abort({ message: 'Job was done,', actorRunId: 'RUN_ID' });
 ```
 
@@ -1020,9 +1021,9 @@ from the [Actor file](#actor-file):
 Both input and output schemas can reference schema files 
 for specific storages:
 
-- [DATASET_SCHEMA.json](./pages/DATASET_SCHEMA.md)
-- [KEY_VALUE_STORE_SCHEMA.json](./pages/KEY_VALUE_STORE_SCHEMA.md)
-- [REQUEST_QUEUE_SCHEMA.json](./pages/REQUEST_QUEUE_SCHEMA.md)
+- [Dataset schema](./pages/DATASET_SCHEMA.md)
+- [Key-value store schema](./pages/KEY_VALUE_STORE_SCHEMA.md)
+- [Request queue schema](./pages/REQUEST_QUEUE_SCHEMA.md)
 
 These storage schemas are used to ensure that stored objects or files 
 fulfil certain criteria, their fields have certain types etc.
