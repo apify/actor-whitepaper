@@ -292,7 +292,7 @@ $ sudo npm install -g apify-cli
 To confirm the installation succeeded and to login to the Apify platform
 with your username and API token, run the `login` command as follows:
 
-```
+```bash
 $ apify login
 ```
 
@@ -310,7 +310,7 @@ The Apify CLI provides a number of commands, which can aid with actor developmen
    
 To get a help for a specific command, run:
 
- ```
+ ```bash
 $ apify help <command>
  ```
 
