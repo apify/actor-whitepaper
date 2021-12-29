@@ -945,18 +945,21 @@ TODO: Maybe using environment variable with the mapping?
 referenced from `.ACTOR/actor.json` or Dockerfile in the actor top-level directory
 (if the first is not present)
 
+
+### Development to Apify platform
+
 `apify push` - uses info from `.ACTOR/actor.json`
 New flags:
 - `--force-title` and `--force-description`
 - `--target` to specify where to deploy. See `.ACTOR/actor.json` for details.
-
-### Development on Apify platform
-
+- 
 ....
 
 ### Repackaging existing software as actors
 
-
+TODO: Just add `.ACTOR` directory to an existing source code repo.
+Use `apify actor` command in the Dockerfile's `RUN` instruction
+to set up and run the actor.
 
 ## Sharing & Community
 

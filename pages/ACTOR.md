@@ -4,6 +4,9 @@ This JSON file is the main definition of the actor.
 
 ```json
 {
+  // TODO: Is this a good idea? Maybe we can skip version altogether
+  //  and be backward-compatible like package.json.
+  //  It would be easier for developers.
   "formatVersion": 2,
   "name": "google-search-scraper",
   "title": "Google Search Scraper",
