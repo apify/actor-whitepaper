@@ -590,41 +590,44 @@ await Actor.setStatusMessage('Crawled 45 of 100 pages');
 await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
 ```
 
-### Start an actor (without waiting for finish)
+### Start an actor
 
-Apify NOTE: The system must enable overriding the default dataset,
+Actor can start other actors, if they have a permission.
+
+It can override the default dataset or key-value store,
 and e.g. forwarding the data to another named dataset,
-that will be consumed by another actor.
-Maybe the dataset should enable removal of records from beginning? Currently, actors need to implement it themselves.
+that will be consumed by the other actor.
 
-**TODO:** We should have consistent naming, “call” is bit confusing, “run” is what it si. But will that work together with “apify run” that runs locally? In the new client we have "start"
+The `call` operation waits for the other actor to finish, the `run` operation
+returns immediately.
 
-DECISION (add explanation): "run" is for initiating the run, call is for "run" and wait.
-See https://github.com/apify/actor-specs/pull/5#discussion_r775381024
-
-**TODO:** Enable overriding of dataset to use by the actor? Perhaps it’s enough to have an utility actor (e.g. `apify/publish-dataset`), you will webhook it to actor run, and on finish, it will take the default dataset, publish it and atomically rename it (e.g. `jancurn/london-denstists`). But this way we’d lose all dataset settings (e.g. permissions, name, description), maybe Datasets should have an operation “swap” that would enable atomic replace of dataset data while keeping its ID and settings.
-
-DECISION: We will allow users to override default dataset. Atomic rename will be a seperate feature. 
-See https://github.com/apify/actor-specs/pull/5#discussion_r775382312
+Note that we'll also support atomic renames of datasets,
+which allow to easily publish datasets.
 
 #### Node.js
 
 ```js
 // Run actor and wait for it to finish
 const run = await Actor.call(
-    'apify/google-search-scraper',
-    { queries: 'test' },
-    { memoryMbytes: 2048 },
+  // TODO: If we had global unique names, we could allow users here to
+  //  use also actor task name or ID, and would't need Actor.callTask()
+  'apify/google-search-scraper',
+  { queries: 'test' },
+  {
+    memoryMbytes: 2048,
+    defaultKeyValueStoreId: 'NEW_ID',
+  },
 );
 
 console.log(`Received message: ${run.output.body.message}`);
 // TODO: This would look better
 // console.log(`Received message: ${run.output.results}`);
 
-const run = await Actor.callTask(
-    'jancurn/virtualrig-us-seo',
-    { queries: 'test' },
-    { memoryMbytes: 4096 },
+// Run actor and don't wait for it to finish
+const run = await Actor.run(
+  'apify/google-search-scraper',
+  { queries: 'test' },
+  { memoryMbytes: 2048 },
 );
 ```
 
@@ -647,10 +650,10 @@ $ apify actor call --memory=1024m --build=beta apify/google-search-scraper
 $ apify actor call --output-record-key=SCREENSHOT apify/google-search-scraper
 
 # Pass input from stdin
-$ cat input.json | apify actor:start apify/google-search-scraper --json
+$ cat input.json | apify actor call apify/google-search-scraper --json
 
 # Call local actor during development
-$ apify actor:start file:../some-dir someInput='xxx'
+$ apify actor call file:../some-dir someInput='xxx'
 ```
 
 #### Slack
@@ -685,14 +688,18 @@ posix_spawn()
 
 ### Metamorph
 
-Replace running actor’s Docker image with another.
-This is useful e.g. for repurposing an actor as a new actor with its own settings and documentation.
+Replace running actor’s Docker image with another actor.
+
+This is the most magical actor operation.
+It is extremely useful for building new actors on top of existing ones.
+You simply define a better input schema and user description,
+and internally delegate the work to other actor.
 
 When metamorphing into another actor, the system checks
 that the other actor has compatible input/output schemas,
 and throws an error if not.
 
-The target actor inherits the default storages used by the calling actor.
+The target actor inherits the default storages used by the calling actor, unless overriden.
 
 #### Node.js
 
@@ -975,3 +982,4 @@ https://apify.com/jancurn/some-scraper
 - Mention CI/CD, e.g. how to integrate with GiHub etc.
 - IDEA: How about having an "event log" for actors?
   They would be shown in UI, and tell user what happened in the actor. This can be done either in API or by special message to log, which will be parsed. **Or with the notifications/messaging API**
+- Add ideas for the permission system
