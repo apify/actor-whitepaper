@@ -597,31 +597,23 @@ See [Environment variables](about:blank#) in Actor documentation.
 
 ### Actor status
 
-Each actor has in on the following statuses:
+Each actor run has a status (`status` field), which can be one of the following values:
 
 |Status|Type|Description|
 |--- |--- |--- |
-|READY|initial|Started but not allocated to any worker yet|
-|RUNNING|transitional|Executing on a worker|
-|SUCCEEDED|terminal|Finished successfully|
-|FAILED|terminal|Run failed|
-|TIMING-OUT|transitional|Timing out now|
-|TIMED-OUT|terminal|Timed out|
-|ABORTING|transitional|Being aborted by user|
-|ABORTED|terminal|Aborted by user|
+|`READY`|initial|Started but not allocated to any worker yet|
+|`RUNNING`|transitional|Executing on a worker|
+|`SUCCEEDED`|terminal|Finished successfully|
+|`FAILED`|terminal|Run failed|
+|`TIMING-OUT`|transitional|Timing out now|
+|`TIMED-OUT`|terminal|Timed out|
+|`ABORTING`|transitional|Being aborted by user|
+|`ABORTED`|terminal|Aborted by user|
 
-Additionally, the actor with a status message.
-
-TODO: Info about status
+Additionally, the actor run has a status message (`statusMessage` field),
+which contains a text for users explaining what the actor is currently doing.
 
 Periodically set a text-only status message to the currently running actor, to tell users what is it doing.
-
-#### CLI
-
-```bash
-$ apify actor set-status-message "Crawled 45 of 100 pages"
-$ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
-```
 
 #### Node.js
 
@@ -631,6 +623,14 @@ await Actor.setStatusMessage('Crawled 45 of 100 pages');
 // Setting status message to other actor externally is also possible
 await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
 ```
+
+#### CLI
+
+```bash
+$ apify actor set-status-message "Crawled 45 of 100 pages"
+$ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
+```
+
 
 ### System events
 
