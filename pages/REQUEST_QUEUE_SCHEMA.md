@@ -1,6 +1,6 @@
-# Request queue schema
+# Request Queue Schema
 
-TODO: later on
+TODO: This will be added later
 
 But in general I think that it might be useful for 2 things:
 - ensuring what kind of URLs might be enqueued (certain domains or subdomains, ...)

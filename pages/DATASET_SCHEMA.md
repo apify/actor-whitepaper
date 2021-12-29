@@ -1,4 +1,4 @@
-# Dataset schema
+# Dataset Schema
 
 Actor results can be saved to append-only object storage
 called [Dataset](https://sdk.apify.com/docs/api/dataset),

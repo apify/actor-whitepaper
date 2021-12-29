@@ -1,4 +1,4 @@
-# Input schema
+# Input Schema
 
 A JSON object that defines structure of the input object accepted by the
 actor (see [Input and Output](../README.md#input-and-output) for details).

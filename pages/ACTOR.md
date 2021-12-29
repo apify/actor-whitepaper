@@ -1,4 +1,4 @@
-# Actor file
+# Actor File
 
 This JSON file must be present at `.ACTOR/actor.json` and contains the main definition of the actor.
 
@@ -60,7 +60,6 @@ Here are the notes comparing the format to the previous version:
   links to the [Output schema](./OUTPUT_SCHEMA.md) file. Both are optional.
 
 TODOs:
-- `datasetSchema` and `keyValueStoreSchema` link to the schema objects required
-  by the actor
+- The above text needs reformatting, make it more of a refence
 - Maybe we can skip `formatVersion` altogether and be backward-compatible like package.json.
   It would be easier for developers. Let's keep it for now, we can remove it later.
