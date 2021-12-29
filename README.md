@@ -892,7 +892,13 @@ $ ls -l | grep "something" | wc -l
 $ apify call apify/google-search-scraper | apify call apify/send-email queryTerms="aaa\nbbb"
 ```
 
-See also note from Marek: https://github.com/apify/actor-specs/pull/5#discussion_r775390067 
+Note from Marek:
+Here we will need some way how to map outputs from old actor to inputs of the following actor, perhaps we could pipeline thru some utility like [jq](https://stedolan.github.io/jq/tutorial/)
+or use some mapping like:
+
+```
+--input-dataset-id="$output.defaultDatasetId" --dataset-name="xxx"
+``` 
 
 ### Aborting other actor
 
@@ -1005,7 +1011,7 @@ And for storage schemas see:
 - [REQUEST_QUEUE_SCHEMA.json](./REQUEST_QUEUE_SCHEMA.md)
 
 
-- How to integrate output schema with `const { output } = await Apify.call(...)`?
+- TODO: How to integrate output schema with `const { output } = await Apify.call(...)`?
   - @jancurn:
 
   > Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format. There would be properties like in the output_schema.json file, with e.g. URL to dataset, log file, kv-store, live view etc. So it would be an auto-generated field "output" that we can add to JSON returned by the Run API enpoints (e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
@@ -1043,9 +1049,11 @@ New flags:
 
 ### Repackaging existing software as actors
 
-TODO: Just add `.ACTOR` directory to an existing source code repo.
+Just add `.ACTOR` directory to an existing source code repo.
 Use `apify actor` command in the Dockerfile's `RUN` instruction
 to set up and run the actor.
+
+TODO: Explain more, show example
 
 ## Sharing & Community
 
