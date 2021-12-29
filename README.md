@@ -48,11 +48,12 @@ January 2022.
   * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
   * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
   * [Aborting other actor](#aborting-other-actor)
+- [Input and output schema](#input-and-output-schema)
 - [Actor definition files](#actor-definition-files)
   * [Actor file](#actor-file)
   * [Dockerfile](#dockerfile)
   * [README](#readme)
-  * [Schemas (`.ACTOR/*.json`)](#schemas-actorjson)
+  * [Schema files](#schema-files)
 - [Development](#development)
   * [Local development](#local-development)
   * [Development to Apify platform](#development-to-apify-platform)
@@ -915,7 +916,7 @@ $ apify actor abort --run=[RUN_ID] --token=123
 $ kill <pid>
 ```
 
-## Input and output schemas
+## Input and output schema
 
 All the storage schemas are "weak" (allowing more fields to be added) as for example
 some deduplication actor could require each dataset item to have a uuid:
@@ -980,7 +981,7 @@ Good documentation makes good programmers!
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
 
-### Input and output schema
+### Schema files
 
 TODO: Finish this...
 
