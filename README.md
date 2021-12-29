@@ -49,6 +49,7 @@ January 2022.
   * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
   * [Aborting other actor](#aborting-other-actor)
 - [Input and output schema](#input-and-output-schema)
+  * [Storage schemas](#storage-schemas)
 - [Actor definition files](#actor-definition-files)
   * [Actor file](#actor-file)
   * [Dockerfile](#dockerfile)
@@ -358,7 +359,7 @@ print(input)
 
 #### CLI
 
-```
+```bash
 # Emits a JSON object, which can be parsed e.g. using the "jq" tool
 $ apify actor get-input | jq
 
@@ -581,7 +582,7 @@ console.log(env.actorRunId);
 
 #### CLI
 
-```
+```bash
 $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
 ```
 
@@ -723,7 +724,7 @@ const run = await Actor.run(
 
 #### CLI
 
-```
+```bash
 # On stdout, the commands emit actor run object (in text or JSON format),
 # we shouldn't wait for finish, for that it should be e.g. "execute"
 # TODO: Currently this doesn't work!
@@ -803,7 +804,7 @@ await Actor.metamorph(
 
 #### CLI
 
-```
+```bash
 $ apify actor metamorph bob/web-scraper startUrls=http://example.com
 $ apify actor metamorph --input=@input.json --json --memory=4096 \
   bob/web-scraper
@@ -840,7 +841,7 @@ await Actor.addWebhook({
 
 #### CLI
 
-```
+```bash
 apify actor add-webhook --actor-run-id=RUN_ID \\
   --event-types=SUCCEEDED,FAILED \\
   --request-url=https://api.example.com \\
