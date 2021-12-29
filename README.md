@@ -15,7 +15,7 @@ By [Jan Čurn](https://apify.com/jancurn),
 January 2022.
 
 
-### Contents
+## Contents
 
 <!-- toc -->
 
@@ -34,23 +34,20 @@ January 2022.
   * [Python](#python)
   * [Command-line interface (CLI)](#command-line-interface-cli)
 - [Programming interface](#programming-interface)
-  * [Basic operations](#basic-operations)
-    + [Get input](#get-input)
-    + [Main function](#main-function)
-    + [Push results to dataset](#push-results-to-dataset)
-    + [Key-value store](#key-value-store)
-    + [Exit actor](#exit-actor)
-  * [Execution context](#execution-context)
-    + [Environment variables](#environment-variables)
-    + [Actor status](#actor-status)
-    + [System events](#system-events)
-    + [Get memory information](#get-memory-information)
-  * [Interaction with other actors](#interaction-with-other-actors)
-    + [Start an actor](#start-an-actor)
-    + [Metamorph](#metamorph)
-    + [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
-    + [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
-    + [Aborting other actor](#aborting-other-actor)
+  * [Get input](#get-input)
+  * [Main function](#main-function)
+  * [Push results to dataset](#push-results-to-dataset)
+  * [Key-value store](#key-value-store)
+  * [Exit actor](#exit-actor)
+  * [Environment variables](#environment-variables)
+  * [Actor status](#actor-status)
+  * [System events](#system-events)
+  * [Get memory information](#get-memory-information)
+  * [Start an actor](#start-an-actor)
+  * [Metamorph](#metamorph)
+  * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
+  * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
+  * [Aborting other actor](#aborting-other-actor)
 - [Actor definition files](#actor-definition-files)
   * [Docker build instructions (`./Dockerfile`)](#docker-build-instructions-dockerfile)
   * [Documentation (`./README.md`)](#documentation-readmemd)
@@ -328,9 +325,7 @@ this behavior can be overridden in options.
 For example, in Node.js the options object in all commands has `actorRunId`
 field. And CLI has the `--actor-run-id` flag.
 
-### Basic operations
-
-#### Get input
+### Get input
 
 Get access to the actor input object passed by the user.
 It is parsed from a JSON file, which is stored by the system in the actor's default key-value store
@@ -338,7 +333,7 @@ It is parsed from a JSON file, which is stored by the system in the actor's defa
 The input is an object with properties.
 If the actor defines the [Input schema](#input-schema), the input object is guaranteed to conform to it.
 
-##### Node.js
+#### Node.js
 
 ```jsx
 import { Actor } from 'apify';
@@ -352,7 +347,7 @@ console.log(input.option1);
 // prints: { "option1": "aaa", "option2": 456 }
 ```
 
-##### Python
+#### Python
 
 ```python
 from apify import actor
@@ -361,7 +356,7 @@ input = actor.get_input()
 print(input)
 ```
 
-##### CLI
+#### CLI
 
 ```
 # Emits a JSON object, which can be parsed e.g. using the "jq" tool
@@ -370,14 +365,14 @@ $ apify actor get-input | jq
 > { "option1": "aaa", "option2": 456 }
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```
 $ command --option1=aaa --option2=bbb
 int main (int argc, char *argv[])
 ```
 
-#### Main function
+### Main function
 
 This is an optional helper to wrap the body of the actor.
 
@@ -385,7 +380,7 @@ This is an optional helper to wrap the body of the actor.
 How else would we initialize web server to listen for events? Maybe some "subscribe" function?**
 Advantage of `main()` function: Kills actor even if you forgot `setTimeout()`
 
-##### Node.js
+#### Node.js
 
 ```jsx
 import { Actor } from 'apify';
@@ -396,7 +391,7 @@ Actor.main(async () => {
 });
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```c
 int main (int argc, char *argv[]) {
@@ -404,7 +399,7 @@ int main (int argc, char *argv[]) {
 }
 ```
 
-#### Push results to dataset
+### Push results to dataset
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an actor starts, by default it is associated with a newly-created empty dataset.
@@ -413,7 +408,7 @@ The user can override it and specify another dataset when running the actor.
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
 of objects are stored in them. See [Dataset schema](#dataset-schema) bellow for more details.
 
-##### Node.js
+#### Node.js
 
 ```jsx
 // Append result object to the default dataset associated with the run
@@ -426,7 +421,7 @@ const dataset = await Actor.openDataset('bob/poll-results-2019');
 await dataset.pushData({ someResult: 123 });
 ```
 
-##### Python
+#### Python
 
 ```python
 # Append result object to the default dataset associated with the run
@@ -437,7 +432,7 @@ dataset = await actor.open_dataset('bob/poll-results-2019')
 await dataset.push_data({ some_result=123 })
 ```
 
-##### CLI
+#### CLI
 
 ```bash
 # Text format
@@ -456,13 +451,13 @@ $ apify actor push-data --dataset=bob/election-data someResult=123
 $ apify actor push-data --dataset=./my_dataset someResult=123
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```c
 printf("Hello world\tColum 2\tColumn 3");
 ```
 
-#### Key-value store
+### Key-value store
 
 Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
@@ -473,7 +468,7 @@ which only contains one file with input of the actor
 The user can override this behavior and specify another key-value store or input key
 when running the actor.
 
-##### Node.js
+#### Node.js
 
 ```jsx
 // Save object to store (stringified to JSON)
@@ -486,7 +481,7 @@ await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
 const value = await Actor.getValue('my-state');
 ```
 
-##### Python
+#### Python
 
 ```python
 # Save object to store (stringified to JSON)
@@ -499,14 +494,14 @@ await actor.set_value('screenshot', buffer, { contentType='image/png' })
 dataset = await actor.get_value('my-state')
 ```
 
-##### UNIX
+#### UNIX
 
 ```
 $ echo "hello world" > file.txt
 $ cat file.txt
 ```
 
-#### Exit actor
+### Exit actor
 
 When the main actor process exits (i.e. the Docker container stops running),
 the actor run is considered finished and the process exit code is used to determine
@@ -521,7 +516,7 @@ On error, try to explain to users
 what happened and most importantly, how they can fix it.
 This can greatly improve user experience.
 
-##### Node.js
+#### Node.js
 
 ```jsx
 // Actor will finish with 'SUCCEEDED' status
@@ -531,7 +526,7 @@ await Actor.exit(0, 'Succeeded, crawled 50 pages');
 await Actor.exit(1, `Could not finish the crawl, try increasing memory`);
 ```
 
-##### Python
+#### Python
 
 ```python
 # Actor will finish in 'SUCCEEDED' state
@@ -541,7 +536,7 @@ await actor.exit(0, 'Generated 14 screenshots')
 await actor.exit(1, 'Could not finish the crawl, try increasing memory')
 ```
 
-##### CLI
+#### CLI
 
 ```bash
 # Actor will finish in 'SUCCEEDED' state
@@ -552,16 +547,14 @@ $ apify actor exit --message "Email sent"
 $ apify actor exit --code=1 --message "Couldn't fetch the URL"
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```c
 exit(1)
 ```
 
 
-### Execution context
-
-#### Environment variables
+### Environment variables
 
 Actors have access to standard process environment variables.
 
@@ -575,7 +568,7 @@ Custom-defined environment variables (potentially secured with encryption)
 that are then passed to the actor process both on Apify platform and in local development.
 These are defined in the [.actor/ACTOR.json](/pages/ACTOR.md) file.
 
-##### Node.js
+#### Node.js
 
 For convenience, rather than using environment vars directly, we provide a helper function
 that returns an object, with TypeScript-defined type.
@@ -585,14 +578,14 @@ const env = await Actor.getEnv();
 console.log(env.actorRunId);
 ```
 
-##### CLI
+#### CLI
 
 ```
 $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
 ```
 
 
-##### UNIX equivalent:
+#### UNIX equivalent:
 
 ```
 $ echo $ACTOR_RUN_ID
@@ -602,7 +595,7 @@ Apify NOTE: These can be defined by actor owner during build, but unlike traditi
 
 See [Environment variables](about:blank#) in Actor documentation.
 
-#### Actor status
+### Actor status
 
 Each actor has in on the following statuses:
 
@@ -623,14 +616,14 @@ TODO: Info about status
 
 Periodically set a text-only status message to the currently running actor, to tell users what is it doing.
 
-##### CLI
+#### CLI
 
 ```bash
 $ apify actor set-status-message "Crawled 45 of 100 pages"
 $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 ```
 
-##### Node.js
+#### Node.js
 
 ```jsx
 await Actor.setStatusMessage('Crawled 45 of 100 pages');
@@ -639,13 +632,13 @@ await Actor.setStatusMessage('Crawled 45 of 100 pages');
 await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
 ```
 
-#### System events
+### System events
 
 Receive system events e.g. CPU statistics of the running container or information about imminent [migration to another server](about:blank#xxx).
 
 In the future, this can be extended to custom events and messages.
 
-##### Node.js
+#### Node.js
 
 ```
 Actor.events.on('cpuInfo', data => {
@@ -653,25 +646,25 @@ Actor.events.on('cpuInfo', data => {
 });
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```
 signal(SIGINT, handle_sigint);
 ```
 
-#### Get memory information
+### Get memory information
 
 Get information about the total and available memory of the actor’s container or local system.
 For example, this is useful to auto-scale a pool
 of workers used for crawling large websites.
 
-##### Node.js
+#### Node.js
 
 ```
 const memoryInfo = await Actor.getMemoryInfo();
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```
 # Print memory usage of programs
@@ -679,10 +672,7 @@ $ ps -a
 ```
 
 
-
-### Interaction with other actors
-
-#### Start an actor
+### Start an actor
 
 Actor can start other actors, if they have a permission.
 
@@ -696,7 +686,7 @@ returns immediately.
 Note that we'll also support atomic renames of datasets,
 which allow to easily publish datasets.
 
-##### Node.js
+#### Node.js
 
 ```js
 // Run actor and wait for it to finish
@@ -723,7 +713,7 @@ const run = await Actor.run(
 );
 ```
 
-##### CLI
+#### CLI
 
 ```
 # On stdout, the commands emit actor run object (in text or JSON format),
@@ -748,7 +738,7 @@ $ cat input.json | apify actor call apify/google-search-scraper --json
 $ apify actor call file:../some-dir someInput='xxx'
 ```
 
-##### Slack
+#### Slack
 
 It will also be possible to run actors from Slack app.
 The following command starts the actor, and then prints the messages to a Slack channel.
@@ -757,7 +747,7 @@ The following command starts the actor, and then prints the messages to a Slack 
 /apify run bob/google-search-scraper startUrl=afff
 ```
 
-##### API
+#### API
 
 ```
 [POST] https://api.apify.com/v2/actors/apify~google-search-scraper/run
@@ -768,7 +758,7 @@ The following command starts the actor, and then prints the messages to a Slack 
   returnDataset=true
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```
 # Run a program in the background
@@ -778,7 +768,7 @@ $ command <arg1>, <arg2>, … &
 posix_spawn()
 ```
 
-#### Metamorph
+### Metamorph
 
 Replace running actor’s Docker image with another actor.
 
@@ -793,7 +783,7 @@ and throws an error if not.
 
 The target actor inherits the default storages used by the calling actor, unless overriden.
 
-##### Node.js
+#### Node.js
 
 ```
 await Actor.metamorph(
@@ -803,7 +793,7 @@ await Actor.metamorph(
 );
 ```
 
-##### CLI
+#### CLI
 
 ```
 $ apify actor metamorph bob/web-scraper startUrls=http://example.com
@@ -811,18 +801,18 @@ $ apify actor metamorph --input=@input.json --json --memory=4096 \
   bob/web-scraper
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```
 $ exec /bin/bash
 ```
 
-#### Attach webhook to an actor run
+### Attach webhook to an actor run
 
 Run another actor or an external HTTP API endpoint after actor run finishes or fails.
 
 
-##### Node.js
+#### Node.js
 
 ```js
 await Actor.addWebhook({
@@ -840,7 +830,7 @@ await Actor.addWebhook({
 });
 ```
 
-##### CLI
+#### CLI
 
 ```
 apify actor add-webhook --actor-run-id=RUN_ID \\
@@ -857,7 +847,7 @@ apify actor add-webhook --event-types=SUCCEEDED \\
 apify actor add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail 
 ```
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```
 # Execute commands sequentially, based on their status
@@ -866,7 +856,7 @@ apify actor add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail
 // $ command1 || command2 ("orf" symbol)
 ```
 
-#### Pipe result of an actor to another (aka chaining)
+### Pipe result of an actor to another (aka chaining)
 
 Actor can start other actors and
 pass them its own dataset or key-value store.
@@ -878,7 +868,7 @@ effectively creating a pipe, with custom rolling window.
 Webhooks can be attached to storage operations,
 and so launch other actors to consume newly added items or files.
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```
 $ ls -l | grep "something" | wc -l
@@ -894,24 +884,24 @@ $ ls -l | grep "something" | wc -l
 
 See note from Marek: https://github.com/apify/actor-specs/pull/5#discussion_r775390067 
 
-#### Aborting other actor
+### Aborting other actor
 
 Abort itself or other running actor on the Apify platform, setting it to `ABORTED` state.
 
-##### Node.js
+#### Node.js
 
 ```jsx
 await Actor.abort({ message: 'Job was done,', runId: 'RUN_ID' });
 ```
 
-##### CLI
+#### CLI
 
 ```bash
 $ apify actor abort --run=[RUN_ID] --token=123 
 ```
 
 
-##### UNIX equivalent
+#### UNIX equivalent
 
 ```
 # Terminate a program
