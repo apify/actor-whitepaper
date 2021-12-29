@@ -1,11 +1,11 @@
-# Main `.actor` directory
+# Main `.ACTOR` directory
 
 Directory `./actor` must be placed at actor's top-level directory and contains the specification of the actor:
 - Main properties such as name or description
 - The input
 - The output
 
-The only required file is `.actor/ACTOR.json,` and all the other files are optional. In addition to `ACTOR.json`, most actors also implement `INPUT_SCHEMA.json`, `OUTPUT_SCHEMA.json`, and a couple of storage schemas.
+The only required file is `.ACTOR/actor.json,` and all the other files are optional. In addition to `ACTOR.json`, most actors also implement `INPUT_SCHEMA.json`, `OUTPUT_SCHEMA.json`, and a couple of storage schemas.
 
 For file specifying actor iself, see:
 - [ACTOR.json](./ACTOR.md)
