@@ -583,6 +583,8 @@ const env = await Actor.getEnv();
 console.log(env.actorRunId);
 ```
 
+TODO: This might need to be unified with https://sdk.apify.com/docs/api/configuration
+
 #### CLI
 
 ```bash
@@ -725,6 +727,8 @@ const run = await Actor.run(
 );
 ```
 
+TODO: See note about naming (`start`) at https://github.com/apify/actor-specs/pull/5#discussion_r775385311
+
 #### CLI
 
 ```bash
@@ -806,6 +810,9 @@ await Actor.metamorph(
     { memoryMbytes: 4096 },
 );
 ```
+
+TODO: Note from Mara: BUT the input is not just JSON object but rather a body and content type! Which is one big thing we need to propagate everywhere here.
+JC: I think we shouldn't support this old way, and use only object here, which is stored as JSON.
 
 #### CLI
 
