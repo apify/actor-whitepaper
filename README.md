@@ -926,18 +926,23 @@ care about other values.
 
 TODO: ...
 
+### Storage schemas
+
+...
+
 ## Actor definition files
 
 The actor system uses several special files that define actor metadata, documentation,
-instructions how to build and run it, input/output schema, etc.
+instructions how to build and run it, input and output schema, etc.
 
 These files are typically stored in the `.ACTOR` directory
 placed in actor's top-level directory.
 **The entire `.ACTOR` directory should be added to the source control.**
+The only required files are [Actor file](#actor-file) and [Dockerfile](#dockerfile),
+all the other files are optional.
 
-These files are used by the `apify push` or `apify run` commands,
+The actor definition files are used by the `apify push` and `apify run` commands,
 as well as when building actors on the Apify platform.
-The only required files are `.ACTOR/actor.json` and Dockerfile, all the other files are optional.
 
 
 ### Actor file

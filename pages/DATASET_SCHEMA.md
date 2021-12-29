@@ -1,16 +1,31 @@
 # Dataset schema
 
-## Basic properties
+Actor results can be saved to append-only object storage
+called [Dataset](https://sdk.apify.com/docs/api/dataset),
+which can be assigned a schema that ensures only objects with certain properties and types
+are added to the dataset.
 
-Dataset schema describes:
+Note that the schema is weak, in a sense that if the schema doesn't define a property,
+the property can be added and have any type. Only properties explicitly mentioned by the schema
+are validated. This is important feature which allows extensibility.
+For example, a data deduplication actor might require on input datasets
+that have `uuid: String` field in objects, but not care about anything else.
+
+The Dataset schema can be programmatically assigned to dataset on creation or when its empty dataset,
+using the API.
+
+
+**Dataset schema describes:**
+
 - Content of the dataset, i.e., the schema of objects that are allowed to be added
-- Different views on how we can look at the data, AKA transformations
+- Different views on how we can look at the data, aka transformations
 - Visualization of the View using predefined components (grid, table, ...), which improves the run view interface at Apify Console
   and also provides a better interface for datasets shared by Apify users
 
 <img src="https://user-images.githubusercontent.com/594801/147474979-a224008c-8cba-43a6-8d2e-c24f6b0d5b37.png" width="500">
 
-Basic properties:
+## Basic properties
+
 - It's immutable
     - If you want to change the structure, then you need to create a new dataset
 - It's weak

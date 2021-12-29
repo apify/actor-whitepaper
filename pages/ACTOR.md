@@ -1,6 +1,8 @@
-# Actor file `.ACTOR/actor.json`
+# Actor file
 
-This JSON file is the main definition of the actor.
+This JSON file must be present at `.ACTOR/actor.json` and contains the main definition of the actor.
+
+It looks as follows:
 
 ```json
 {
@@ -15,13 +17,9 @@ This JSON file is the main definition of the actor.
     "MYSQL_PASSWORD": "@mySecretPassword"
   },
   "dockerfile": "./Dockerfile",
-  
-  //"datasetSchema": "./schemas/DATASET_SCHEMA.json",
-  //"keyValueStoreSchema": "./schemas/KEY_VALUE_STORE_SCHEMA.json",
-  //"requestQueueSchema": "./schemas/REQUEST_QUEUE_SCHEMA.json",
-
+  "readme": "./ACTOR.md",
   "inputSchema": "./input_schema.json",
-  "outputSchema": "./output_schema.json",
+  "outputSchema": "./output_schema.json"
 }
 ```
 
@@ -56,8 +54,10 @@ Here are the notes comparing the format to the previous version:
   other one. Note that paths in Dockerfile are ALWAYS relative to the Dockerfile's location.
   When calling `apify run`, the system runs the actor using the Dockerfile.
 - `env` was renamed to `environmentVariables` for more clarity.
-- TODO: `datasetSchema` and `keyValueStoreSchema` link to the schema objects required
-  by the actor
 
+
+TODOs:
+- `datasetSchema` and `keyValueStoreSchema` link to the schema objects required
+  by the actor
 - TODO: Maybe we can skip `formatVersion` altogether and be backward-compatible like package.json.
   It would be easier for developers. Let's keep it for now, we can remove it later.

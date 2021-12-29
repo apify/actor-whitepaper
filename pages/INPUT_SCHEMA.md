@@ -1,7 +1,15 @@
-# ./actor/INPUT_SCHEMA.json
+# Input schema
 
-Defines structure of the input object accepted by the actor.
-It is stored in the default key-value store associated with the run.
+A JSON object that defines structure of the input object accepted by the
+actor (see [Get input](../README.md#get-input) for details).
+The file is referenced from the main [actor file](ACTOR.md) using the `inputSchema` directive,
+and it is typically stored in `./ACTOR/input_schema.json`.
+
+Previously, the input schema has been stored in
+the [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/development/input-schema) file.
+
+**Backwards compatibility:** If the main actor file is missing,
+the system uses the `INPUT_SCHEMA.json` in actor's top-level directory (if present).
 
 Changes to the previous version:
 - `formatVersion` instead of `schemaVersion`
