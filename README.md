@@ -597,7 +597,7 @@ See [Environment variables](about:blank#) in Actor documentation.
 
 ### Actor status
 
-Each actor run has a status (`status` field), which can be one of the following values:
+Each actor run has a status (the `status` field), which can be one of the following values:
 
 |Status|Type|Description|
 |--- |--- |--- |
@@ -610,10 +610,15 @@ Each actor run has a status (`status` field), which can be one of the following 
 |`ABORTING`|transitional|Being aborted by user|
 |`ABORTED`|terminal|Aborted by user|
 
-Additionally, the actor run has a status message (`statusMessage` field),
-which contains a text for users explaining what the actor is currently doing.
+Additionally, the actor run has a status message (the `statusMessage` field),
+which contains a text for users informing them what the actor is currently doing,
+and thus greatly improve their user experience.
 
-Periodically set a text-only status message to the currently running actor, to tell users what is it doing.
+When an actor exits, the status message is either automatically set to some default text
+(e.g. "Actor finished with exit code 1"), or to a custom message - see [Exit actor](#exit-actor) for details.
+
+When the actor is running, it should periodically update the status message as follows,
+to keep users informed and happy:
 
 #### Node.js
 
@@ -622,6 +627,12 @@ await Actor.setStatusMessage('Crawled 45 of 100 pages');
 
 // Setting status message to other actor externally is also possible
 await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
+```
+
+#### Python
+
+```python
+await actor.set_status_message('Crawled 45 of 100 pages')
 ```
 
 #### CLI
