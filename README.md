@@ -196,15 +196,14 @@ Read stdin |	Read from a dataset
 Write to stdout	| Push data to dataset, update actor status
 Write to stderr	| Set exit message
 File system	| Key-value store
-Process ID (PID) | Actor run ID
+Process identifier (PID) | Actor run ID
 Process exit code | Actor exit code
 
 ### Design goals
 
-Make it really easy to use, i.e. generate the UI etc.
-
 - Keep it as simple as possible, but not simpler
 - Each actor should do just one thing, and have everything to run on its own
+- When in doubt, optimize for the users of the actors, e.g. generating a nice user interface
 - TODO...
 
 ### Relation to the Actor model
@@ -984,8 +983,8 @@ For details, see the [Actor file](./pages/ACTOR.md) page.
 This file contains instructions for the system how to build the actor Docker image and how to run it.
 This is how actors are started locally by the `apify run` command, as well as on the Apify platform.
 
-The Dockerfile is referenced from the [Actor file](#actor-file) using the `dockerfile`
-setting, and typically stored at `.ACTOR/Dockerfile`.
+The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
+directive, and typically stored at `.ACTOR/Dockerfile`.
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
 Learn more in the official [Dockerfile reference](https://docs.docker.com/engine/reference/builder/).
 
@@ -997,8 +996,8 @@ in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-starte
 It is used to generate its web page on Apify,
 and it should contain great explanation what the actor does and how to use it.
 
-The README file is referenced from the [Actor file](#actor-file) using the `readme`
-setting, and typically stored at `.ACTOR/README.md`.
+The README file is referenced from the [Actor file](./pages/ACTOR.md) using the `readme`
+directive, and typically stored at `.ACTOR/README.md`.
 
 Good documentation makes good programmers!
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
@@ -1018,15 +1017,15 @@ to generate API documentation, and render the view of actor's output.
 The input and output schema is defined by two JSON files that are referenced 
 from the [Actor file](#actor-file):
 
-- [Input schema](./pages/INPUT_SCHEMA.md)
-- [Output schema](./pages/OUTPUT_SCHEMA.md)
+- [Input schema file](./pages/INPUT_SCHEMA.md)
+- [Output schema file](./pages/OUTPUT_SCHEMA.md)
 
 Both input and output schemas can reference schema files 
 for specific storages:
 
-- [Dataset schema](./pages/DATASET_SCHEMA.md)
-- [Key-value store schema](./pages/KEY_VALUE_STORE_SCHEMA.md)
-- [Request queue schema](./pages/REQUEST_QUEUE_SCHEMA.md)
+- [Dataset schema file](./pages/DATASET_SCHEMA.md)
+- [Key-value store schema file](./pages/KEY_VALUE_STORE_SCHEMA.md)
+- [Request queue schema file](./pages/REQUEST_QUEUE_SCHEMA.md)
 
 These storage schemas are used to ensure that stored objects or files 
 fulfil certain criteria, their fields have certain types etc.
@@ -1112,10 +1111,11 @@ https://apify.com/jancurn/some-scraper
 
 ## TODOs
 
+- `.ACTOR` or `.actor` ??? Final call to decide!
 - Mention CI/CD, e.g. how to integrate with GiHub etc.
 - IDEA: How about having an "event log" for actors?
   They would be shown in UI, and tell user what happened in the actor.
   This can be done either in API or by special message to log, which will be parsed.
   **Or with the notifications/messaging API**
 - Add ideas for the permission system
-- Add more pictures
+- Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.

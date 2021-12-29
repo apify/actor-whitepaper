@@ -1,4 +1,4 @@
-# Request Queue Schema
+# Request Queue Schema File
 
 TODO: This will be added later
 

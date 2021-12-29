@@ -60,6 +60,6 @@ Here are the notes comparing the format to the previous version:
   links to the [Output schema](./OUTPUT_SCHEMA.md) file. Both are optional.
 
 TODOs:
-- The above text needs reformatting, make it more of a refence
+- The above text needs reformatting, make it more like a reference
 - Maybe we can skip `formatVersion` altogether and be backward-compatible like package.json.
   It would be easier for developers. Let's keep it for now, we can remove it later.

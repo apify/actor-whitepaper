@@ -1,4 +1,4 @@
-# Input Schema
+# Input Schema File
 
 A JSON object that defines structure of the input object accepted by the
 actor (see [Input and Output](../README.md#input-and-output) for details).
@@ -72,6 +72,9 @@ datasets with matching schema. This feature will make it easy to integrate actor
 and pipe results from one to another.
 
 ## TODOs
+- JC: Not sure how `actor` and `actorRun` are supposed to work? For example, if `actor`
+  is a reference to other actor to be called, why not use webhook?
+  And how about `actorRun` ??? 
 - We should properly reconsider our current schema format.
   For example, the way we write string enum is suboptimal as the user has to separately
   name keys and values instead of a simple map that is error-prone. (JC: Yes please!)

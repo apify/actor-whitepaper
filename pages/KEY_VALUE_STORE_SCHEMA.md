@@ -1,4 +1,4 @@
-# Key-value Store Schema
+# Key-value Store Schema File
 
 ## Basic properties
 
