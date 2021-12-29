@@ -5,12 +5,6 @@ called [Dataset](https://sdk.apify.com/docs/api/dataset),
 which can be assigned a schema that ensures only objects with certain properties and types
 are added to the dataset. 
 
-Note that the schema is weak, in a sense that if the schema doesn't define a property,
-the property can be added and have any type. Only properties explicitly mentioned by the schema
-are validated. This is important feature which allows extensibility.
-For example, a data deduplication actor might require on input datasets
-that have `uuid: String` field in objects, but not care about anything else.
-
 The Dataset schema can be programmatically assigned to dataset on creation or when its empty dataset,
 using the API.
 
@@ -52,7 +46,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
 
 ```json
 {
-    "formatVersion": 2,
+    "datasetSchemaVersion": 2,
     "name": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
     "fields": {

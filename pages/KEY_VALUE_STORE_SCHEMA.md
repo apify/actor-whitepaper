@@ -45,7 +45,7 @@ as the implementation and API will be the same.
 
 ```json
 {
-    "formatVersion": 2,
+    "keyValueStoreSchemaVersion": 2,
     "name": "My Instagram backup",
     "description": "Backup of my Instagram account",
     
@@ -55,7 +55,7 @@ as the implementation and API will be the same.
             "description": "Contains all Instagram post images",
             "keyPrefix": "post-image-",
             "contentTypes": ["image/jpeg", "image/png"]
-        }
+        },
 
         "profilePicture": {
             "name": "Profile picture",
