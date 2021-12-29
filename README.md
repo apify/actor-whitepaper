@@ -819,7 +819,7 @@ Custom-defined environment variables (potentially secured with encryption)
 that are then passed to the actor process both on Apify platform and in local development.
 These are defined in the [.actor/ACTOR.json](/pages/ACTOR.md) file.
 
-**Node.js**
+#### Node.js
 
 For convenience, rather than using environment vars directly, we provide a helper function
 that returns an object, with TypeScript-defined type.
@@ -829,7 +829,7 @@ const env = await Actor.getEnv();
 console.log(env.actorRunId);
 ```
 
-**CLI**
+#### CLI
 
 ```
 $ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
@@ -934,12 +934,21 @@ High-level overview how to build new actors.
 
 ### Local development
 
+TODO: Explain basic workflow with "apify" - create, run, push etc.
+
 Actors can be developed and run locally. To support running other actors, we need to define mapping
-of `username/actor` to local directories with `.actor` sub-directory.
-
-Explain basic workflow with "apify" - create, run, push etc.
-
+of `username/actor` to local or remote git/https directories with `.ACTOR` sub-directory,
+which is then used to launch actors specified e.g. by `Apify.call('bob/some-actor')'`.
 TODO: Maybe using environment variable with the mapping?
+
+`apify run` - starts the actor using Dockerfile
+referenced from `.ACTOR/actor.json` or Dockerfile in the actor top-level directory
+(if the first is not present)
+
+`apify push` - uses info from `.ACTOR/actor.json`
+New flags:
+- `--force-title` and `--force-description`
+- `--target` to specify where to deploy. See `.ACTOR/actor.json` for details.
 
 ### Development on Apify platform
 
