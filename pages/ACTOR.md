@@ -18,8 +18,19 @@ It looks as follows:
   },
   "dockerfile": "./Dockerfile",
   "readme": "./ACTOR.md",
-  "inputSchema": "./input_schema.json",
-  "outputSchema": "./output_schema.json"
+
+  // We need both input and output schema here, that's given.
+  // But we also need to define schemas for default storages here, so that
+  // 1) the storages are set the right schema on creation
+  // 2) caller can override the default storages, pass other ones, and those
+  //    will be checked if they have a compatible schema.
+  "schemas": {
+    "input": "./input_schema.json",
+    "output": "./output_schema.json",
+    "defaultKeyValueStore": "./key_value_store_schema.json",
+    "defaultDataset": "./dataset_schema.json",
+    "defaultRequestQueue": "./request_queue_schema.json"
+  }
 }
 ```
 
@@ -56,8 +67,7 @@ Here are the notes comparing the format to the previous version:
 - `env` was renamed to `environmentVariables` for more clarity. `apify build` or `apify run`
   could have an option `--apply-env-vars-to-build` like we have it on platform.
 - The `dockerfile` and `readme` directives are mandatory, this is the bare minimum required from actors!
-- `inputSchema` links to the [Input schema](./INPUT_SCHEMA.md) file, and `outputSchema`
-  links to the [Output schema](./OUTPUT_SCHEMA.md) file. Both are optional.
+- Added `schemas` directive to link to specific schema files. Any part of this is optional.
 
 TODOs:
 - The above text needs reformatting, make it more like a reference

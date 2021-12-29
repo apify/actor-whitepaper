@@ -81,7 +81,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
                     "pictureUrl": "$picture"
                 }
             }
-        }
+        },
         "productVariants": {
             "name": "Product variants",
             "description": "Each product expanded into item per variant",
