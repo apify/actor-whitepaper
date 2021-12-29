@@ -887,15 +887,12 @@ and so launch other actors to consume newly added items or files.
 $ ls -l | grep "something" | wc -l
 ```
 
+**TODO:** We could have a special CLI support for creating actor chains using pipe operator, like this: 
 ```
-// TODO: Support creating chains like this
-// XXX:   actor call apify/google-search-scraper
-  => actor call apify/send-email queryTerms="aaa\nbbb"
-// XXX:   actor call apify/web-scraper
-  => actor call lukaskrivka/upload-google-sheets sheeetId="abc"
+$ apify call apify/google-search-scraper | apify call apify/send-email queryTerms="aaa\nbbb"
 ```
 
-See note from Marek: https://github.com/apify/actor-specs/pull/5#discussion_r775390067 
+See also note from Marek: https://github.com/apify/actor-specs/pull/5#discussion_r775390067 
 
 ### Aborting other actor
 
