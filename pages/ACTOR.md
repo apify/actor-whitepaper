@@ -53,11 +53,14 @@ Here are the notes comparing the format to the previous version:
   other Dockerfile in the top-level directory, to separate actor Docker image from the
   other one. Note that paths in Dockerfile are ALWAYS relative to the Dockerfile's location.
   When calling `apify run`, the system runs the actor using the Dockerfile.
-- `env` was renamed to `environmentVariables` for more clarity.
+- `env` was renamed to `environmentVariables` for more clarity. `apify build` or `apify run`
+  could have an option `--apply-env-vars-to-build` like we have it on platform.
 - The `dockerfile` and `readme` directives are mandatory, this is the bare minimum required from actors!
+- `inputSchema` links to the [Input schema](./INPUT_SCHEMA.md) file, and `outputSchema`
+  links to the [Output schema](./OUTPUT_SCHEMA.md) file. Both are optional.
 
 TODOs:
 - `datasetSchema` and `keyValueStoreSchema` link to the schema objects required
   by the actor
-- TODO: Maybe we can skip `formatVersion` altogether and be backward-compatible like package.json.
+- Maybe we can skip `formatVersion` altogether and be backward-compatible like package.json.
   It would be easier for developers. Let's keep it for now, we can remove it later.

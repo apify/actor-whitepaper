@@ -5,24 +5,21 @@ actor (see [Get input](../README.md#get-input) for details).
 The file is referenced from the main [actor file](ACTOR.md) using the `inputSchema` directive,
 and it is typically stored in `./ACTOR/input_schema.json`.
 
-Previously, the input schema has been stored in
-the [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/development/input-schema) file.
-
 **Backwards compatibility:** If the main actor file is missing,
-the system uses the `INPUT_SCHEMA.json` in actor's top-level directory (if present).
+the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/development/input-schema) in actor's top-level directory (if present).
 
-Changes to the previous version:
-- `formatVersion` instead of `schemaVersion`
+Changes to the legacy `INPUT_SCHEMA.json`:
+- `inputSchemaVersion` instead of `schemaVersion`, to make it clear what is this file, as file names can be arbitrary.
 - define what is required at field level instead of having a separate property `"required": ["startUrls", "pageFunction"]`
 
 The basic structure of the input schema is:
 
 ```json
 {
-    "formatVersion": "2",
+    "inputSchemaVersion": "2",
     "title": "My actor schema",
     "description": "....",
-    "properties": [
+    "properties": {
         "startUrls": {
             "title": "Start URLs",
             "type": "array",
@@ -42,11 +39,9 @@ The basic structure of the input schema is:
             "editor": "javascript"
         },
         ...
-    ]
+    }
 }
 ```
-
-**TODO: This is really just a schema for a file inside some key-value store, isn't? Then why such special treatment **
 
 We have currently five input types:
 - String
@@ -69,4 +64,8 @@ restricted by the referenced schema to make sure that selected storage is compat
 ```
 
 ## TODOs
-- We should properly reconsider our current format. For example, the way we write string enum is suboptimal as the user has to separately name keys and values instead of a simple map that is error-prone.
+- JC: Do we really need `title`? What for? I'd skip it and keep just `description`, which is shown in the Input UI.
+  Equally, for the output schema do the same...
+- We should properly reconsider our current format.
+  For example, the way we write string enum is suboptimal as the user has to separately
+  name keys and values instead of a simple map that is error-prone. (JC: Yes please!)

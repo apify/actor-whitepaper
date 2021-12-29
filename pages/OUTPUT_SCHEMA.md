@@ -8,22 +8,22 @@ and it is typically stored in `.ACTOR/output_schema.json`.
 
 ## Structure
 
-```js
+```json
 {
-    "formatVersion": 1,
-    "outputs": {
+    "outputSchemaVersion": 1,
+    "properties": {
         // Default dataset contains all the scraped products
         "currentProducts": {
             "id": "@default",
             "type": "dataset",
-            "schema": "./PRODUCTS_DATASET_SCHEMA"
+            "schema": "./products_dataset_schema.json"
         },
 
         // Actor uses named persistent request queue and named dataset to store all historical products
         "historicalProducts": {
             "id": "~historical-products",
             "type": "dataset",
-            "schema": "./PRODUCTS_DATASET_SCHEMA"
+            "schema": "./products_dataset_schema.json"
         },
         "historicalProductsQueue": {
             "id": "~historical-products",
@@ -33,8 +33,8 @@ and it is typically stored in `.ACTOR/output_schema.json`.
 
         "productImages": {
             "type": "keyValueStore",
-            "schema": "./PRODUCT_IMAGES_KEY_VALUE_STORE_SCHEMA.json"
-        }
+            "schema": "./product_images_key_value_store_schema.json"
+        },
 
         // Live view
         "apiServer": {
@@ -73,5 +73,6 @@ This tab will be at the first position and displayed by default. Tab will show t
 
 ## TODOs
 - We have a `title` and `description` in schemas. Perhaps it's not needed there, and we can have it just here?
+  JC: I'd keep it, it can be displayed 
 - Should we enforce users to have at least one item with `visible: true`? Or what about doing it the opposite
 way and letting the user choose what should not be visible?
