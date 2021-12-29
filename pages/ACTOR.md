@@ -4,9 +4,6 @@ This JSON file is the main definition of the actor.
 
 ```json
 {
-  // TODO: Is this a good idea? Maybe we can skip version altogether
-  //  and be backward-compatible like package.json.
-  //  It would be easier for developers.
   "formatVersion": 2,
   "name": "google-search-scraper",
   "title": "Google Search Scraper",
@@ -61,3 +58,6 @@ Here are the notes comparing the format to the previous version:
 - `env` was renamed to `environmentVariables` for more clarity.
 - TODO: `datasetSchema` and `keyValueStoreSchema` link to the schema objects required
   by the actor
+
+- TODO: Maybe we can skip `formatVersion` altogether and be backward-compatible like package.json.
+  It would be easier for developers. Let's keep it for now, we can remove it later.
