@@ -56,9 +56,25 @@ And in order to make actors easy to pipeline, we should also add `actor`, `actor
 `dataset`, `keyValueStore` and `requestQueue` types, each optionally
 restricted by the referenced schema to make sure that selected storage is compatible.
 
+
+NOTE from Mara: The idea was that we should have an input type for any system resource,
+so perhaps even for the user. But it's a super low priority.
+
+The use case for `actor` could be for example a testing actor with 3 inputs:
+- actor to be tested
+- test function containing for example Jest unit test over the output
+- input for the actor
+
+and the testing actor would call the given actor with a given output and in the end execute tests if the results are correct.
+Similarly you could have a `runId` on input but maybe there is no good usecase.
+
+
 TODO JC: Not sure how `actor` and `actorRun` are supposed to work? For example, if `actor`
 is a reference to other actor to be called, why not use webhook?
 And how about `actorRun` ???
+
+
+
 
 For example:
 
