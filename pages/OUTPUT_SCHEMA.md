@@ -85,9 +85,10 @@ Perhaps the cleanest way would be to set these directly in `.ACTOR/actor.json`.
     "apiServer": {
       "title": "API server",
       "type": "liveView",
+      "description": "API documentation is available in swagger.com/api/xxxx",
       "path": "/nice-report?query=123",
-      // We should perhaps link a swagger file describing the API somehow?
-      // JC: I don't think this is realistic, how would we even enforce the API schema?
+      // IDEA: In the future, we could perhaps work with the API/swagger schema on more advanced level,
+      // but it might be an overkill
       "schema": "TODO"
     }
   }
