@@ -1110,7 +1110,6 @@ https://apify.com/jancurn/some-scraper
 
 ## TODOs
 
-- `.actor` or `.actor` ??? Final call to decide!
 - Mention CI/CD, e.g. how to integrate with GiHub etc.
 - IDEA: How about having an "event log" for actors?
   They would be shown in UI, and tell user what happened in the actor.
