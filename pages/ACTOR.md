@@ -1,6 +1,6 @@
 # Actor File
 
-This JSON file must be present at `.ACTOR/actor.json` and contains the main definition of the actor.
+This JSON file must be present at `.actor/actor.json` and contains the main definition of the actor.
 
 It looks as follows:
 
@@ -34,7 +34,7 @@ It looks as follows:
 }
 ```
 
-The `.ACTOR/actor.json` replaces the legacy `apify.json` file.
+The `.actor/actor.json` replaces the legacy `apify.json` file.
 Here are the notes comparing the format to the previous version:
 
 - We removed the `template` property as it's not needed for anything, it only stored the original template

@@ -1,4 +1,4 @@
-# Apify's Actor Programming Model Specification [DRAFT]
+# Apify's Actor Programming Model Whitepaper [DRAFT]
 
 **The new way to develop serverless microapss called _actors_
 that are easy to ship to users,
@@ -258,7 +258,7 @@ log file, kv-store, live view etc. So it would be an auto-generated field "outpu
 that we can add to JSON returned by the Run API enpoints
 (e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
 - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
-- `output` will be a property of run object generated from `OUTPUT_SCHEMA.json`
+- `output` will be a property of run object generated from Output schema
 
 
 ## Installation and setup
@@ -583,7 +583,7 @@ see the [Apify documentation](https://docs.apify.com/actors/development/environm
 Additionally, the actor developer can define custom environment variables
 that are then passed to the actor process both on Apify platform and in local development environment.
 The variables can be secured, to protect API keys and passwords, and avoid committing them to the source code.
-These variables are defined in the [.ACTOR/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive.
+These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive.
 
 #### Node.js
 
@@ -953,9 +953,9 @@ $ kill <pid>
 The actor system uses several special files that define actor metadata, documentation,
 instructions how to build and run it, input and output schema, etc.
 
-These files are typically stored in the `.ACTOR` directory
+These files are typically stored in the `.actor` directory
 placed in actor's top-level directory.
-**The entire `.ACTOR` directory should be added to the source control.**
+**The entire `.actor` directory should be added to the source control.**
 The only required files are [Actor file](#actor-file) and [Dockerfile](#dockerfile),
 all the other files are optional.
 
@@ -970,7 +970,7 @@ repositories which were wrapped as actor only ex post.
 ### Actor file
 
 This is the main definition file of the actor in JSON format,
-and it always must be present at `.ACTOR/actor.json`.
+and it always must be present at `.actor/actor.json`.
 This file contains references to all other necessary files.
 
 For details, see the [Actor file](./pages/ACTOR.md) page.
@@ -982,7 +982,7 @@ This file contains instructions for the system how to build the actor Docker ima
 This is how actors are started locally by the `apify run` command, as well as on the Apify platform.
 
 The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
-directive, and typically stored at `.ACTOR/Dockerfile`.
+directive, and typically stored at `.actor/Dockerfile`.
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
 Learn more in the official [Dockerfile reference](https://docs.docker.com/engine/reference/builder/).
 
@@ -995,7 +995,7 @@ It is used to generate its web page on Apify,
 and it should contain great explanation what the actor does and how to use it.
 
 The README file is referenced from the [Actor file](./pages/ACTOR.md) using the `readme`
-directive, and typically stored at `.ACTOR/README.md`.
+directive, and typically stored at `.actor/README.md`.
 
 Good documentation makes good programmers!
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
@@ -1041,7 +1041,7 @@ that have `uuid: String` field in objects, but not care about anything else.
 
 ### Backward compatibility
 
-If the `.ACTOR/actor.json` file is missing,
+If the `.actor/actor.json` file is missing,
 the system falls back to legacy mode, looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
 files in the actor's top-level directory, and uses them instead.
 
@@ -1055,27 +1055,27 @@ how to build directly on Apify+screenshots.
 TODO: Explain basic workflow with "apify" - create, run, push etc.
 
 Actors can be developed and run locally. To support running other actors, we need to define mapping
-of `username/actor` to local or remote git/https directories with `.ACTOR` sub-directory,
+of `username/actor` to local or remote git/https directories with `.actor` sub-directory,
 which is then used to launch actors specified e.g. by `Apify.call('bob/some-actor')'`.
 TODO: Maybe using environment variable with the mapping?
 
 `apify run` - starts the actor using Dockerfile
-referenced from `.ACTOR/actor.json` or Dockerfile in the actor top-level directory
+referenced from `.actor/actor.json` or Dockerfile in the actor top-level directory
 (if the first is not present)
 
 
 ### Deployment to Apify platform
 
-`apify push` - uses info from `.ACTOR/actor.json`
+`apify push` - uses info from `.actor/actor.json`
 New flags:
 - `--force-title` and `--force-description`
-- `--target` to specify where to deploy. See `.ACTOR/actor.json` for details.
+- `--target` to specify where to deploy. See `.actor/actor.json` for details.
 - 
 ....
 
 ### Repackaging existing software as actors
 
-Just add `.ACTOR` directory to an existing source code repo.
+Just add `.actor` directory to an existing source code repo.
 Use `apify actor` command in the Dockerfile's `RUN` instruction
 to set up and run the actor.
 
@@ -1110,7 +1110,7 @@ https://apify.com/jancurn/some-scraper
 
 ## TODOs
 
-- `.ACTOR` or `.actor` ??? Final call to decide!
+- `.actor` or `.actor` ??? Final call to decide!
 - Mention CI/CD, e.g. how to integrate with GiHub etc.
 - IDEA: How about having an "event log" for actors?
   They would be shown in UI, and tell user what happened in the actor.
