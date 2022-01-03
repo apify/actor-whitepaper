@@ -1138,7 +1138,7 @@ Note from Marek regarding permissision:
 - By default, the actor should have following permissions that the user would accept when running the actor for the first time:
   - Write to all the default + named storages linked in the output schema
   - Proxy - simply because we want all the traffic to run thru the proxy so we don't want actors scraping directly
-- In `ACTOR.json` the actor could request additional permissions, basically anything from [permissions](https://docs.apify.com/access-rights/list-of-permissions#actor-task), for example, `DATASET.READ` to be able to read all the datasets or `SCHEDULER.WRITE` to manage schedules
+- In `actor.json` the actor could request additional permissions, basically anything from [permissions](https://docs.apify.com/access-rights/list-of-permissions#actor-task), for example, `DATASET.READ` to be able to read all the datasets or `SCHEDULER.WRITE` to manage schedules
 
 There is one tricky part:
 - If an actor needs to `.call()` other actors then basically the user must give him full permissions. Otherwise, the actor would have to list all the other actors it's going to call and the user would have to accept all the permissions needed in recursive calls.
