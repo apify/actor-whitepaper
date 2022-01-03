@@ -298,7 +298,7 @@ You just need to install [Node.js](https://nodejs.org/en/download/)
 and then the [apify-cli](https://www.npmjs.com/package/apify-cli) NPM package globally as follows:
 
 ```bash
-$ sudo npm install -g apify-cli
+$ npm install -g apify-cli
 ```
 
 To confirm the installation succeeded and to login to the Apify platform
@@ -667,6 +667,8 @@ In the future, this can be extended to custom events and messages.
 
 #### Node.js
 
+TODO: From Ondra: This could be simplified to just `Actor.on`. Like `page.on('request')` or `request.on('response')`  
+
 ```
 Actor.events.on('cpuInfo', data => {
     if (data.isCpuOverloaded) console.log('Oh no, the CPU is overloaded!');
@@ -699,7 +701,7 @@ $ ps -a
 ```
 
 
-### Start an actor
+### Start another actor
 
 Actor can start other actors, if they have a permission.
 
@@ -709,9 +711,6 @@ that will be consumed by the other actor.
 
 The `call` operation waits for the other actor to finish, the `run` operation
 returns immediately.
-
-Note that we'll also support atomic renames of datasets,
-which allow to easily publish datasets.
 
 #### Node.js
 
@@ -723,6 +722,7 @@ const run = await Actor.call(
   'apify/google-search-scraper',
   { queries: 'test' },
   {
+      // TODO from Ondra: this should have exactly the same names as in client. Currently they are different
     memoryMbytes: 2048,
     defaultKeyValueStoreId: 'NEW_ID',
   },
