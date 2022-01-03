@@ -1,4 +1,4 @@
-# Key-value store schema
+# Key-value Store Schema File
 
 ## Basic properties
 
@@ -28,12 +28,12 @@ like to embed to run view for the user once the monitoring is finished.
 ```json
 {
     "recordGroups": {
-        "report": {
+        "monitoringReport": {
             "name": "Monitoring report",
             "description": "HTML page containing monitoring results",
             "key": "REPORT",
-            "contentTypes": ["text/html"],
-        },
+            "contentTypes": ["text/html"]
+        }
     }
 }
 ```
@@ -45,7 +45,7 @@ as the implementation and API will be the same.
 
 ```json
 {
-    "formatVersion": 2,
+    "keyValueStoreSchemaVersion": 2,
     "name": "My Instagram backup",
     "description": "Backup of my Instagram account",
     
@@ -55,7 +55,7 @@ as the implementation and API will be the same.
             "description": "Contains all Instagram post images",
             "keyPrefix": "post-image-",
             "contentTypes": ["image/jpeg", "image/png"]
-        }
+        },
 
         "profilePicture": {
             "name": "Profile picture",
@@ -79,3 +79,15 @@ In addition to this user will be able to list by prefix directly:
 ```
 https://api.apify.com/v2/key-value-stores/storeId/keys?prefix=post-images-
 ```
+
+## TODO
+- JC: I'm still not sure about the name `recordGroups`, it implies that it's only groups of records,
+  while it can be just individual records. Maybe we can find something better?
+- What is kv-store schema is used by actor to define structure of key-value store it operates on,
+  but the developer defines a non-compatible record group for "INPUT" prefix?
+  Maybe the default kv-stores should be created with a default record group to cover the "INPUT" prefixes
+  and give them JSON types. Then, we'd never need to worry about existing records.
+  But it's a breaking change for some actors... maybe we can only do this for V2 actors with actor file...
+  ... it's getting quite complicated.
+- What if there's a conflict between record groups?
+  Shall we consider the first one matching as if the file is valid for schema?

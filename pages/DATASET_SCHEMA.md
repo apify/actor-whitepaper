@@ -1,16 +1,24 @@
-# Dataset schema
+# Dataset Schema File
 
-## Basic properties
+Actor results can be saved to append-only object storage
+called [Dataset](https://sdk.apify.com/docs/api/dataset),
+which can be assigned a schema that ensures only objects with certain properties and types
+are added to the dataset. 
 
-Dataset schema describes:
+The Dataset schema can be programmatically assigned to dataset on creation or when its empty dataset,
+using the API.
+
+**Dataset schema describes:**
+
 - Content of the dataset, i.e., the schema of objects that are allowed to be added
-- Different views on how we can look at the data, AKA transformations
+- Different views on how we can look at the data, aka transformations
 - Visualization of the View using predefined components (grid, table, ...), which improves the run view interface at Apify Console
   and also provides a better interface for datasets shared by Apify users
 
 <img src="https://user-images.githubusercontent.com/594801/147474979-a224008c-8cba-43a6-8d2e-c24f6b0d5b37.png" width="500">
 
-Basic properties:
+## Basic properties
+
 - It's immutable
     - If you want to change the structure, then you need to create a new dataset
 - It's weak
@@ -20,7 +28,7 @@ Basic properties:
 There are two ways how to create a dataset with schema:
 - User can start the actor that has dataset schema linked from its
 [OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
-- Or user can do it pragmatically via API by
+- Or user can do it pragmatically via API (for empty dataset) by
   - either passing schema as payload to [create dataset](https://docs.apify.com/api#/reference/datasets/dataset-collection/create-dataset) API endpoint
   - or using the SDK:
 
@@ -38,7 +46,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
 
 ```json
 {
-    "formatVersion": 2,
+    "datasetSchemaVersion": 2,
     "name": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
     "fields": {
@@ -73,7 +81,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
                     "pictureUrl": "$picture"
                 }
             }
-        }
+        },
         "productVariants": {
             "name": "Product variants",
             "description": "Each product expanded into item per variant",
