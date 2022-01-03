@@ -633,7 +633,8 @@ When an actor exits, the status message is either automatically set to some defa
 (e.g. "Actor finished with exit code 1"), or to a custom message - see [Exit actor](#exit-actor) for details.
 
 When the actor is running, it should periodically update the status message as follows,
-to keep users informed and happy:
+to keep users informed and happy. The function can be called as often as necessary,
+the SDK only invokes API if status changed. This is to simplify the usage.
 
 #### Node.js
 
@@ -947,6 +948,9 @@ $ apify actor abort --actor-run-id=[RUN_ID] --token=123
 $ kill <pid>
 ```
 
+### Live view
+
+TODO: Desribe more, show example URLs etc.
 
 ## Actor definition files
 
@@ -1119,7 +1123,11 @@ https://apify.com/jancurn/some-scraper
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
 - Maybe we should add "API" section to all the programming interface sections,
   so that this is a complete reference. Would be useful also to understand the actor output.
-
+- Add pricing
+- To storages, add info about atomic rename, e.g. `setName` function, and link to other operations...
+- Add comparison with other systems, like Lambda etc.
+- Review the [old initial specification](https://docs.google.com/document/d/15qL6Vl2Uztn8DbSp_22o4uhqyEaOHTqhFBlCTvJy700/edit#heading=h.fzd6vjhdt62n) of actors and see what can be reused
+  e.g. pricing stuff on actor invocation, live view containers, 
 
 Note from Marek regarding permissision:
 
