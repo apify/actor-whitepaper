@@ -227,11 +227,13 @@ implementation of a formal mathematical model.
 
 For example, our actors
 do not provide any standard message passing mechanism. The actors might communicate together
-directly via HTTP requests (see live view - **TODO: Add link**),
+directly via HTTP requests (see [Live view](#live-view)),
 manipulate each other's operation using the Apify platform API (e.g. abort another actor),
 or affect each other by sharing some internal state or storage.
 The actors simply do not have any formal restrictions,
 and they can access whichever external systems they want.
+
+TODO: From Ondra: Maybe that's a shame. Would be nice to have an API that would send a message to a run and the run would get it as `.on('message', (msg) => { ... })`. Would save people from implementing their own servers in actors.
 
 ### Why the name "actor" ?
 
@@ -709,7 +711,7 @@ It can override the default dataset or key-value store,
 and e.g. forwarding the data to another named dataset,
 that will be consumed by the other actor.
 
-The `call` operation waits for the other actor to finish, the `run` operation
+The `call` operation waits for the other actor to finish, the `start` operation
 returns immediately.
 
 #### Node.js
