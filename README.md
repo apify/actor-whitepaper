@@ -395,7 +395,7 @@ int main (int argc, char *argv[]) {}
 
 This is an optional helper to wrap the body of the actor.
 
-**TODO**: Is this even needed? Perhaps just to call `Actor.exit(1, ‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see...
+**TODO**: Is this even needed? Perhaps just to call `Actor.fail(‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see...
 How else would we initialize web server to listen for events? Maybe some "subscribe" function?**
 Advantage of `main()` function: Kills actor even if you forgot `setTimeout()`
 
@@ -538,7 +538,7 @@ shown below. This has two advantages:
 - The system emits the `exit` event, which can be listened to and used by various
   components of the actor to perform a cleanup, persist state, etc.
   Note that the caller of exit can specify how long should the system wait for all `exit`
-  event handlers to complete before closing the process.
+  event handlers to complete before closing the process, using the `timeoutSecs` option.
   For details, see [System Events](#system-events).
 
 #### Node.js
@@ -547,15 +547,17 @@ shown below. This has two advantages:
 // Actor will finish with 'SUCCEEDED' status
 await Actor.exit('Succeeded, crawled 50 pages');
 
-// Actor will finish with 'FAILED' status, not waiting for the `exit` handlers to finish  
-await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1, timeoutSecs: 0 });
+// Exit right away without calling `exit` handlers at all
+await Actor.exit('Done right now', { timeoutSecs: 0 });
 
-// ...which is equivalent to (a syntactic sugar):
+// Actor will finish with 'FAILED' status 
+await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 });
+// ... or nicer way using this syntactic sugar:
 await Actor.fail('Could not finish the crawl, try increasing memory');
 
 // Register a handler to be called on exit.
-// Note that 
-Actor.on('exit', ({ statusMessage, exitCode }) => {
+// Note that the handler has `timeoutSecs` to finish its job
+Actor.on('exit', ({ statusMessage, exitCode, timeoutSecs }) => {
     // Perform cleanup...
 })
 ```
@@ -568,6 +570,8 @@ await actor.exit('Generated 14 screenshots')
 
 # Actor will finish in 'FAILED' state
 await actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 })
+# ... or nicer way using this syntactic sugar:
+await Actor.fail('Could not finish the crawl, try increasing memory');
 ```
 
 #### CLI
