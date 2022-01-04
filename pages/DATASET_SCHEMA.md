@@ -110,6 +110,9 @@ slow to write is [JSON Schema](https://json-schema.org/). We could start with
 the [Easy JSON Schema](https://github.com/easy-json-schema/easy-json-schema) and add support for JSON
 Schema later, but in this case, we will need another property saying what schema is used.
 
+NOTE JC: In any case, we need to support field types and required/optional.
+Let's start with Easy JSON schema to keep things simple, we can extend in the future.
+
 Here is a comparison of JSON Schema and Easy JSON Schema:
 
 ```json
@@ -222,3 +225,4 @@ visualization: {
 
 - Perhaps the visualization's `properties` should be called `itemProperties` as it's not the property of the whole component but one item
 - JSON schema specification (full or simple) above
+- In future versions let's consider referencing schema using URL, for now let's keep it simple

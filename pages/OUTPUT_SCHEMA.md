@@ -29,6 +29,10 @@ Perhaps the cleanest way would be to set these directly in `.actor/actor.json`.
   which would be used by default for this kind of API endpoint, and just return
   data to user.
 
+NOTE: We decided that output schema can reference other datasets/kv-stores/queues
+but only those ones that are referenced in the input, or the default. Hence
+there's no point to include storage schema here again, as it's done elsewhere.
+
 ## Structure
 
 ```json

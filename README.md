@@ -523,35 +523,39 @@ $ cat file.txt
 
 When the main actor process exits (i.e. the Docker container stops running),
 the actor run is considered finished and the process exit code is used to determine
-whether the actor has status `SUCCEEDED` (exit code is `0`)
-or `FAILED` (exit code is not equal to `0`).
-In this case, the platforms set a status message to some default value,
+whether the actor has succeeded (exit code `0` leads to status `SUCCEEDED`)
+or failed (exit code not equal to `0` leads to status `SUCCEEDED`).
+In this case, the platforms set a status message to a default value like `Actor exit with exit code 0`,
 which is not very descriptive for the users.
 
-To provide a custom status message for users,
+To provide a custom status message for users to tell them what the actor achieved,
 you can exit the actor as shown bellow.
 On error, try to explain to users
-what happened and most importantly, how they can fix it.
-This can greatly improve user experience.
+what happened and most importantly, how they can fix the error.
+This greatly improves user experience.
 
 #### Node.js
 
 ```js
 // Actor will finish with 'SUCCEEDED' status
-await Actor.exit(0, 'Succeeded, crawled 50 pages');
+await Actor.exit('Succeeded, crawled 50 pages');
 
 // Actor will finish with 'FAILED' status
-await Actor.exit(1, `Could not finish the crawl, try increasing memory`);
+await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 });
+
+// ...which is equivalent to (a syntactic sugar):
+await Actor.fail('Could not finish the crawl, try increasing memory');
+
 ```
 
 #### Python
 
 ```python
 # Actor will finish in 'SUCCEEDED' state
-await actor.exit(0, 'Generated 14 screenshots')
+await actor.exit('Generated 14 screenshots')
 
 # Actor will finish in 'FAILED' state
-await actor.exit(1, 'Could not finish the crawl, try increasing memory')
+await actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 })
 ```
 
 #### CLI

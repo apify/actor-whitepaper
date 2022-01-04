@@ -106,6 +106,8 @@ actor is started. That's quite logical. But it also means that if the actor want
 the default dataset to be set certain schema, this needs to be done in Output schema.
 
 ## TODOs
+- This file should be a complete reference for the input schema...
 - We should properly reconsider our current schema format.
   For example, the way we write string enum is suboptimal as the user has to separately
   name keys and values instead of a simple map that is error-prone. (JC: Yes please!)
+- Also, e.g. change "editor: requesltListSoruces " to type: requesltListSoruces ... let's do this
