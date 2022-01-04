@@ -528,11 +528,18 @@ or failed (exit code not equal to `0` leads to status `SUCCEEDED`).
 In this case, the platforms set a status message to a default value like `Actor exit with exit code 0`,
 which is not very descriptive for the users.
 
-To provide a custom status message for users to tell them what the actor achieved,
-you can exit the actor as shown bellow.
-On error, try to explain to users
-what happened and most importantly, how they can fix the error.
-This greatly improves user experience.
+An alternative and preferred way to exit an actor is using the `exit` function in SDK, as
+shown below. This has two advantages:
+
+- You can provide a custom status message for users to tell them what the actor achieved
+  On error, try to explain to users
+  what happened and most importantly, how they can fix the error.
+  This greatly improves user experience.
+- The system emits the `exit` event, which can be listened to and used by various
+  components of the actor to perform a cleanup, persist state, etc.
+  Note that the caller of exit can specify how long should the system wait for all `exit`
+  event handlers to complete before closing the process.
+  For details, see [System Events](#system-events).
 
 #### Node.js
 
@@ -540,12 +547,17 @@ This greatly improves user experience.
 // Actor will finish with 'SUCCEEDED' status
 await Actor.exit('Succeeded, crawled 50 pages');
 
-// Actor will finish with 'FAILED' status
-await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 });
+// Actor will finish with 'FAILED' status, not waiting for the `exit` handlers to finish  
+await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1, timeoutSecs: 0 });
 
 // ...which is equivalent to (a syntactic sugar):
 await Actor.fail('Could not finish the crawl, try increasing memory');
 
+// Register a handler to be called on exit.
+// Note that 
+Actor.on('exit', ({ statusMessage, exitCode }) => {
+    // Perform cleanup...
+})
 ```
 
 #### Python
@@ -667,15 +679,17 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 
 ### System events
 
-Receive system events e.g. CPU statistics of the running container or information about
-imminent [migration to another server](#TODO).
+Receive system events, e.g. CPU statistics of the running container or information about
+imminent [migration to another server](#TODO), or [Actor exit](#exit-actor).
 
 In the future, this mechanism can be extended to custom events and messages.
 
+TODO: Add a table of events and details of params, plus links, timeouts etc.
+
 #### Node.js
 
-```
-Actor.on('cpuInfo', data => {
+```js
+Actor.on('cpuInfo', (data) => {
     if (data.isCpuOverloaded) console.log('Oh no, the CPU is overloaded!');
 });
 ```
