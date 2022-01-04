@@ -663,16 +663,15 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 
 ### System events
 
-Receive system events e.g. CPU statistics of the running container or information about imminent [migration to another server](about:blank#xxx).
+Receive system events e.g. CPU statistics of the running container or information about
+imminent [migration to another server](#TODO).
 
-In the future, this can be extended to custom events and messages.
+In the future, this mechanism can be extended to custom events and messages.
 
 #### Node.js
 
-TODO: From Ondra: This could be simplified to just `Actor.on`. Like `page.on('request')` or `request.on('response')`  
-
 ```
-Actor.events.on('cpuInfo', data => {
+Actor.on('cpuInfo', data => {
     if (data.isCpuOverloaded) console.log('Oh no, the CPU is overloaded!');
 });
 ```
@@ -775,7 +774,7 @@ It will also be possible to run actors from Slack app.
 The following command starts the actor, and then prints the messages to a Slack channel.
 
 ```
-/apify run bob/google-search-scraper startUrl=afff
+/apify start bob/google-search-scraper startUrl=afff
 ```
 
 #### API
@@ -862,6 +861,7 @@ await Actor.addWebhook({
         "resource": {{resource}}
     }`,
     // Again, it's possible to attach webhook to another running actor.
+    // TODO: 
     actorRunId: 'RUN_ID',
 });
 ```
@@ -923,7 +923,14 @@ or use some mapping like:
 
 ```
 --input-dataset-id="$output.defaultDatasetId" --dataset-name="xxx"
-``` 
+```
+
+Note from Ondra:
+I tried to write a JS example for piping, but figured that piping is not really aligned with how actors work, because piping assumes the output of one program is immediately processed by another program. Actors can produce output like this, but they can't process input like this. Input is provided only once, when the actor starts. Unless we consider e.g. request queue as input. We will have to think about this a bit differently.
+
+Note from Jan:
+Indeed, the flow is to start one actor, and pass one of it's storages as default to the other newly started actor. If we had a generic Queue, it could be used nicely for these use case. I'm adding these notes to the doc, so that we can get back to them later.
+
 
 ### Abort another actor
 
