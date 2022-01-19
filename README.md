@@ -835,7 +835,9 @@ When metamorphing into another actor, the system checks
 that the other actor has compatible input/output schemas,
 and throws an error if not.
 
-The target actor inherits the default storages used by the calling actor, unless overriden.
+The target actor inherits the default storages used by the calling actor, unless overridden.
+
+TODO: Describe what happens with output schema
 
 #### Node.js
 
