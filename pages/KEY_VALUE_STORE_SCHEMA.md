@@ -45,7 +45,8 @@ as the implementation and API will be the same.
 
 ```json
 {
-    "keyValueStoreSchemaVersion": 2,
+    "schemaType": "KeyValueStoreSchema",
+    "schemaVersion": 2,
     "name": "My Instagram backup",
     "description": "Backup of my Instagram account",
     

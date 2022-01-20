@@ -339,6 +339,8 @@ this behavior can be overridden in options.
 For example, in Node.js the options object in all commands has `actorRunId`
 field, and `apify actor` CLI command has the `--actor-run-id` flag.
 
+TODO: We decided not to pass `actorRunId` as arg to methods, but use it in constructor
+
 ### Get input
 
 Get access to the actor input object passed by the user.
@@ -1120,6 +1122,9 @@ TODO: Explain more, show example
 
 ## Sharing & Community
 
+TODO: Motivation - why building on Apify is easier than building your own SaaS
+
+
 ### User profile page
 
 For example:
@@ -1146,6 +1151,12 @@ https://apify.com/jancurn/some-scraper
 
 
 ## TODOs
+
+From last meeting
+- Consider renaming `RequestQueue` to just `Queue` and make it more generic
+- Actor input is always JSON, nothing else. To support e.g. images on input,
+  we just need some better SDK and UI.
+- "Rename default store" (not sure what that means)
 
 - Mention CI/CD, e.g. how to integrate with GiHub etc.
 - IDEA: How about having an "event log" for actors?

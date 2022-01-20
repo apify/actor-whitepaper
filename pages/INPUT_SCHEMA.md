@@ -19,7 +19,8 @@ The basic structure of the input schema is:
 
 ```json
 {
-    "actorInputSchemaVersion": 2,
+    "schemaType": "ActorInputSchema",
+    "schemaVersion": 2,
     "description": "Text that is shown in the Input UI",
     "properties": {
         "startUrls": {

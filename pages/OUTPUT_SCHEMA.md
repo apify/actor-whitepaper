@@ -37,7 +37,8 @@ there's no point to include storage schema here again, as it's done elsewhere.
 
 ```json
 {
-  "actorOutputSchemaVersion": 1,
+  "schemaType": "ActorOutputSchema",
+  "schemaVersion": 2,
   "description": "Text that is shown in the Output UI",
   "properties": {
     // Default dataset contains all the scraped products

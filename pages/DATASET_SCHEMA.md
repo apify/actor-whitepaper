@@ -46,7 +46,8 @@ Uncaught Error: Dataset schema is not compatible with a given schema
 
 ```json
 {
-    "datasetSchemaVersion": 2,
+    "schemaType": "DatasetSchema",
+    "schemaVersion": 2,
     "name": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
     "fields": {

@@ -59,14 +59,16 @@ Here are the notes comparing the format to the previous version:
   all user accounts, similarly as with software libraries,
   and hence they are part of `actor.json`.
 - The `dockerfile` property points to a Dockerfile that is to be used to build the
-  actor image. If not present, the system looks for Dockerfile in the actor's top-level
+  actor image. If not present, the system looks for Dockerfile in the `.actor` directory
+  and if not found, then in actor's top-level
   directory. This setting is useful if the source code repository has some
   other Dockerfile in the top-level directory, to separate actor Docker image from the
   other one. Note that paths in Dockerfile are ALWAYS relative to the Dockerfile's location.
   When calling `apify run`, the system runs the actor using the Dockerfile.
 - `env` was renamed to `environmentVariables` for more clarity. `apify build` or `apify run`
   could have an option `--apply-env-vars-to-build` like we have it on platform.
-- The `dockerfile` and `readme` directives are mandatory, this is the bare minimum required from actors!
+- The `dockerfile` and `readme` directives are optional, the system falls back to reasonable
+  defaults, first in `.actor` directory and then in the top-level directory.
 - Added `schemas` directive to link to specific schema files. Any part of this is optional.
 
 TODOs:
