@@ -44,10 +44,7 @@ there's no point to include storage schema here again, as it's done elsewhere.
     // Default dataset contains all the scraped products
     // In the "output" object, the field should be a link to dataset with the right view
     "currentProducts": {
-      // TODO JC: This "id" feels wrong, it's not really an ID.
-      //   How about just "type": "defaultDataset" ???
-      "id": "@default",
-      "type": "dataset",
+      "type": "DefaultDataset",
       "schema": "./products_dataset_schema.json",
       "view": "productVariants"
     },
@@ -58,7 +55,7 @@ there's no point to include storage schema here again, as it's done elsewhere.
     //  something that URLs can be generated when the actor starts.
     "historicalProducts": {
       "id": "~historical-products",
-      "type": "dataset",
+      "type": "Dataset",
       "schema": "./products_dataset_schema.json"
     },
     "historicalProductsQueue": {
@@ -71,7 +68,7 @@ there's no point to include storage schema here again, as it's done elsewhere.
     // as a list of images. In the output object, this will be a link to a API with "prefix" param.
     "productImages": {
       "title": "Product images",
-      "type": "keyValueStore",
+      "type": "DefaultKeyValueStore",
       "description": "Yaddada",
       "schema": "./product_images_key_value_store_schema.json",
       "recordGroup": "screenshots"
@@ -80,7 +77,7 @@ there's no point to include storage schema here again, as it's done elsewhere.
     // In the output object, the result should be a link to the single KV-store file
     "summaryReportView": {
       "title": "API server",
-      "type": "keyValueStore.file",
+      "type": "DefaultKeyValueStore.file",
       "schema": "./key_value_store_schema.json",
       "recordGroup": "monitoringReport"
     },

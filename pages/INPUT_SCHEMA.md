@@ -25,7 +25,7 @@ The basic structure of the input schema is:
     "properties": {
         "startUrls": {
             "title": "Start URLs",
-            "type": "array",
+            "type": "Array",
             "description": "URLs to start with",
             "prefill": [
                 { "url": "http://example.com" },
@@ -36,7 +36,7 @@ The basic structure of the input schema is:
         },
         "pageFunction": {
             "title": "Page function",
-            "type": "string",
+            "type": "String",
             "description": "Function executed for each request",
             "prefill": "async () => {return $('title').text();}",
             "editor": "javascript"
@@ -47,11 +47,13 @@ The basic structure of the input schema is:
 ```
 
 We have currently five input types:
-- `String`
-- `Boolean`
-- `Integer`
-- `Object`
-- `Array`
+- `String` / `string`
+- `Boolean` / `boolean`
+- `Integer` / `integer`
+- `Object` / `object`
+- `Array` / `array`
+
+Other types like `DefaultDataset` must start with upper case.
 
 And in order to make actors easy to pipeline, we should also add `actor`, `actorRun` types and also
 `dataset`, `keyValueStore` and `requestQueue` types, each optionally
