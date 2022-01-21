@@ -132,10 +132,20 @@ TODO:
 
 - We need to properly define the output object, how will it look like. e.g.
 
-```
+```js
 {
-  "results": "https://api.apify.com/v2/dataset/xxxxx?fields=fff,ggg",
+  "results": {
+    "default": "https://api.apify.com/v2/dataset/xxxxx",
+  },
+  "results2": {
+    "default": https://api.apify.com/v2/dataset/xxxxx",
+    "ads": https://api.apify.com/v2/dataset/xxxxx",
+   },
+   
+   
+  // Other simpler option
   "ads": "https://api.apify.com/v2/dataset/xxxxx?fields=fff,ggg&unwind=bla",
+  "ads2": "https://api.apify.com/v2/dataset/xxxxx?view=ads",
   "screenshots": "https://api.apify.com/v2/key-value-stores/xxxxx?fields=fff,ggg&unwind=bla",
   "liveView": "https://run-234234.apify.net/some/stat/url"
 }
