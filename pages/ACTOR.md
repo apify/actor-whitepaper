@@ -34,6 +34,9 @@ It looks as follows:
 }
 ```
 
+TODO:
+- `formatVersion` vs `version` - that's confusing
+
 The `.actor/actor.json` replaces the legacy `apify.json` file.
 Here are the notes comparing the format to the previous version:
 
