@@ -44,8 +44,9 @@ there's no point to include storage schema here again, as it's done elsewhere.
     // Default dataset contains all the scraped products
     // In the "output" object, the field should be a link to dataset with the right view
     "currentProducts": {
+      // TODO: What if user wants to reference a dataset that was passed on input,
+      // not just "DefaultDataset"? Will we allow this?
       "type": "DefaultDataset",
-      "schema": "./products_dataset_schema.json",
       "view": "productVariants"
     },
 
@@ -127,3 +128,15 @@ This tab will be at the first position and displayed by default. Tab will show t
 - Optionally, the setup for different states
 - Be able to pragmatically changes this using API by actor itself
 
+TODO:
+
+- We need to properly define the output object, how will it look like. e.g.
+
+```
+{
+  "results": "https://api.apify.com/v2/dataset/xxxxx?fields=fff,ggg",
+  "ads": "https://api.apify.com/v2/dataset/xxxxx?fields=fff,ggg&unwind=bla",
+  "screenshots": "https://api.apify.com/v2/key-value-stores/xxxxx?fields=fff,ggg&unwind=bla",
+  "liveView": "https://run-234234.apify.net/some/stat/url"
+}
+```
