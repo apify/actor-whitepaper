@@ -60,7 +60,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
         "productVariants.color": "String",  
         ...
     },
-    "views": {
+    "collections": {
         "overview": {
             "name": "Products overview",
             "description": "Displays only basic fields such as title and price",
@@ -72,7 +72,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
                     "picture"
                 ]
             },
-            "visualisation": {
+            "view": {
                 "component": "grid",
                 "options": { "width": 6 },
                 "properties": {
@@ -95,7 +95,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
                 "unwind": "productVariants"
 
             },
-            "visualisation": {
+            "view": {
                 // Simply renders all the available fields
                 "component": "table"
             }
@@ -164,26 +164,26 @@ Here is a comparison of JSON Schema and Easy JSON Schema:
 }
 ```
 
-## Views
+## Collections
 
-Dataset view enables the user to explore certain data ways. For example the
-[Google Search Scraper](https://apify.com/apify/google-search-scraper) enables the user to View 
+Dataset collections enables the user to explore certain data ways. For example the
+[Google Search Scraper](https://apify.com/apify/google-search-scraper) enables the user to collect 
 the results in multiple ways:
 - One item = one page with two embed arrays of organic results and ads
 - One item = one organic results
 - One item = one search result
 
-The first View in the list is considered to be a default one.
+The first collection in the list is considered to be a default one.
 
-### Views's transformation
+### Collection's transformation
 
 Transformation is a combination of a 
 [GET dataset items](https://docs.apify.com/api#/reference/datasets/item-collection/get-items)
-API endpoint parameters. This makes View usable in both UI and API
+API endpoint parameters. This makes Collections usable in both UI and API
 where the users can use it to preset the parameters easily, for example:
 
 ```
-https://api.apify.com/v2/datasets/[ID]/items?format=[FORMAT]&view=searchResults
+https://api.apify.com/v2/datasets/[ID]/items?format=[FORMAT]&collection=searchResults
 ```
 
 instead of this complicated URL in the case of [Google Search Scraper](https://apify.com/apify/google-search-scraper#how-to-get-one-search-result-per-row):
@@ -204,12 +204,12 @@ And here is the description from the dataset schema:
   },
 ```
 
-### View's visualization
+### Collection's view
 
 It's a triplet of `component`, `options`, and `properties` (according to the ReactJS language) that maps dataset fields to template property names.
 
 ```
-visualization: {
+view: {
     component: 'grid',
     options: {
       columns: 6,
