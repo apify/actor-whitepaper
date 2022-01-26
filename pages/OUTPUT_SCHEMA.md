@@ -150,3 +150,86 @@ TODO:
   "liveView": "https://run-234234.apify.net/some/stat/url"
 }
 ```
+
+#### Case 1 - no views in output
+
+UI:
+- We simply render the first view for the both dataset and key-value store with some switcher for the other ones
+
+Schema:
+
+```json
+{
+    "currentProducts": {
+      "type": "DefaultDataset"
+    },
+    "images": {
+      "type": "KeyValueStore"
+    }
+}
+```
+
+Output:
+
+```json
+{
+    "currentProducts": {
+      "type": "DefaultDataset",
+      "id": "lkspwWd8dFknjkxx",
+      "url": "https://api.apify.com/datasets/...."
+      "views": ["allProducts", "byCategory"]
+    },
+    "images": {
+      "type": "KeyValueStore",
+      "id": "sksowWnsjkwSopjs",
+      "url": "https://api.apify.com/key-value-stores/....",
+      "recordGroups": ["screenshots", "products"]
+    }
+}
+```
+
+Questions:
+- Shouldn't we expend "views" and "recordGroups" to actual URLs?
+
+#### Case 2 - views in output
+
+UI:
+- We will render only the defined view and also embed only that view into the output 
+
+
+Schema:
+
+```json
+{
+    "allProducts": {
+      "type": "DefaultDataset"
+      "view": "allProducts"
+    },
+    "productImages": {
+      "type": "KeyValueStore"
+      "recordGroup": "products" 
+    }
+}
+```
+
+Output:
+
+```json
+{
+    "allProducts": {
+      "type": "DefaultDataset",
+      "id": "lkspwWd8dFknjkxx",
+      "view": "allProducts",
+      "url": "https://api.apify.com/datasets/....?view=allProducts"
+    },
+    "productImages": {
+      "type": "KeyValueStore",
+      "id": "sksowWnsjkwSopjs",
+      "url": "https://api.apify.com/key-value-stores/....?recordGroup=products",
+      "recordGroup": "products"
+    }
+}
+```
+
+Questions:
+- Shouldn't we always add the whole default dataset and key value store to output?
