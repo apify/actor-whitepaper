@@ -36,6 +36,8 @@ It looks as follows:
 
 TODO:
 - `formatVersion` vs `version` - that's confusing
+   Franta suggests How about `actorSpecificationVersion` or `specVersion`, or something in between
+   Maybe `actorVersion` is best?
 
 The `.actor/actor.json` replaces the legacy `apify.json` file.
 Here are the notes comparing the format to the previous version:
@@ -58,6 +60,9 @@ Here are the notes comparing the format to the previous version:
   Note that `apify push` has option `--target=eva/my-actor:0.0` that allows
   deployment of the actor under a different user account, using permissions
   and personal API token of the current user.
+  We should also add options to override only parts of this, 
+  like `--target-user` (ID or username), `--name`, `--build-tag` and `--version`,
+  it would be useful e.g. in CI for beta versions etc.
 - Note that `version` and `buildTag` are shared across actor deployments to
   all user accounts, similarly as with software libraries,
   and hence they are part of `actor.json`.
@@ -78,3 +83,20 @@ TODOs:
 - The above text needs reformatting, make it more like a reference
 - Maybe we can skip `formatVersion` altogether and be backward-compatible like package.json.
   It would be easier for developers. Let's keep it for now, we can remove it later.
+  The consensus seems to keep it, just in case...
+
+
+Idea from Franta:
+
+We could have a key here `defaultStorages`, where we could specify all the default storages which will be created for each run, and their schemas, it would be a bit cleaner, and it would be easy to implement Ondra's idea about having multiple default storages of the same type for a run. And if some actor doesn't need a dataset or request queue, we wouldn't have to create it.
+
+Something like
+```json
+"defaultStorages": [
+    { "type": "dataset", "id": "productsDataset", "schema": "products_dataset_schema.json" },
+    { "type": "dataset", "id": "categoriesDataset", "schema": "categories_dataset_schema.json" },
+    { "type": "keyValueStore", "id": "imagesStore", "schema": "images_store_schema.json" },
+]
+```
+
+Then we could reference those storages from the output schema by their `id`. This way the output schema wouldn't have to deal with the storages schema, and it could just piece together the output from the default storages & input storages.

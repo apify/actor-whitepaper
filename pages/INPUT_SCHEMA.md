@@ -103,6 +103,10 @@ For example:
 This example would be rendered in Input UI as a search/dropdown that would only list named
 datasets or key-value stores with matching schema. This feature will make it easy to integrate actors,
 and pipe results from one to another.
+Note from Franta: It would be cool to have an option in the dropdown to create a
+new dataset/key-value store with the right schema,
+if it's the first time you're running some actor,
+and then in the next runs you could reuse it.
 
 Note that the actor's default dataset cannot be used as input, as it doesn't exist before the 
 actor is started. That's quite logical. But it also means that if the actor wants
