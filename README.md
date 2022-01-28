@@ -754,7 +754,7 @@ const run = await Actor.call(
 );
 
 // Run actor and don't wait for it to finish
-const run2 = await Actor.run(
+const run2 = await Actor.start(
   'apify/google-search-scraper',
   { queries: 'test' },
   { memoryMbytes: 2048 },
