@@ -17,7 +17,7 @@ Changes to the legacy `INPUT_SCHEMA.json`:
 
 The basic structure of the input schema is:
 
-```json
+```jsonc
 {
     "schemaType": "ActorInputSchema",
     "schemaVersion": 2,
@@ -81,7 +81,7 @@ And how about `actorRun` ???
 
 For example:
 
-```json
+```jsonc
   "inputDataset": {
     "title": "Input dataset",
     "type": "dataset",

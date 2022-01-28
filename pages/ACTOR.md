@@ -4,7 +4,7 @@ This JSON file must be present at `.actor/actor.json` and contains the main defi
 
 It looks as follows:
 
-```json
+```jsonc
 {
   "formatVersion": 2,
   "name": "google-search-scraper",

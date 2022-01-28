@@ -9,7 +9,7 @@ store multiple types of files into the key-value store. Let's say the scraper st
 So for each of these, we would define a prefix group and allow the user to list images from a single group in both the
 UI and API.
 
-```json
+```jsonc
 {
    "recordGroups": {
       "screenshots": {
@@ -25,7 +25,7 @@ UI and API.
 A good example is [monitoring](https://apify.com/apify/monitoring#check-frequency) actor that generates HTML report that we would
 like to embed to run view for the user once the monitoring is finished.
 
-```json
+```jsonc
 {
     "recordGroups": {
         "monitoringReport": {
@@ -43,7 +43,7 @@ as the implementation and API will be the same.
 
 ## Structure
 
-```json
+```jsonc
 {
     "schemaType": "KeyValueStoreSchema",
     "schemaVersion": 2,

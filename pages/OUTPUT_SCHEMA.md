@@ -35,7 +35,7 @@ there's no point to include storage schema here again, as it's done elsewhere.
 
 ## Structure
 
-```json
+```jsonc
 {
   "schemaType": "ActorOutputSchema",
   "schemaVersion": 2,
@@ -158,7 +158,7 @@ UI:
 
 Schema:
 
-```json
+```jsonc
 {
     "currentProducts": {
       "type": "DefaultDataset"
@@ -171,7 +171,7 @@ Schema:
 
 Output:
 
-```json
+```jsonc
 {
     "currentProducts": {
       "type": "DefaultDataset",
@@ -199,7 +199,7 @@ UI:
 
 Schema:
 
-```json
+```jsonc
 {
     "allProducts": {
       "type": "DefaultDataset"
@@ -214,7 +214,7 @@ Schema:
 
 Output:
 
-```json
+```jsonc
 {
     "allProducts": {
       "type": "DefaultDataset",

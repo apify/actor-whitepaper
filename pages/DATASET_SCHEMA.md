@@ -44,7 +44,7 @@ Uncaught Error: Dataset schema is not compatible with a given schema
 
 ## Structure
 
-```json
+```jsonc
 {
     "schemaType": "DatasetSchema",
     "schemaVersion": 2,
@@ -116,7 +116,7 @@ Let's start with Easy JSON schema to keep things simple, we can extend in the fu
 
 Here is a comparison of JSON Schema and Easy JSON Schema:
 
-```json
+```jsonc
 {
   "id": "string",
   "*name": "string",
@@ -128,7 +128,7 @@ Here is a comparison of JSON Schema and Easy JSON Schema:
 }
 ```
 
-```json
+```jsonc
 {
   "type": "object",
   "required": [
@@ -194,7 +194,7 @@ https://api.apify.com/v2/datasets/[ID]/items?format=[FORMAT]&fields=searchQuery,
 
 And here is the description from the dataset schema:
 
-```json
+```jsonc
   "transformation": {
       "fields": [
           "searchQuery",
