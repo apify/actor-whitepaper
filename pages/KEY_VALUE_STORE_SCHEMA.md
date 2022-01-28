@@ -11,7 +11,7 @@ UI and API.
 
 ```jsonc
 {
-   "recordGroups": {
+   "collections": {
       "screenshots": {
             "name": "Post images",
             "keyPrefix": "images-",
@@ -27,7 +27,7 @@ like to embed to run view for the user once the monitoring is finished.
 
 ```jsonc
 {
-    "recordGroups": {
+    "collections": {
         "monitoringReport": {
             "name": "Monitoring report",
             "description": "HTML page containing monitoring results",
@@ -50,7 +50,7 @@ as the implementation and API will be the same.
     "name": "My Instagram backup",
     "description": "Backup of my Instagram account",
     
-    "recordGroups": {
+    "collections": {
         "postImages": {
             "name": "Post images",
             "description": "Contains all Instagram post images",
@@ -82,8 +82,6 @@ https://api.apify.com/v2/key-value-stores/storeId/keys?prefix=post-images-
 ```
 
 ## TODO
-- JC: I'm still not sure about the name `recordGroups`, it implies that it's only groups of records,
-  while it can be just individual records. Maybe we can find something better?
 - What is kv-store schema is used by actor to define structure of key-value store it operates on,
   but the developer defines a non-compatible record group for "INPUT" prefix?
   Maybe the default kv-stores should be created with a default record group to cover the "INPUT" prefixes
