@@ -39,46 +39,46 @@ const dataset = await Apify.openDataset('my-new-dataset', { schema });
 This also ensures that you are opening a dataset that is compatible with the actor as otherwise, you get an error:
 
 ```
-Uncaught Error: Dataset schema is not compatible with a given schema
+Uncaught Error: Dataset schema is not compatible with the provided schema
 ```
 
 ## Structure
 
 ```jsonc
 {
-    "schemaType": "DatasetSchema",
-    "schemaVersion": 2,
-    "name": "Eshop products",
+    "actorSpecificationVersion": 1,
+    "title": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
     "fields": {
-        "title": "String",  
-        "priceUsd": "Number", 
-        "manufacturer": "Object",
-        "manufacturer.title": "String", 
-        "manufacturer.url": "Number",
-        "productVariants": "Array",
-        "productVariants.color": "String",  
+        "title": "string",  
+        "priceUsd": "number", 
+        "manufacturer": {
+            "title": "string", 
+            "url": "number",
+        },
+        "productVariants": [{
+            "color": "?string"
+        }],
+        
         ...
     },
     "views": {
         "overview": {
-            "name": "Products overview",
+            "title": "Products overview",
             "description": "Displays only basic fields such as title and price",
             "transformation": {
-                // Comma separated arrays such as "fields" and "pick" will be written as arrays
                 "fields": [
                     "title",
                     "price",
                     "picture"
                 ]
             },
-            "visualisation": {
+            "display": {
                 "component": "grid",
                 "options": { "width": 6 },
                 "properties": {
                     "title": "$title",
-                    // We will need some templating here
-                    "description": "${price} USD",
+                    "description": "$price USD",
                     "pictureUrl": "$picture"
                 }
             }
@@ -95,8 +95,9 @@ Uncaught Error: Dataset schema is not compatible with a given schema
                 "unwind": "productVariants"
 
             },
-            "visualisation": {
-                // Simply renders all the available fields
+            "display": {
+                // Simply renders all the available fields. 
+                // This component is used by default when no display is specified.
                 "component": "table"
             }
         }
@@ -175,7 +176,7 @@ the results in multiple ways:
 
 The first View in the list is considered to be a default one.
 
-### Views's transformation
+### Views' transformation
 
 Transformation is a combination of a 
 [GET dataset items](https://docs.apify.com/api#/reference/datasets/item-collection/get-items)
@@ -204,12 +205,12 @@ And here is the description from the dataset schema:
   },
 ```
 
-### View's visualization
+### Display of a view
 
 It's a triplet of `component`, `options`, and `properties` (according to the ReactJS language) that maps dataset fields to template property names.
 
 ```
-visualization: {
+display: {
     component: 'grid',
     options: {
       columns: 6,
