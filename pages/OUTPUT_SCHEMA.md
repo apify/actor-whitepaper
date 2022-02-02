@@ -117,7 +117,6 @@ This tab will be at the first position and displayed by default. Tab will show t
 
 ```jsonc
 {
-    "actorSpecificationVersion": 1,
     "title": "Some title",
     "description": "Some description",
     "properties": {
