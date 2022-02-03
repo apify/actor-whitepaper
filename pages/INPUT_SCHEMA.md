@@ -10,7 +10,7 @@ the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/d
 
 Changes to the legacy `INPUT_SCHEMA.json`:
 - We removed `title`, it is largely useless.
-- Using `actorSpecificationVersion` instead of `schemaVersion`, to make it clear what is this file,
+- Using `actorSpecification` instead of `schemaVersion`, to make it clear what is this file,
   as file names can be arbitrary.
 - define what is required at field level instead of having a separate
   property `"required": ["startUrls", "pageFunction"]`.
@@ -19,7 +19,7 @@ The basic structure of the input schema is:
 
 ```jsonc
 {
-    "actorSpecificationVersion": 1,
+    "actorSpecification": 1,
     "description": "Text that is shown in the Input UI",
     "properties": {
         "startUrls": {

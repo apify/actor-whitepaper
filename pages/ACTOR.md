@@ -6,7 +6,7 @@ It looks as follows:
 
 ```jsonc
 {
-  "actorSpecificationVersion": 2, // required
+  "actorSpecification": 2, // required
   "name": "google-search-scraper",
   "title": "Google Search Scraper",
   "description": "The 200-char description",

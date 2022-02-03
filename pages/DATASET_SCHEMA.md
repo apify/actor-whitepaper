@@ -46,7 +46,7 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 
 ```jsonc
 {
-    "actorSpecificationVersion": 1,
+    "actorSpecification": 1,
     "title": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
     "fields": {
