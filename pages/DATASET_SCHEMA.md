@@ -84,7 +84,7 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
             }
         },
         "productVariants": {
-            "name": "Product variants",
+            "title": "Product variants",
             "description": "Each product expanded into item per variant",
             "transformation": {
                 "fields": [
