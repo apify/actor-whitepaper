@@ -985,7 +985,78 @@ $ kill <pid>
 
 ### Live view
 
+Each running actor can  
+
 TODO: Desribe more, show example URLs etc.
+
+
+### Charging money
+
+To run an actor on Apify platform, you might have
+to purchase a paid plan and then pay for the computing resources, 
+and potentially a fixed fee for using the actor if it's "paid". So far so good.
+
+But what sets actors apart from other cloud computing systems
+is an inherent monetization system, which enables developers to charge users variables
+amounts based on dynamic properties, e.g. requested number of results,
+complexity of the input, or external APIs required for the operation.
+
+Users of actors can ensure they will not be charged too much by specifying
+the maximum amount when running an actor.
+
+To charge the current user of the actor a specific amount, do this:
+
+#### Node.js
+
+```js
+const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
+```
+
+Users of actors can ensure they will not be charged too much by specifying
+the maximum amount when running an actor.
+
+```js
+const run = await Actor.call(
+  'bob/analyse-images',
+  { imageUrls: ['...'] },
+  {
+      // By default, it's 0, hence actors cannot charge users unless they specifically enable that.
+      maxCreditsUsd: 5,
+  },
+);
+```
+
+When a paid actor subsequently starts another paid actor, the charges performed
+by the subsequent actors are taken from the main actor's credits. This enables
+
+Few rules for using paid actors:
+
+- If your actor is charging users, make sure at the earliest time possible  
+  that the actor is being run with sufficient credits by checking the input
+  and `MAX_CREDITS_USD` (see Environment variables TODO).
+  If the maximum credits are not sufficient for actors operation with respect
+  to the input, fail the actor immediately with a reasonable error message for the user.
+- You can call `Actor.charge()` as many times as you want, but once
+  the total sum of charged credits would exceed the maximum limit,
+  the function throws an error.
+- Only charge the users right after you have incurred the costs,
+  not in advance. If the actor fails in the middle or is aborted, the users
+  only need to be charged for results they actually received.
+  Nothing will make users of your actors angrier than charging them for something they didn't get.
+
+
+**TODO**
+- In actor specification file, add `perUnitCreditsUsd` field to actor input fields
+  which can be used by the Apify platform to automatically inform the user about
+  maximum possible charge, and automatically set `maxCreditsUsd`. For example,
+  for Instagram Scraper paid by number of profiles scraped, this setting would be 
+  added to `maxProfileCount` field which limits the maximum number of profiles to scrape.
+  Note that the actor doesn't know in advance how many profiles it will be able to fetch,
+  hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
+  
+
+
+
 
 ## Actor definition files
 
@@ -1137,8 +1208,6 @@ To improve user and community engagement, we should enable people to upload thei
 
 For example, for our help with the COVID-19 pandemic, we released a new page at https://apify.com/covid-19 with list of relevant actors and datasets. Why not let people do the same? Anyone could create a new team (e.g. called `covid-19`), change branding of the page a bit, upload a Markdown with text content, and the system will automatically show user’s published actors, datasets and key-value stores.
 
-On user account, there should be just one global setting called `Make profile public` instead of the current `Make profile picture publicly visible`
-
 
 ### Shared actors
 
@@ -1167,7 +1236,6 @@ From last meeting
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
 - Maybe we should add "API" section to all the programming interface sections,
   so that this is a complete reference. Would be useful also to understand the actor output.
-- Add pricing
 - To storages, add info about atomic rename, e.g. `setName` function, and link to other operations...
 - Add comparison with other systems, like Lambda etc.
 - Review the [old initial specification](https://docs.google.com/document/d/15qL6Vl2Uztn8DbSp_22o4uhqyEaOHTqhFBlCTvJy700/edit#heading=h.fzd6vjhdt62n) of actors and see what can be reused
