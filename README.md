@@ -694,8 +694,10 @@ TODO: Add a table of events and details of params, plus links, timeouts etc.
 
 #### Node.js
 
+TODO: More info about how it looks: `persistState`, `aborting`, `Actor.off()` ...
+
 ```js
-Actor.on('cpuInfo', (data) => {
+Actor.on('systemInfo', (data) => {
     if (data.isCpuOverloaded) console.log('Oh no, the CPU is overloaded!');
 });
 ```
@@ -765,7 +767,6 @@ const run2 = await Actor.start(
 console.log(`Output object: ${run2.output}`);
 ```
 
-TODO: Review note about naming (`start`) at https://github.com/apify/actor-specs/pull/5#discussion_r775385311
 
 #### CLI
 
@@ -875,6 +876,8 @@ Run another actor or an external HTTP API endpoint after actor run finishes or f
 
 #### Node.js
 
+TODO: Check the API is as is now
+
 ```js
 await Actor.addWebhook({
     eventType: ['SUCCEEDED', 'FAILED'],
@@ -960,13 +963,13 @@ Indeed, the flow is to start one actor, and pass one of it's storages as default
 
 ### Abort another actor
 
-Abort itself or other running actor on the Apify platform,
+Abort itself or another running actor on the Apify platform,
 changing its [status](#actor-status) to `ABORTED`.
 
 #### Node.js
 
 ```js
-await Actor.abort({ message: 'Job was done,', actorRunId: 'RUN_ID' });
+await Actor.abort({ statusMessage: 'Job was done,', actorRunId: 'RUN_ID' });
 ```
 
 #### CLI
