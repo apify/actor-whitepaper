@@ -1,4 +1,4 @@
-# Apify's Actor Programming Model Whitepaper [DRAFT]
+# The Actor Programming Model Whitepaper [DRAFT]
 
 **The new way to develop serverless microapss called _actors_
 that are easy to ship to users,
@@ -72,17 +72,17 @@ This document explains how to develop _actors_,
 a new kind of serverless microapps for general-purpose language-agnostic computing and automation jobs.
 The main design goal for actors is to make it easy for developers build and ship reusable
 cloud software tools, which are also easy to run
-and integrate by their potentially not-too-technical users.
+and integrate by potentially not-too-technical users.
 
 The actors were first introduced by [Apify](https://apify.com/) in late 2017,
 as a way to easily build, package, and ship web scraping and web automation tools to customers.
-Over the four years, we kept developing the concept and applied
+Over the next years, Apify kept developing the concept and applied
 it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
 Drawing on our experience,
 we're now releasing this formal specification of the actor programming model,
-in a hope to make it a new standard and help community to more effectively
+in a hope to make it a new open standard and help community to more effectively
 build and ship software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
@@ -97,30 +97,31 @@ or removing duplicates from a large dataset.
 Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
 
 Basically, actors are Docker images that additionally have:
-- **Documentation** in a form of README.md file.
+- **Documentation** in a form of README.md file
 - **Input and output schemas** that describe what input the actor requires,
-  and what results it produces.
+  and what results it produces
 - Access to an out-of-box **storage system** for actor data, results, and files
-- **Metadata** such as the actor name, description, author and version.
+- **Metadata** such as the actor name, description, author and version
 
 The documentation and input/output schemas are the key ingredients
 that make it possible for people to easily understand what the actor does,
-enter the required inputs, and integrate the results of the actor into their other workflows.
+enter the required inputs both in user interface or API,
+and integrate the results of the actor into their other workflows.
 Actors can easily call and interact with each other, enabling building more complex
 tools on top of simple ones.
 
 The actors can be published
 on the [Apify platform](https://apify.com/store),
 which automatically generates a rich website with documentation
-and a practical user interface to encourage people to try the actor right away.
+and a practical user interface, in order to encourage people to try the actor right away.
 The platform takes care of securely hosting the actors' Docker containers
 and scaling the computing, storage and network resources as needed,
 so neither actor developers nor the users need to deal with the infrastructure.
 It just works.
 
-The Apify platform provides an open API, cron-like scheduler, webhooks
+The Apify platform provides an open API, cron-style scheduler, webhooks
 and [integrations](https://apify.com/integrations)
-to services such as Zapier or Integromat, which make it easy for users
+to services such as Zapier or Make, which make it easy for users
 to integrate actors into their existing workflows. Additionally, the actor developers
 can set a price tag for the usage of their actors, and thus make
 [passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-actors-b0392278d085/)
