@@ -38,41 +38,43 @@ there's no point to include storage schema here again, as it's done elsewhere.
 ```jsonc
 {
   "actorSpecification": 1,
-  "description": "Text that is shown in the Output UI",
+  "title": "Some title", // optional
+  "description": "Text that is shown in the Output UI", // optional
   "properties": {
     // Default dataset contains all the scraped products
     // In the "output" object, the field should be a link to dataset with the right view
     "currentProducts": {
       "type": "dataset",
-      "views": ["productVariants"]
+      "views": ["productVariants"] // optional, default means all views in dataset
       // If the user wants to use an existing dataset,
       // they should reference it from input:
-      "target": "$input.myProductsDatasetId"
+      "target": "$input.myProductsDatasetId" //optional
     },
 
     // Selects a specific group of records with a certain prefix. In UI, this can be shown
     // as a list of images. In the output object, this will be a link to a API with "prefix" param.
     "productImages": {
-      "title": "Product images",
       "type": "key-value-store",
-      "description": "Yaddada",
-      "collections": ["screenshots"]
+      "title": "Product images", //optional
+      "description": "Yaddada", //optional
+      "collections": ["screenshots"] // optional, default means all collections in key-value-store
     },
     
     // If the users want to reference a single file, they do it via selecting a collection
     // that displays only a single file. In the output object, the result should be a link to file.
     "summaryReportView": {
-      "title": "API server",
       "type": "key-value-store",
-      "collections": ["monitoringReport"]
+      "title": "API server", // optional
+      "collections": ["monitoringReport"],
+      "target": "default" //optional
     },
 
     // Live view
     // In the "output" object, the result should be a link to live view URL
     "apiServer": {
-      "title": "API server",
       "type": "live-view",
-      "description": "API documentation is available in swagger.com/api/xxxx",
+      "title": "API server", // optional
+      "description": "API documentation is available in swagger.com/api/xxxx", // optional
       "path": "/nice-report?query=123",
       // IDEA: In the future, we could perhaps work with the API/swagger schema on more advanced level,
       // but it might be an overkill
@@ -121,8 +123,8 @@ This tab will be at the first position and displayed by default. Tab will show t
     "description": "Some description",
     "properties": {
         "currentProducts": {
-            "type": "dataset",
             "id": "lkspwWd8dFknjkxx",
+            "type": "dataset",
             "url": "https://api.apify.com/datasets/lkspwWd8dFknjkxx",
             "views": {
                 "productVariants": {
@@ -133,10 +135,10 @@ This tab will be at the first position and displayed by default. Tab will show t
             }
         },
         "productImages": {
+            "id": "FkspwWd8dFknjkxx",
             "type": "key-value-store",
             "title": "Product images",
             "description": "Yaddada",
-            "id": "FkspwWd8dFknjkxx",
             "url": "https://api.apify.com/key-value-stores/FkspwWd8dFknjkxx",
             "collections": {
                 "screenshots": {

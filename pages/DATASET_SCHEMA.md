@@ -47,9 +47,9 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 ```jsonc
 {
     "actorSpecification": 1,
-    "title": "Eshop products",
-    "description": "Dataset containing the whole product catalog including prices and stock availability.",
-    "fields": {
+    "title": "Eshop products", // optional
+    "description": "Dataset containing the whole product catalog including prices and stock availability.", // optional
+    "fields": { // not supported yer
         "title": "string",  
         "priceUsd": "number", 
         "manufacturer": {
@@ -64,22 +64,30 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
     },
     "views": {
         "overview": {
-            "title": "Products overview",
-            "description": "Displays only basic fields such as title and price",
+            "title": "Products overview", // optional
+            "description": "Displays only basic fields such as title and price", // optional
             "transformation": {
                 "fields": [
                     "title",
                     "price",
-                    "picture"
+                    "picture",
+                    "productDetails/color"
                 ]
             },
             "display": {
-                "component": "grid",
-                "options": { "width": 6 },
+                "component": "table",
                 "properties": {
-                    "title": "$title",
-                    "description": "$price USD",
-                    "pictureUrl": "$picture"
+                    "price": {
+                      "label": "Price USD",
+                      "format": "number"
+                    },
+                    "picture": {
+                      "label": "Cover",
+                      "format": "image"
+                    },
+                    "productDetails/color":{
+                      "label": "Color",
+                    },
                 }
             }
         },
@@ -91,9 +99,7 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
                     "title",
                     "price",
                     "productVariants"
-                ],
-                "unwind": "productVariants"
-
+                ]
             },
             "display": {
                 // Simply renders all the available fields. 
@@ -211,14 +217,20 @@ It's a triplet of `component`, `options`, and `properties` (according to the Rea
 
 ```
 display: {
-    component: 'grid',
+    component: "grid",
     options: {
       columns: 6,
     },
     properties: {
-        image: '$image.href',
-        title: '$title',
-        url: '$field1.field2.url,
+        "title":{
+          position:"header"
+        },
+        "image/href":{
+          position:"image"
+        },
+        "field1/field2/url":{
+          position:"link"
+        }
     }
 }
 ```
