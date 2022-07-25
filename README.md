@@ -81,8 +81,8 @@ it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
 Drawing on our experience,
-we're now releasing this formal specification of the actor programming model,
-in a hope to make it a new open standard and help community to more effectively
+we're now releasing this specification of the actor programming model,
+in a hope to make it a new open standard, and to help community to more effectively
 build and ship software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
