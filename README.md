@@ -80,16 +80,15 @@ Over the next years, Apify kept developing the concept and applied
 it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
-Drawing on our experience,
-we're now releasing this specification of the actor programming model,
+Drawing on this experience,
+we're releasing this specification of the actor programming model to the public,
 in a hope to make it a new open standard, and to help community to more effectively
 build and ship software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
 ### Basic concept
 
-Actors are serverless programs running in the cloud,
-best suited for execution of batch operations.
+Actors are serverless programs running in the cloud.
 They can perform anything from simple actions such as
 filling out a web form or sending an email,
 to complex operations such as crawling an entire website,
@@ -103,8 +102,7 @@ Basically, actors are Docker images that additionally have:
 - Access to an out-of-box **storage system** for actor data, results, and files
 - **Metadata** such as the actor name, description, author and version
 
-The documentation and input/output schemas are the key ingredients
-that make it possible for people to easily understand what the actor does,
+The documentation and input/output make it possible for people to easily understand what the actor does,
 enter the required inputs both in user interface or API,
 and integrate the results of the actor into their other workflows.
 Actors can easily call and interact with each other, enabling building more complex
@@ -127,44 +125,50 @@ can set a price tag for the usage of their actors, and thus make
 [passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-actors-b0392278d085/)
 to have an incentive to keep developing and improving the actor for the users.
 
+Currently, actors can run locally or on the Apify platform. However, one of the goals of this open 
+specification is to motivate creation of new runtime environments outside of Apify.
+
 The ultimate goal of the actor programming model is to make it as simple as possible
-for people to develop, run and integrate software automation tools.
+for people to develop, run, and integrate software automation tools.
 
 ### What actors are not
 
 Actors are best suited for batch operations that take an input, perform an isolated job for a user,
-and potentially produce some results.
-However, actors are currently not ideally suited for continuous computing or storage workloads, such
+and potentially produce some output.
+However, actors are currently not best suited for continuous computing or storage workloads, such
 as running a live website, API backend, or database.
+
+As actors are based on Docker, it takes certain amount of time to spin up the container
+and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
+even for highly-optimized Docker images. For long-running jobs, actor execution might be migrated
+to another machine, making it unsuitable for databases.
 
 ### Word of warning
 
 Currently, the only available implementation of the actor model is provided by
-[Apify SDK for Node.js](https://sdk.apify.com), but it uses a legacy API and syntax
-that is not described in this document.
+[Apify SDK for Node.js](https://sdk.apify.com), but the implementation is incomplete.
 The goal of this document is to define the north star how Apify's and other implementations
-of actor programming model should look like. Once we release the new implementations
-for Node.js, Python or CLI, we'll release this document to the public
-and make it part of Apify documentation.
+of actor programming model should look like. We'll keep working the implementations
+for Node.js, Python or CLI along the way.
 
 ## Philosophy
 
 Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)** from the 1970s:
 
 1. **Make each program do one thing well**. To do a new job, build afresh rather than complicate old programs by adding new “features”.
-2. Expect the **output of every program to become the input to another**, as yet unknown, program. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
+2. Expect the **output of every program to become the input to another, as yet unknown, program**. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
 3. Design and build software, even operating systems, to be **tried early**, ideally within weeks. Don’t hesitate to throw away the clumsy parts and rebuild them.
 4. **Use tools in preference to unskilled help** to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you’ve finished using them.
 
 The UNIX philosophy is arguably one of the most important software engineering paradigms
 which, together with other favorable design choices of UNIX operating systems,
 ushered the computer and internet revolution.
-By combining smaller parts (programs)
-that can be developed and used independently,
+By combining smaller parts
+that can be developed and used independently (programs),
 it suddenly became possible to build, manage and gradually evolve ever more complex computing systems.
 Even today's modern mobile devices are effectively UNIX-based machines that run a lot of programs
 interacting with each other, and provide a terminal
-which looks very much like early UNIX terminals (actually terminal is just another program).
+which looks very much like early UNIX terminals. In fact, terminal is just another program.
 
 The UNIX-style programs represent a great way to package software for usage
 on a local computer. The programs can be easily used stand-alone,
