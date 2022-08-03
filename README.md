@@ -146,10 +146,10 @@ to another machine, making it unsuitable for databases.
 ### Word of warning
 
 Currently, the only available implementation of the actor model is provided by
-[Apify SDK for Node.js](https://sdk.apify.com), but the implementation is incomplete.
+[Apify SDK for Node.js](https://sdk.apify.com).
 The goal of this document is to define the north star how Apify's and other implementations
-of actor programming model should look like. We'll keep working the implementations
-for Node.js, Python or CLI along the way.
+of actor programming model should look like. We keep working on full implementations
+for Node.js, Python and CLI.
 
 ## Philosophy
 
@@ -206,10 +206,10 @@ Process exit code | Actor exit code
 
 ### Design goals
 
-- Keep it as simple as possible, but not simpler
-- Each actor should do just one thing, and have everything to run on its own
-- When in doubt, optimize for the users of the actors, e.g. generating a nice user interface
-- TODO...
+- Each actor should do just one thing, and do it well.
+- Keep it as simple as possible, but not simpler.
+- When in doubt, optimize for the users, help them understand what the actor does
+- ?
 
 ### Relation to the Actor model
 
@@ -238,7 +238,7 @@ or affect each other by sharing some internal state or storage.
 The actors simply do not have any formal restrictions,
 and they can access whichever external systems they want.
 
-TODO: From Ondra: Maybe that's a shame. Would be nice to have an API that would send a message to a run and the run would get it as `.on('message', (msg) => { ... })`. Would save people from implementing their own servers in actors.
+<!-- TODO: From Ondra: Maybe that's a shame. Would be nice to have an API that would send a message to a run and the run would get it as `.on('message', (msg) => { ... })`. Would save people from implementing their own servers in actors. -->
 
 ### Why the name "actor" ?
 
@@ -425,6 +425,49 @@ int main (int argc, char *argv[]) {
 }
 ```
 
+### Key-value store
+
+Write and read arbitrary files using a storage
+called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
+When an actor starts, by default it is associated with a newly-created key-value store,
+which only contains one file with input of the actor (see [Get input](#get-input)).
+
+The user can override this behavior and specify another key-value store or input key
+when running the actor.
+
+#### Node.js
+
+```js
+// Save object to store (stringified to JSON)
+await Actor.setValue('my-state', { something: 123 });
+
+// Save binary file to store with content type
+await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
+
+// Get record from store (automatically parsed from JSON)
+const value = await Actor.getValue('my-state');
+```
+
+#### Python
+
+```python
+# Save object to store (stringified to JSON)
+await actor.set_value('my-state', { something=123 })
+
+# Save binary file to store with content type
+await actor.set_value('screenshot', buffer, { contentType='image/png' })
+
+# Get object from store (automatically parsed from JSON)
+dataset = await actor.get_value('my-state')
+```
+
+#### UNIX
+
+```bash
+$ echo "hello world" > file.txt
+$ cat file.txt
+```
+
 ### Push results to dataset
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
@@ -481,49 +524,6 @@ $ apify actor push-data --dataset=./my_dataset someResult=123
 
 ```c
 printf("Hello world\tColum 2\tColumn 3");
-```
-
-### Key-value store
-
-Write and read arbitrary files using a storage
-called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
-When an actor starts, by default it is associated with a newly-created key-value store,
-which only contains one file with input of the actor (see [Get input](#get-input)).
-
-The user can override this behavior and specify another key-value store or input key
-when running the actor.
-
-#### Node.js
-
-```js
-// Save object to store (stringified to JSON)
-await Actor.setValue('my-state', { something: 123 });
-
-// Save binary file to store with content type
-await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
-
-// Get record from store (automatically parsed from JSON)
-const value = await Actor.getValue('my-state');
-```
-
-#### Python
-
-```python
-# Save object to store (stringified to JSON)
-await actor.set_value('my-state', { something=123 })
-
-# Save binary file to store with content type
-await actor.set_value('screenshot', buffer, { contentType='image/png' })
-
-# Get object from store (automatically parsed from JSON)
-dataset = await actor.get_value('my-state')
-```
-
-#### UNIX
-
-```bash
-$ echo "hello world" > file.txt
-$ cat file.txt
 ```
 
 ### Exit actor
