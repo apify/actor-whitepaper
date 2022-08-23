@@ -1027,7 +1027,7 @@ const run = await Actor.call(
   { imageUrls: ['...'] },
   {
       // By default, it's 0, hence actors cannot charge users unless they specifically enable that.
-      maxCreditsUsd: 5,
+      maxChargeCreditsUsd: 5,
   },
 );
 ```
@@ -1057,7 +1057,7 @@ Few rules for building actors with variable charging:
 **TODO**
 - In actor specification file, add `perUnitCreditsUsd` field to actor input fields
   which can be used by the Apify platform to automatically inform the user about
-  maximum possible charge, and automatically set `maxCreditsUsd`. For example,
+  maximum possible charge, and automatically set `maxChargeCreditsUsd`. For example,
   for Instagram Scraper paid by number of profiles scraped, this setting would be 
   added to `maxProfileCount` field which limits the maximum number of profiles to scrape.
   Note that the actor doesn't know in advance how many profiles it will be able to fetch,
