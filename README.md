@@ -1010,9 +1010,6 @@ is an inherent monetization system, which enables developers to charge users var
 amounts based on dynamic properties, e.g. requested number of results,
 complexity of the input, or external APIs required for the operation.
 
-Users of actors can ensure they will not be charged too much by specifying
-the maximum amount when running an actor.
-
 To charge the current user of the actor a specific amount, do this:
 
 #### Node.js
@@ -1036,15 +1033,18 @@ const run = await Actor.call(
 ```
 
 When a paid actor subsequently starts another paid actor, the charges performed
-by the subsequent actors are taken from the main actor's credits. This enables
+by the subsequent actors are taken from the main actor's credits.
+This enables actor economy, where actors hierarchically pay other actors or external APIs
+to perform parts of the job.
 
-Few rules for using paid actors:
+Few rules for building actors with variable charging:
 
 - If your actor is charging users, make sure at the earliest time possible  
   that the actor is being run with sufficient credits by checking the input
-  and `MAX_CREDITS_USD` (see Environment variables TODO).
+  and `MAX_CREDITS_USD` environment variable (see Environment variables TODO).
   If the maximum credits are not sufficient for actors operation with respect
-  to the input, fail the actor immediately with a reasonable error message for the user.
+  to the input, fail the actor immediately with a reasonable error message for the user,
+  and don't charge the user anything.
 - You can call `Actor.charge()` as many times as you want, but once
   the total sum of charged credits would exceed the maximum limit,
   the function throws an error.
@@ -1052,7 +1052,7 @@ Few rules for using paid actors:
   not in advance. If the actor fails in the middle or is aborted, the users
   only need to be charged for results they actually received.
   Nothing will make users of your actors angrier than charging them for something they didn't get.
-
+  Add margin to cover for this potential loss.
 
 **TODO**
 - In actor specification file, add `perUnitCreditsUsd` field to actor input fields
@@ -1062,7 +1062,8 @@ Few rules for using paid actors:
   added to `maxProfileCount` field which limits the maximum number of profiles to scrape.
   Note that the actor doesn't know in advance how many profiles it will be able to fetch,
   hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
-  
+- Shall we create another actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
+  That could provide for better UX.
 
 
 
