@@ -561,6 +561,7 @@ await Actor.exit('Done right now', { timeoutSecs: 0 });
 
 // Actor will finish with 'FAILED' status 
 await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 });
+
 // ... or nicer way using this syntactic sugar:
 await Actor.fail('Could not finish the crawl, try increasing memory');
 
@@ -701,7 +702,7 @@ TODO: Add a table of events and details of params, plus links, timeouts etc.
 
 #### Node.js
 
-TODO: More info about how it looks: `persistState`, `aborting`, `Actor.off()` ...
+<!-- TODO: Add more info about how it looks: `persistState`, `aborting`, `Actor.off()` ... -->
 
 ```js
 Actor.on('systemInfo', (data) => {
@@ -751,8 +752,6 @@ returns immediately.
 ```js
 // Run actor and wait for it to finish
 const run = await Actor.call(
-  // TODO: If we had global unique names, we could allow users here to
-  //  use also actor task name or ID, and would't need Actor.callTask()
   'apify/google-search-scraper',
   { queries: 'test' },
   {
