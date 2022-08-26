@@ -67,27 +67,30 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
             "title": "Products overview", // optional
             "description": "Displays only basic fields such as title and price", // optional
             "transformation": {
+                "flatten":[
+                    "author"
+                    "latestTweets",
+                ],
                 "fields": [
-                    "title",
-                    "price",
-                    "picture",
-                    "productDetails/color"
+                    "author.name",
+                    "latestTweets.0.tweet",
+                    "someOtherField",
+                    "anotherField",
+                    "nonFlatenedObjectOrArray"
                 ]
             },
             "display": {
                 "component": "table",
                 "properties": {
-                    "price": {
-                      "label": "Price USD",
-                      "format": "number"
+                    "author.name": {
+                      "label": "Author"
                     },
-                    "picture": {
-                      "label": "Cover",
-                      "format": "image"
+                    "latestTweets.0.tweet": {
+                      "label": "Latest tweet"
                     },
-                    "productDetails/color":{
-                      "label": "Color",
-                    },
+                    "nonFlatenedObjectOrArray":{
+                      "label": "Meta"
+                    }
                 }
             }
         },
@@ -207,9 +210,16 @@ And here is the description from the dataset schema:
           "searchQuery",
           "organicResults"
       ],
-      "unwind": "organicResults"
+      "unwind": "organicResults",
+      "flatten": ["searchQuery"]
   },
 ```
+**Nested objects**
+In order to be able to properly and consistently display nested object data in Excel, CSV, Table UI etc. it is necessary to flatten or unwind the original object. 
+
+Unwind deconstructs the nested children into parent object. eg: with transformation.unwind:[”foo”] the object ```{”foo”:{”bar”:”hello”}}``` is turned into ```{’bar”:”hello”}``` ( Please be aware that in case of the object key conflict, the existing key/value will be replaced by the new key/value )
+
+Flatten transforms the nested object into flat structure. eg: with transformation.flatten:[”foo”] the object ```{”foo”:{”bar”:”hello”}}``` is turned into ```{’foo.bar”:”hello”}``` 
 
 ### Display of a view
 
@@ -225,18 +235,60 @@ display: {
         "title":{
           position:"header"
         },
-        "image/href":{
+        "image.href":{
           position:"image"
         },
-        "field1/field2/url":{
+        "field1.field2.url":{
           position:"link"
         }
     }
 }
 ```
 
+
+## Dataset schema structure definitions
+
+### DatasetSchema object definition
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| actorSpecification | integer | true | Specifies the version of dataset schema structure document. Currently only version 1 is available. |
+| fields | JSONSchema compatible object | true | Schema of one dataset object. Use JsonSchema Draft 2020-12 or other compatible format. |
+| views | DatasetView object | true | An object with description of an API and UI views |
+
+### DatasetView object definition
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| title | string | true | The title is visible in UI in Output tab as well as in the API. |
+| description | string | false | Description is only available in API response. Usage of this field is optional. |
+| transformation | ViewTransformation object | true | The definition of data transformation which is applied when dataset data are loaded from Dataset API. |
+| display | ViewDisplay object | true | The definition of Output tab UI visualisation. |
+
+### ViewTransformation object definition
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| fields | string[] | true | Selects fields that is going to be presented on Output. An order of  the fields in matches the order of columns in visualisation UI. In case the fields value is missing it will be presented as “undefined” in UI. |
+| unwind | string | false | Deconstructs the nested children into parent object. eg: with unwind:[”foo”] the object {”foo”:{”bar”:”hello”}} is turned into {’bar”:”hello”} |
+| flatten | string[] | false | Transforms the nested object into flat structure. eg: with flatten:[”foo”] the object {”foo”:{”bar”:”hello”}} is turned into {’foo.bar”:”hello”} |
+| limit | integer | false | Maximum number of results returned. Default is all results. |
+
+### ViewDisplay object definition
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| component | string | true | Only component “table” is available. |
+| properties | Object with keys matching the Output object’s properties. Each one is configured using ViewDisplayProperty object. | false | In case properties are not set the table will be rendered automatically with fields formatted as Strings, Arrays or Objects. |
+
+### ViewDisplayProperty object definition
+
+| Property | Type | Required | Description |
+| --- | --- | --- | --- |
+| label | string | false | In case the data are visualised as in Table view. Label will be visible table column’s header. |
+| format | enum(text, number, date, boolean, image, array, object) | false | Describes how Output data values are formatted in order to be rendered in Output tab UI. |
+
 ## TODOs
 
-- Perhaps the visualization's `properties` should be called `itemProperties` as it's not the property of the whole component but one item
 - JSON schema specification (full or simple) above
 - In future versions let's consider referencing schema using URL, for now let's keep it simple
