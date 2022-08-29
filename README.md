@@ -992,12 +992,35 @@ $ apify actor abort --actor-run-id=[RUN_ID] --token=123
 $ kill <pid>
 ```
 
-### Live view
+### Live view HTTP web server
 
-Each running actor can  
+An actor can launch an HTTP web server that is exposed to the outer world.
+This enables actors to provide a custom HTTP API to integrate with other systems,
+or to provide a web application for human users, to show actor run details, diagnostics, charts,
+or simply to run an arbitrary web app. 
 
-TODO: Desribe more, show example URLs etc.
+On Apify platform, the port on which the actor can launch the public web server,
+is specified by the `APIFY_CONTAINER_PORT` environment variable.
+The web server is then exposed to the world on a URL identified 
+by the `APIFY_CONTAINER_URL`, e.g. `https://d0gf00d.runs.apify.net`.
 
+<!-- TODO: These should probably be called `ACTOR_LIVE_VIEW_PORT` or `ACTOR_LIVE_VIEW_URL` -->
+
+#### Node.js
+
+```js
+const express = require('express');
+const app = express();
+const port = process.env.APIFY_CONTAINER_PORT;
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.listen(process.env.APIFY_CONTAINER_PORT, () => {
+  console.log(`Example live view web app running at ${process.env.APIFY_CONTAINER_URL}`)
+})
+```
 
 ### Charging money
 
