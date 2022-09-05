@@ -272,7 +272,9 @@ display: {
 | fields | string[] | true | Selects fields that is going to be presented on Output. An order of  the fields in matches the order of columns in visualisation UI. In case the fields value is missing it will be presented as “undefined” in UI. |
 | unwind | string | false | Deconstructs the nested children into parent object. eg: with unwind:[”foo”] the object {”foo”:{”bar”:”hello”}} is turned into {’bar”:”hello”} |
 | flatten | string[] | false | Transforms the nested object into flat structure. eg: with flatten:[”foo”] the object {”foo”:{”bar”:”hello”}} is turned into {’foo.bar”:”hello”} |
+| omit | string | false | Removes the specified fields from the output. Nested fields names can used there as well. |
 | limit | integer | false | Maximum number of results returned. Default is all results. |
+| desc | boolean | false | By default results are sorted Ascending based on the write event into dataset. desc:true param will return the newest writes to dataset first. |
 
 ### ViewDisplay object definition
 
