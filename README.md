@@ -992,17 +992,17 @@ $ apify actor abort --actor-run-id=[RUN_ID] --token=123
 $ kill <pid>
 ```
 
-### Live view HTTP web server
+### Live view web server
 
 An actor can launch an HTTP web server that is exposed to the outer world.
 This enables actors to provide a custom HTTP API to integrate with other systems,
-or to provide a web application for human users, to show actor run details, diagnostics, charts,
-or simply to run an arbitrary web app. 
+to provide a web application for human users, to show actor run details, diagnostics, charts,
+or to run an arbitrary web app.
 
 On Apify platform, the port on which the actor can launch the public web server,
 is specified by the `APIFY_CONTAINER_PORT` environment variable.
-The web server is then exposed to the world on a URL identified 
-by the `APIFY_CONTAINER_URL`, e.g. `https://d0gf00d.runs.apify.net`.
+The web server is then exposed to the public internet on a URL identified 
+by the `APIFY_CONTAINER_URL`, e.g. `https://hard-to-guess-identifier.runs.apify.net`.
 
 <!-- TODO: These should probably be called `ACTOR_LIVE_VIEW_PORT` or `ACTOR_LIVE_VIEW_URL` -->
 
@@ -1018,77 +1018,91 @@ app.get('/', (req, res) => {
 })
 
 app.listen(process.env.APIFY_CONTAINER_PORT, () => {
-  console.log(`Example live view web app running at ${process.env.APIFY_CONTAINER_URL}`)
+  console.log(`Example live view web server running at ${process.env.APIFY_CONTAINER_URL}`)
 })
 ```
 
 ### Charging money
 
-To run an actor on Apify platform, you might have
-to purchase a paid plan and then pay for the computing resources, 
-and potentially a fixed fee for using the actor if it's "paid". So far so good.
+To run an actor on the Apify platform, the user might need
+to purchase a paid plan to cover for the computing resources used, 
+and potentially a fixed monthly fee for renting the actor if it's paid.
 
-But what sets actors apart from other cloud computing systems
-is an inherent monetization system, which enables developers to charge users variables
-amounts based on dynamic properties, e.g. requested number of results,
-complexity of the input, or external APIs required for the operation.
+What sets actors apart from other cloud computing systems
+is a built-in monetization system, which enables developers to charge users variable
+amounts, e.g. based on returned number of results,
+complexity of the input, or external APIs used by the actor.
 
-To charge the current user of the actor a specific amount, do this:
+The actor can dynamically charge the current user a specific amount of money
+by calling the `charge` function.
+Users of actors can ensure they will not be charged too much by specifying
+the maximum amount when starting an actor using the `maxChargeCreditsUsd` run option.
+The actor can call the `charge` function as many times as necessary,
+but once the total sum of charged credits would exceed the maximum limit,
+the invocation of the function throws an error.
 
-#### Node.js
+When a paid actor subsequently starts another paid actor, the charges performed
+by the subsequent actors are taken from the calling actor's credits.
+This enables actor economy, where actors hierarchically pay other actors or external APIs
+to perform parts of the job.
+
+**Rules for building actors with variable charging:**
+
+<!-- TODO: Should be called ACTOR_MAX_CHARGE_CREDITS_USD? -->
+
+- If your actor is charging users, make sure at the earliest time possible  
+  that the actor is being run with sufficient credits, by checking the input
+  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO).
+  If the maximum credits are not sufficient for actor's operation with respect
+  to the input (e.g. user is requesting too many results for too little money),
+  fail the actor immediately with a reasonable error status message for the user,
+  and don't charge the user anything.
+- Charge the users right **after** you have incurred the costs,
+  not in advance. If the actor fails in the middle or is aborted, the users
+  only need to be charged for results they actually received.
+  Nothing will make users of your actors angrier than charging them for something they didn't receive.
+  Add margin to cover for this potential (low-probability) loss.
+
+**Integration with input schema**
+
+The actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
+`maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
+per unit of usage specified in the input schema.
+
+
+
+  which can be used by the Apify platform to automatically inform the user about
+  maximum possible charge, and automatically set `maxChargeCreditsUsd`. For example,
+  for Instagram Scraper paid by number of profiles scraped, this setting would be
+  added to `maxProfileCount` field which limits the maximum number of profiles to scrape.
+  Note that the actor doesn't know in advance how many profiles it will be able to fetch,
+  hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
+
+<!-- TODO: Shall we create another actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
+That could provide for better UX. But might be an overkill... -->
+
+
+
+#### Node.js [Not implemented yet]
+
+Charge the current user of the actor a specific amount:
 
 ```js
 const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
 ```
 
-Users of actors can ensure they will not be charged too much by specifying
-the maximum amount when running an actor.
+Set the maximum amount to charge when starting an actor.
 
 ```js
 const run = await Actor.call(
   'bob/analyse-images',
   { imageUrls: ['...'] },
   {
-      // By default, it's 0, hence actors cannot charge users unless they specifically enable that.
+      // By default, it's 0, hence actors cannot charge users unless they explicitely allow that.
       maxChargeCreditsUsd: 5,
   },
 );
 ```
-
-When a paid actor subsequently starts another paid actor, the charges performed
-by the subsequent actors are taken from the main actor's credits.
-This enables actor economy, where actors hierarchically pay other actors or external APIs
-to perform parts of the job.
-
-Few rules for building actors with variable charging:
-
-- If your actor is charging users, make sure at the earliest time possible  
-  that the actor is being run with sufficient credits by checking the input
-  and `MAX_CREDITS_USD` environment variable (see Environment variables TODO).
-  If the maximum credits are not sufficient for actors operation with respect
-  to the input, fail the actor immediately with a reasonable error message for the user,
-  and don't charge the user anything.
-- You can call `Actor.charge()` as many times as you want, but once
-  the total sum of charged credits would exceed the maximum limit,
-  the function throws an error.
-- Only charge the users right after you have incurred the costs,
-  not in advance. If the actor fails in the middle or is aborted, the users
-  only need to be charged for results they actually received.
-  Nothing will make users of your actors angrier than charging them for something they didn't get.
-  Add margin to cover for this potential loss.
-
-**TODO**
-- In actor specification file, add `perUnitCreditsUsd` field to actor input fields
-  which can be used by the Apify platform to automatically inform the user about
-  maximum possible charge, and automatically set `maxChargeCreditsUsd`. For example,
-  for Instagram Scraper paid by number of profiles scraped, this setting would be 
-  added to `maxProfileCount` field which limits the maximum number of profiles to scrape.
-  Note that the actor doesn't know in advance how many profiles it will be able to fetch,
-  hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
-- Shall we create another actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
-  That could provide for better UX.
-
-
 
 
 ## Actor definition files
@@ -1096,13 +1110,12 @@ Few rules for building actors with variable charging:
 The actor system uses several special files that define actor metadata, documentation,
 instructions how to build and run it, input and output schema, etc.
 
-These files are typically stored in the `.actor` directory
-placed in actor's top-level directory.
+These files shall be stored in the `.actor` directory placed in actor's top-level directory.
 **The entire `.actor` directory should be added to the source control.**
 The only required files are [Actor file](#actor-file) and [Dockerfile](#dockerfile),
 all the other files are optional.
 
-The actor definition files are used by the `apify push` and `apify run` commands,
+The actor definition files are used by the `apify push` and `apify run` CLI commands,
 as well as when building actors on the Apify platform.
 The motivation to keep the files in a separate directory
 is to keep the source code repository tidy, and to prevent interactions with other source files,
