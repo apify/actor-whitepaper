@@ -1108,17 +1108,16 @@ const run = await Actor.call(
 The actor system uses several special files that define actor metadata, documentation,
 instructions how to build and run it, input and output schema, etc.
 
-These files shall be stored in the `.actor` directory placed in actor's top-level directory.
-**The entire `.actor` directory should be added to the source control.**
+**These files MUST be stored in the `.actor` directory placed in actor's top-level directory.
+The entire `.actor` directory should be added to the source control.**
 The only required files are [Actor file](#actor-file) and [Dockerfile](#dockerfile),
-all the other files are optional.
+all other files are optional.
 
-The actor definition files are used by the `apify push` and `apify run` CLI commands,
+The actor definition files are used by the CLI (e.g. by `apify push` and `apify run` commands),
 as well as when building actors on the Apify platform.
-The motivation to keep the files in a separate directory
-is to keep the source code repository tidy, and to prevent interactions with other source files,
-in particular for existing software tool
-repositories which were wrapped as actor only ex post.
+The motivation to place the files into a separate directory
+is to keep the source code repository tidy and to prevent interactions with other source files,
+in particular when creating an actor from pre-existing software repositories.
 
 
 ### Actor file
@@ -1132,8 +1131,11 @@ For details, see the [Actor file](./pages/ACTOR.md) page.
 
 ### Dockerfile
 
-This file contains instructions for the system how to build the actor Docker image and how to run it.
-This is how actors are started locally by the `apify run` command, as well as on the Apify platform.
+This file contains instructions for the system how to build the actor's
+Docker image and how to run it.
+Actors are started by running their Docker image,
+both locally using the `apify run` command,
+as well as on the Apify platform.
 
 The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
 directive, and typically stored at `.actor/Dockerfile`.
@@ -1144,14 +1146,15 @@ Learn more in the official [Dockerfile reference](https://docs.docker.com/engine
 ### README
 
 The README file contains actor documentation written
-in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-It is used to generate its web page on Apify,
+in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+format.
+It is used to generate actor's public web page on Apify,
 and it should contain great explanation what the actor does and how to use it.
 
 The README file is referenced from the [Actor file](./pages/ACTOR.md) using the `readme`
 directive, and typically stored at `.actor/README.md`.
 
-Good documentation makes good programmers!
+Good documentation makes good actors!
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
 
@@ -1159,8 +1162,7 @@ Good documentation makes good programmers!
 
 The structure of actor's [input and output](#input-and-output) can optionally be
 dictated by the input and output schema files.
-These files list names, types and other details
-about properties accepted by actor on input, and properties that the actor produces on output,
+These files list properties accepted by actor on input, and properties that the actor produces on output,
 respectively.
 The input and output schema files are used to render a user interface
 for people to make it easy to run the actor,
@@ -1181,10 +1183,11 @@ for specific storages:
 - [Request queue schema file](./pages/REQUEST_QUEUE_SCHEMA.md)
 
 These storage schemas are used to ensure that stored objects or files 
-fulfil certain criteria, their fields have certain types etc.
-The schemas can be applied to the storages directly,
+fulfil certain criteria, their fields have certain types, etc.
+On Apify platform, the schemas can be applied to the storages directly,
 without actors.
 
+<!-- TODO: Is this true? -->
 All the storage schemas are weak, in a sense that if the schema doesn't define a property,
 such property can be added to the storage and have an arbitrary type.
 Only properties explicitly mentioned by the schema
@@ -1196,8 +1199,10 @@ that have `uuid: String` field in objects, but not care about anything else.
 ### Backward compatibility
 
 If the `.actor/actor.json` file is missing,
-the system falls back to legacy mode, looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
+the system falls back to the legacy mode,
+looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
 files in the actor's top-level directory, and uses them instead.
+This behavior might be deprecated in the future.
 
 ## Development
 
@@ -1205,6 +1210,8 @@ TODO: Write a high-level overview how to build new actors. Provide links
 how to build directly on Apify+screenshots.
 
 ### Local development
+
+**Status: Not implemented yet.**
 
 TODO: Explain basic workflow with "apify" - create, run, push etc.
 
@@ -1238,19 +1245,6 @@ TODO: Explain more, show example
 ## Sharing & Community
 
 TODO: Motivation - why building on Apify is easier than building your own SaaS
-
-
-### User profile page
-
-For example:
-
-```
-https://apify.com/jancurn
-```
-
-To improve user and community engagement, we should enable people to upload their custom cover photo and long description in Markdown format (such as README.md) file. The goal is to provide ability to
-
-For example, for our help with the COVID-19 pandemic, we released a new page at https://apify.com/covid-19 with list of relevant actors and datasets. Why not let people do the same? Anyone could create a new team (e.g. called `covid-19`), change branding of the page a bit, upload a Markdown with text content, and the system will automatically show user’s published actors, datasets and key-value stores.
 
 
 ### Shared actors
