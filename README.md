@@ -856,7 +856,7 @@ It is extremely useful for building new actors on top of existing ones.
 You simply define a better input schema and user description,
 and internally delegate the work to other actor.
 
-When metamorphing into another actor, the system checks
+When metamorphing an actor into another actor, the system checks
 that the other actor has compatible input/output schemas,
 and throws an error if not.
 
@@ -866,16 +866,13 @@ TODO: Describe what happens with output schema
 
 #### Node.js
 
-```
+```js
 await Actor.metamorph(
     'bob/web-scraper',
     { startUrls: [ "http://example.com" ] },
     { memoryMbytes: 4096 },
 );
 ```
-
-TODO: Note from Mara: BUT the input is not just JSON object but rather a body and content type! Which is one big thing we need to propagate everywhere here.
-JC: I think we shouldn't support this old way, and use only object here, which is stored as JSON.
 
 #### CLI
 
