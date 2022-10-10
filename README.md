@@ -99,24 +99,30 @@ to complex operations such as crawling an entire website,
 or removing duplicates from a large dataset.
 Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
 
-Basically, actors are Docker images that additionally have:
+Basically, actors are programs packaged as Docker images,
+which accept a well-defined JSON input, perform
+an action, and optionally produce a well-defined JSON output.
+
+Actors have the following elements:
+- **Dockerfile** which specifies where is the actor's source code,
+  how to build it, and run it
 - **Documentation** in a form of README.md file
 - **Input and output schemas** that describe what input the actor requires,
   and what results it produces
 - Access to an out-of-box **storage system** for actor data, results, and files
-- **Metadata** such as the actor name, description, author and version
+- **Metadata** such as the actor name, description, author, and version
 
-The documentation and input/output make it possible for people to easily understand what the actor does,
+The documentation and the input/output schemas make it possible for people to easily understand what the actor does,
 enter the required inputs both in user interface or API,
 and integrate the results of the actor into their other workflows.
 Actors can easily call and interact with each other, enabling building more complex
-tools on top of simple ones.
+systems on top of simple ones.
 
 The actors can be published
 on the [Apify platform](https://apify.com/store),
 which automatically generates a rich website with documentation
 and a practical user interface, in order to encourage people to try the actor right away.
-The platform takes care of securely hosting the actors' Docker containers
+The Apify platform takes care of securely hosting the actors' Docker containers
 and scaling the computing, storage and network resources as needed,
 so neither actor developers nor the users need to deal with the infrastructure.
 It just works.
@@ -212,7 +218,7 @@ Process exit code | Actor exit code
 
 - Each actor should do just one thing, and do it well.
 - Keep it as simple as possible, but not simpler.
-- When in doubt, optimize for the users, help them understand what the actor does
+- When in doubt, optimize for the users of the actors, help them understand what the actor does
 - ?
 
 ### Relation to the Actor model
