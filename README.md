@@ -20,7 +20,7 @@ January 2022.
 <!-- toc -->
 
 - [Introduction](#introduction)
-  * [Basic concept](#basic-concept)
+  * [Overview](#overview)
   * [What actors are not](#what-actors-are-not)
   * [Word of warning](#word-of-warning)
 - [Philosophy](#philosophy)
@@ -28,7 +28,9 @@ January 2022.
   * [Design goals](#design-goals)
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "actor" ?](#why-the-name-actor-)
-- [Input and output](#input-and-output)
+- [Basic concepts](#basic-concepts)
+  * [Input and output](#input-and-output)
+  * [Storage](#storage)
 - [Installation and setup](#installation-and-setup)
   * [Apify platform](#apify-platform)
   * [Node.js](#nodejs)
@@ -49,7 +51,7 @@ January 2022.
   * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
   * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
   * [Abort another actor](#abort-another-actor)
-  * [Live view](#live-view)
+  * [Live view web server](#live-view-web-server)
   * [Charging money](#charging-money)
 - [Actor definition files](#actor-definition-files)
   * [Actor file](#actor-file)
@@ -61,8 +63,8 @@ January 2022.
   * [Local development](#local-development)
   * [Deployment to Apify platform](#deployment-to-apify-platform)
   * [Repackaging existing software as actors](#repackaging-existing-software-as-actors)
+  * [Continuous integration and delivery](#continuous-integration-and-delivery)
 - [Sharing & Community](#sharing--community)
-  * [User profile page](#user-profile-page)
   * [Shared actors](#shared-actors)
 - [TODOs](#todos)
 
@@ -88,7 +90,7 @@ in a hope to make it a new open standard, and to help community to more effectiv
 build and ship software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
-### Basic concept
+### Overview
 
 Actors are serverless programs running in the cloud.
 They can perform anything from simple actions such as
@@ -257,9 +259,14 @@ confirming "actor" was a good choice.
 Last but no least, our model of actors is similar
 to the actor model known from the computer science.
 
-## Input and output
+## Basic concepts
 
-TODO: write this text, include examples of input and output objects, possibly also API
+### Input and output
+
+TODO: write this text, include examples of input and output objects, possibly also API.
+
+Both actor input and output is always a JSON file. To support e.g. images on input, we just need some better SDK and UI.
+
 
 Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format.
 There would be properties like in the output_schema.json file, with e.g. URL to dataset,
@@ -269,6 +276,9 @@ that we can add to JSON returned by the Run API enpoints
 - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
 - `output` will be a property of run object generated from Output schema
 
+### Storage
+
+TODO...
 
 ## Installation and setup
 
@@ -1242,6 +1252,11 @@ to set up and run the actor.
 
 TODO: Explain more, show example
 
+
+### Continuous integration and delivery
+
+TODO: Mention CI/CD, e.g. how to integrate with GiHub etc.
+
 ## Sharing & Community
 
 TODO: Motivation - why building on Apify is easier than building your own SaaS
@@ -1260,16 +1275,7 @@ https://apify.com/jancurn/some-scraper
 ## TODOs
 
 From last meeting
-- Consider renaming `RequestQueue` to just `Queue` and make it more generic
-- Actor input is always JSON, nothing else. To support e.g. images on input,
-  we just need some better SDK and UI.
-- "Rename default store" (not sure what that means)
 
-- Mention CI/CD, e.g. how to integrate with GiHub etc.
-- IDEA: How about having an "event log" for actors?
-  They would be shown in UI, and tell user what happened in the actor.
-  This can be done either in API or by special message to log, which will be parsed.
-  **Or with the notifications/messaging API**
 - Add ideas for the permission system
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
 - Maybe we should add "API" section to all the programming interface sections,
