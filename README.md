@@ -1279,6 +1279,7 @@ https://apify.com/jancurn/some-scraper
 
 From last meeting
 
+- In Apify SDK, move non-standard functions elsewhere or mark them as such
 - Add ideas for the permission system
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
 - Maybe we should add "API" section to all the programming interface sections,
