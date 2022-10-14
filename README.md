@@ -20,7 +20,7 @@ January 2022.
 <!-- toc -->
 
 - [Introduction](#introduction)
-  * [Basic concept](#basic-concept)
+  * [Overview](#overview)
   * [What actors are not](#what-actors-are-not)
   * [Word of warning](#word-of-warning)
 - [Philosophy](#philosophy)
@@ -28,7 +28,9 @@ January 2022.
   * [Design goals](#design-goals)
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "actor" ?](#why-the-name-actor-)
-- [Input and output](#input-and-output)
+- [Basic concepts](#basic-concepts)
+  * [Input and output](#input-and-output)
+  * [Storage](#storage)
 - [Installation and setup](#installation-and-setup)
   * [Apify platform](#apify-platform)
   * [Node.js](#nodejs)
@@ -37,18 +39,20 @@ January 2022.
 - [Programming interface](#programming-interface)
   * [Get input](#get-input)
   * [Main function](#main-function)
-  * [Push results to dataset](#push-results-to-dataset)
   * [Key-value store](#key-value-store)
+  * [Push results to dataset](#push-results-to-dataset)
   * [Exit actor](#exit-actor)
   * [Environment variables](#environment-variables)
   * [Actor status](#actor-status)
   * [System events](#system-events)
   * [Get memory information](#get-memory-information)
-  * [Start an actor](#start-an-actor)
+  * [Start another actor](#start-another-actor)
   * [Metamorph](#metamorph)
   * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
   * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
   * [Abort another actor](#abort-another-actor)
+  * [Live view web server](#live-view-web-server)
+  * [Charging money](#charging-money)
 - [Actor definition files](#actor-definition-files)
   * [Actor file](#actor-file)
   * [Dockerfile](#dockerfile)
@@ -59,8 +63,8 @@ January 2022.
   * [Local development](#local-development)
   * [Deployment to Apify platform](#deployment-to-apify-platform)
   * [Repackaging existing software as actors](#repackaging-existing-software-as-actors)
+  * [Continuous integration and delivery](#continuous-integration-and-delivery)
 - [Sharing & Community](#sharing--community)
-  * [User profile page](#user-profile-page)
   * [Shared actors](#shared-actors)
 - [TODOs](#todos)
 
@@ -80,41 +84,45 @@ Over the next years, Apify kept developing the concept and applied
 it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
-Drawing on our experience,
-we're now releasing this specification of the actor programming model,
+Drawing on this experience,
+we're releasing this specification of the actor programming model to the public,
 in a hope to make it a new open standard, and to help community to more effectively
 build and ship software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
-### Basic concept
+### Overview
 
-Actors are serverless programs running in the cloud,
-best suited for execution of batch operations.
+Actors are serverless programs running in the cloud.
 They can perform anything from simple actions such as
 filling out a web form or sending an email,
 to complex operations such as crawling an entire website,
 or removing duplicates from a large dataset.
 Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
 
-Basically, actors are Docker images that additionally have:
+Basically, actors are programs packaged as Docker images,
+which accept a well-defined JSON input, perform
+an action, and optionally produce a well-defined JSON output.
+
+Actors have the following elements:
+- **Dockerfile** which specifies where is the actor's source code,
+  how to build it, and run it
 - **Documentation** in a form of README.md file
 - **Input and output schemas** that describe what input the actor requires,
   and what results it produces
 - Access to an out-of-box **storage system** for actor data, results, and files
-- **Metadata** such as the actor name, description, author and version
+- **Metadata** such as the actor name, description, author, and version
 
-The documentation and input/output schemas are the key ingredients
-that make it possible for people to easily understand what the actor does,
+The documentation and the input/output schemas make it possible for people to easily understand what the actor does,
 enter the required inputs both in user interface or API,
 and integrate the results of the actor into their other workflows.
 Actors can easily call and interact with each other, enabling building more complex
-tools on top of simple ones.
+systems on top of simple ones.
 
 The actors can be published
 on the [Apify platform](https://apify.com/store),
 which automatically generates a rich website with documentation
 and a practical user interface, in order to encourage people to try the actor right away.
-The platform takes care of securely hosting the actors' Docker containers
+The Apify platform takes care of securely hosting the actors' Docker containers
 and scaling the computing, storage and network resources as needed,
 so neither actor developers nor the users need to deal with the infrastructure.
 It just works.
@@ -127,44 +135,50 @@ can set a price tag for the usage of their actors, and thus make
 [passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-actors-b0392278d085/)
 to have an incentive to keep developing and improving the actor for the users.
 
+Currently, actors can run locally or on the Apify platform. However, one of the goals of this open 
+specification is to motivate creation of new runtime environments outside of Apify.
+
 The ultimate goal of the actor programming model is to make it as simple as possible
-for people to develop, run and integrate software automation tools.
+for people to develop, run, and integrate software automation tools.
 
 ### What actors are not
 
 Actors are best suited for batch operations that take an input, perform an isolated job for a user,
-and potentially produce some results.
-However, actors are currently not ideally suited for continuous computing or storage workloads, such
+and potentially produce some output.
+However, actors are currently not best suited for continuous computing or storage workloads, such
 as running a live website, API backend, or database.
+
+As actors are based on Docker, it takes certain amount of time to spin up the container
+and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
+even for highly-optimized Docker images. For long-running jobs, actor execution might be migrated
+to another machine, making it unsuitable for databases.
 
 ### Word of warning
 
 Currently, the only available implementation of the actor model is provided by
-[Apify SDK for Node.js](https://sdk.apify.com), but it uses a legacy API and syntax
-that is not described in this document.
+[Apify SDK for Node.js](https://sdk.apify.com).
 The goal of this document is to define the north star how Apify's and other implementations
-of actor programming model should look like. Once we release the new implementations
-for Node.js, Python or CLI, we'll release this document to the public
-and make it part of Apify documentation.
+of actor programming model should look like. We keep working on full implementations
+for Node.js, Python and CLI.
 
 ## Philosophy
 
 Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)** from the 1970s:
 
 1. **Make each program do one thing well**. To do a new job, build afresh rather than complicate old programs by adding new “features”.
-2. Expect the **output of every program to become the input to another**, as yet unknown, program. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
+2. Expect the **output of every program to become the input to another, as yet unknown, program**. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
 3. Design and build software, even operating systems, to be **tried early**, ideally within weeks. Don’t hesitate to throw away the clumsy parts and rebuild them.
 4. **Use tools in preference to unskilled help** to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you’ve finished using them.
 
 The UNIX philosophy is arguably one of the most important software engineering paradigms
 which, together with other favorable design choices of UNIX operating systems,
 ushered the computer and internet revolution.
-By combining smaller parts (programs)
-that can be developed and used independently,
+By combining smaller parts
+that can be developed and used independently (programs),
 it suddenly became possible to build, manage and gradually evolve ever more complex computing systems.
 Even today's modern mobile devices are effectively UNIX-based machines that run a lot of programs
 interacting with each other, and provide a terminal
-which looks very much like early UNIX terminals (actually terminal is just another program).
+which looks very much like early UNIX terminals. In fact, terminal is just another program.
 
 The UNIX-style programs represent a great way to package software for usage
 on a local computer. The programs can be easily used stand-alone,
@@ -202,10 +216,10 @@ Process exit code | Actor exit code
 
 ### Design goals
 
-- Keep it as simple as possible, but not simpler
-- Each actor should do just one thing, and have everything to run on its own
-- When in doubt, optimize for the users of the actors, e.g. generating a nice user interface
-- TODO...
+- Each actor should do just one thing, and do it well.
+- Keep it as simple as possible, but not simpler.
+- When in doubt, optimize for the users of the actors, help them understand what the actor does
+- ?
 
 ### Relation to the Actor model
 
@@ -234,7 +248,7 @@ or affect each other by sharing some internal state or storage.
 The actors simply do not have any formal restrictions,
 and they can access whichever external systems they want.
 
-TODO: From Ondra: Maybe that's a shame. Would be nice to have an API that would send a message to a run and the run would get it as `.on('message', (msg) => { ... })`. Would save people from implementing their own servers in actors.
+<!-- TODO: From Ondra: Maybe that's a shame. Would be nice to have an API that would send a message to a run and the run would get it as `.on('message', (msg) => { ... })`. Would save people from implementing their own servers in actors. -->
 
 ### Why the name "actor" ?
 
@@ -251,9 +265,14 @@ confirming "actor" was a good choice.
 Last but no least, our model of actors is similar
 to the actor model known from the computer science.
 
-## Input and output
+## Basic concepts
 
-TODO: write this text, include examples of input and output objects, possibly also API
+### Input and output
+
+TODO: write this text, include examples of input and output objects, possibly also API.
+
+Both actor input and output is always a JSON file. To support e.g. images on input, we just need some better SDK and UI.
+
 
 Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format.
 There would be properties like in the output_schema.json file, with e.g. URL to dataset,
@@ -263,6 +282,9 @@ that we can add to JSON returned by the Run API enpoints
 - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
 - `output` will be a property of run object generated from Output schema
 
+### Storage
+
+TODO...
 
 ## Installation and setup
 
@@ -421,6 +443,49 @@ int main (int argc, char *argv[]) {
 }
 ```
 
+### Key-value store
+
+Write and read arbitrary files using a storage
+called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
+When an actor starts, by default it is associated with a newly-created key-value store,
+which only contains one file with input of the actor (see [Get input](#get-input)).
+
+The user can override this behavior and specify another key-value store or input key
+when running the actor.
+
+#### Node.js
+
+```js
+// Save object to store (stringified to JSON)
+await Actor.setValue('my-state', { something: 123 });
+
+// Save binary file to store with content type
+await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
+
+// Get record from store (automatically parsed from JSON)
+const value = await Actor.getValue('my-state');
+```
+
+#### Python
+
+```python
+# Save object to store (stringified to JSON)
+await actor.set_value('my-state', { something=123 })
+
+# Save binary file to store with content type
+await actor.set_value('screenshot', buffer, { contentType='image/png' })
+
+# Get object from store (automatically parsed from JSON)
+dataset = await actor.get_value('my-state')
+```
+
+#### UNIX
+
+```bash
+$ echo "hello world" > file.txt
+$ cat file.txt
+```
+
 ### Push results to dataset
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
@@ -479,49 +544,6 @@ $ apify actor push-data --dataset=./my_dataset someResult=123
 printf("Hello world\tColum 2\tColumn 3");
 ```
 
-### Key-value store
-
-Write and read arbitrary files using a storage
-called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
-When an actor starts, by default it is associated with a newly-created key-value store,
-which only contains one file with input of the actor (see [Get input](#get-input)).
-
-The user can override this behavior and specify another key-value store or input key
-when running the actor.
-
-#### Node.js
-
-```js
-// Save object to store (stringified to JSON)
-await Actor.setValue('my-state', { something: 123 });
-
-// Save binary file to store with content type
-await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
-
-// Get record from store (automatically parsed from JSON)
-const value = await Actor.getValue('my-state');
-```
-
-#### Python
-
-```python
-# Save object to store (stringified to JSON)
-await actor.set_value('my-state', { something=123 })
-
-# Save binary file to store with content type
-await actor.set_value('screenshot', buffer, { contentType='image/png' })
-
-# Get object from store (automatically parsed from JSON)
-dataset = await actor.get_value('my-state')
-```
-
-#### UNIX
-
-```bash
-$ echo "hello world" > file.txt
-$ cat file.txt
-```
-
 ### Exit actor
 
 When the main actor process exits (i.e. the Docker container stops running),
@@ -555,6 +577,7 @@ await Actor.exit('Done right now', { timeoutSecs: 0 });
 
 // Actor will finish with 'FAILED' status 
 await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 });
+
 // ... or nicer way using this syntactic sugar:
 await Actor.fail('Could not finish the crawl, try increasing memory');
 
@@ -695,7 +718,7 @@ TODO: Add a table of events and details of params, plus links, timeouts etc.
 
 #### Node.js
 
-TODO: More info about how it looks: `persistState`, `aborting`, `Actor.off()` ...
+<!-- TODO: Add more info about how it looks: `persistState`, `aborting`, `Actor.off()` ... -->
 
 ```js
 Actor.on('systemInfo', (data) => {
@@ -745,8 +768,6 @@ returns immediately.
 ```js
 // Run actor and wait for it to finish
 const run = await Actor.call(
-  // TODO: If we had global unique names, we could allow users here to
-  //  use also actor task name or ID, and would't need Actor.callTask()
   'apify/google-search-scraper',
   { queries: 'test' },
   {
@@ -835,7 +856,7 @@ It is extremely useful for building new actors on top of existing ones.
 You simply define a better input schema and user description,
 and internally delegate the work to other actor.
 
-When metamorphing into another actor, the system checks
+When metamorphing an actor into another actor, the system checks
 that the other actor has compatible input/output schemas,
 and throws an error if not.
 
@@ -845,16 +866,13 @@ TODO: Describe what happens with output schema
 
 #### Node.js
 
-```
+```js
 await Actor.metamorph(
     'bob/web-scraper',
     { startUrls: [ "http://example.com" ] },
     { memoryMbytes: 4096 },
 );
 ```
-
-TODO: Note from Mara: BUT the input is not just JSON object but rather a body and content type! Which is one big thing we need to propagate everywhere here.
-JC: I think we shouldn't support this old way, and use only object here, which is stored as JSON.
 
 #### CLI
 
@@ -987,79 +1005,115 @@ $ apify actor abort --actor-run-id=[RUN_ID] --token=123
 $ kill <pid>
 ```
 
-### Live view
+### Live view web server
 
-Each running actor can  
+An actor can launch an HTTP web server that is exposed to the outer world.
+This enables actors to provide a custom HTTP API to integrate with other systems,
+to provide a web application for human users, to show actor run details, diagnostics, charts,
+or to run an arbitrary web app.
 
-TODO: Desribe more, show example URLs etc.
+On Apify platform, the port on which the actor can launch the public web server,
+is specified by the `APIFY_CONTAINER_PORT` environment variable.
+The web server is then exposed to the public internet on a URL identified 
+by the `APIFY_CONTAINER_URL`, e.g. `https://hard-to-guess-identifier.runs.apify.net`.
 
+<!-- TODO: These should probably be called `ACTOR_LIVE_VIEW_PORT` or `ACTOR_LIVE_VIEW_URL` -->
+
+#### Node.js
+
+```js
+const express = require('express');
+const app = express();
+const port = process.env.APIFY_CONTAINER_PORT;
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.listen(process.env.APIFY_CONTAINER_PORT, () => {
+  console.log(`Example live view web server running at ${process.env.APIFY_CONTAINER_URL}`)
+})
+```
 
 ### Charging money
 
-To run an actor on Apify platform, you might have
-to purchase a paid plan and then pay for the computing resources, 
-and potentially a fixed fee for using the actor if it's "paid". So far so good.
+**STATUS: This feature is not implemented yet.**
 
-But what sets actors apart from other cloud computing systems
-is an inherent monetization system, which enables developers to charge users variables
-amounts based on dynamic properties, e.g. requested number of results,
-complexity of the input, or external APIs required for the operation.
+To run an actor on the Apify platform, the user might need
+to purchase a paid plan to cover for the computing resources used, 
+pay a fixed monthly fee for "renting" the actor if it's paid,
+or pay a variable fee for the number of results produced by the actor.
 
+On top of these "static" payment options, actors will eventually support
+a built-in monetization system that enables developers to charge users variable
+amounts, e.g. based on returned number of results,
+complexity of the input, or cost of external APIs used by the actor.
+
+The actor can dynamically charge the current user a specific amount of money
+by calling the `charge` function.
 Users of actors can ensure they will not be charged too much by specifying
-the maximum amount when running an actor.
+the maximum amount when starting an actor using the `maxChargeCreditsUsd` run option.
+The actor can call the `charge` function as many times as necessary,
+but once the total sum of charged credits would exceed the maximum limit,
+the invocation of the function throws an error.
 
-To charge the current user of the actor a specific amount, do this:
+When a paid actor subsequently starts another paid actor, the charges performed
+by the subsequent actors are taken from the calling actor's credits.
+This enables actor economy, where actors hierarchically pay other actors or external APIs
+to perform parts of the job.
+
+**Rules for building actors with variable charging:**
+
+<!-- TODO: Should be called ACTOR_MAX_CHARGE_CREDITS_USD? -->
+
+- If your actor is charging users, make sure at the earliest time possible  
+  that the actor is being run with sufficient credits, by checking the input
+  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO).
+  If the maximum credits are not sufficient for actor's operation with respect
+  to the input (e.g. user is requesting too many results for too little money),
+  fail the actor immediately with a reasonable error status message for the user,
+  and don't charge the user anything.
+- Charge the users right **after** you have incurred the costs,
+  not in advance. If the actor fails in the middle or is aborted, the users
+  only need to be charged for results they actually received.
+  Nothing will make users of your actors angrier than charging them for something they didn't receive.
+
+**Integration with input schema**
+
+The actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
+`maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
+per unit of usage specified in the input schema.
+This field can be used by the Apify platform to automatically inform the user about
+maximum possible charge, and automatically set `maxChargeCreditsUsd` for the actor run.
+For example,
+for Google Search Scraper paid by number of pages scraped, this setting would be
+added to `maxPageCount` field which limits the maximum number of pages to scrape.
+Note that the actor doesn't know in advance how many pages it will be able to fetch,
+hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
+
+<!-- TODO: Shall we create another actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
+That could provide for better UX. Probably not, it would be an overkill... -->
 
 #### Node.js
+
+Charge the current user of the actor a specific amount:
 
 ```js
 const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
 ```
 
-Users of actors can ensure they will not be charged too much by specifying
-the maximum amount when running an actor.
+Set the maximum amount to charge when starting an actor.
 
 ```js
 const run = await Actor.call(
   'bob/analyse-images',
   { imageUrls: ['...'] },
   {
-      // By default, it's 0, hence actors cannot charge users unless they specifically enable that.
-      maxCreditsUsd: 5,
+      // By default, it's 0, hence actors cannot charge users unless they explicitely allow that.
+      maxChargeCreditsUsd: 5,
   },
 );
 ```
-
-When a paid actor subsequently starts another paid actor, the charges performed
-by the subsequent actors are taken from the main actor's credits. This enables
-
-Few rules for using paid actors:
-
-- If your actor is charging users, make sure at the earliest time possible  
-  that the actor is being run with sufficient credits by checking the input
-  and `MAX_CREDITS_USD` (see Environment variables TODO).
-  If the maximum credits are not sufficient for actors operation with respect
-  to the input, fail the actor immediately with a reasonable error message for the user.
-- You can call `Actor.charge()` as many times as you want, but once
-  the total sum of charged credits would exceed the maximum limit,
-  the function throws an error.
-- Only charge the users right after you have incurred the costs,
-  not in advance. If the actor fails in the middle or is aborted, the users
-  only need to be charged for results they actually received.
-  Nothing will make users of your actors angrier than charging them for something they didn't get.
-
-
-**TODO**
-- In actor specification file, add `perUnitCreditsUsd` field to actor input fields
-  which can be used by the Apify platform to automatically inform the user about
-  maximum possible charge, and automatically set `maxCreditsUsd`. For example,
-  for Instagram Scraper paid by number of profiles scraped, this setting would be 
-  added to `maxProfileCount` field which limits the maximum number of profiles to scrape.
-  Note that the actor doesn't know in advance how many profiles it will be able to fetch,
-  hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
-  
-
-
 
 
 ## Actor definition files
@@ -1067,18 +1121,16 @@ Few rules for using paid actors:
 The actor system uses several special files that define actor metadata, documentation,
 instructions how to build and run it, input and output schema, etc.
 
-These files are typically stored in the `.actor` directory
-placed in actor's top-level directory.
-**The entire `.actor` directory should be added to the source control.**
+**These files MUST be stored in the `.actor` directory placed in actor's top-level directory.
+The entire `.actor` directory should be added to the source control.**
 The only required files are [Actor file](#actor-file) and [Dockerfile](#dockerfile),
-all the other files are optional.
+all other files are optional.
 
-The actor definition files are used by the `apify push` and `apify run` commands,
+The actor definition files are used by the CLI (e.g. by `apify push` and `apify run` commands),
 as well as when building actors on the Apify platform.
-The motivation to keep the files in a separate directory
-is to keep the source code repository tidy, and to prevent interactions with other source files,
-in particular for existing software tool
-repositories which were wrapped as actor only ex post.
+The motivation to place the files into a separate directory
+is to keep the source code repository tidy and to prevent interactions with other source files,
+in particular when creating an actor from pre-existing software repositories.
 
 
 ### Actor file
@@ -1092,8 +1144,11 @@ For details, see the [Actor file](./pages/ACTOR.md) page.
 
 ### Dockerfile
 
-This file contains instructions for the system how to build the actor Docker image and how to run it.
-This is how actors are started locally by the `apify run` command, as well as on the Apify platform.
+This file contains instructions for the system how to build the actor's
+Docker image and how to run it.
+Actors are started by running their Docker image,
+both locally using the `apify run` command,
+as well as on the Apify platform.
 
 The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
 directive, and typically stored at `.actor/Dockerfile`.
@@ -1104,14 +1159,15 @@ Learn more in the official [Dockerfile reference](https://docs.docker.com/engine
 ### README
 
 The README file contains actor documentation written
-in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-It is used to generate its web page on Apify,
+in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+format.
+It is used to generate actor's public web page on Apify,
 and it should contain great explanation what the actor does and how to use it.
 
 The README file is referenced from the [Actor file](./pages/ACTOR.md) using the `readme`
 directive, and typically stored at `.actor/README.md`.
 
-Good documentation makes good programmers!
+Good documentation makes good actors!
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
 
@@ -1119,8 +1175,7 @@ Good documentation makes good programmers!
 
 The structure of actor's [input and output](#input-and-output) can optionally be
 dictated by the input and output schema files.
-These files list names, types and other details
-about properties accepted by actor on input, and properties that the actor produces on output,
+These files list properties accepted by actor on input, and properties that the actor produces on output,
 respectively.
 The input and output schema files are used to render a user interface
 for people to make it easy to run the actor,
@@ -1141,10 +1196,11 @@ for specific storages:
 - [Request queue schema file](./pages/REQUEST_QUEUE_SCHEMA.md)
 
 These storage schemas are used to ensure that stored objects or files 
-fulfil certain criteria, their fields have certain types etc.
-The schemas can be applied to the storages directly,
+fulfil certain criteria, their fields have certain types, etc.
+On Apify platform, the schemas can be applied to the storages directly,
 without actors.
 
+<!-- TODO: Is this true? -->
 All the storage schemas are weak, in a sense that if the schema doesn't define a property,
 such property can be added to the storage and have an arbitrary type.
 Only properties explicitly mentioned by the schema
@@ -1156,8 +1212,10 @@ that have `uuid: String` field in objects, but not care about anything else.
 ### Backward compatibility
 
 If the `.actor/actor.json` file is missing,
-the system falls back to legacy mode, looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
+the system falls back to the legacy mode,
+looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
 files in the actor's top-level directory, and uses them instead.
+This behavior might be deprecated in the future.
 
 ## Development
 
@@ -1165,6 +1223,8 @@ TODO: Write a high-level overview how to build new actors. Provide links
 how to build directly on Apify+screenshots.
 
 ### Local development
+
+**Status: Not implemented yet.**
 
 TODO: Explain basic workflow with "apify" - create, run, push etc.
 
@@ -1195,22 +1255,14 @@ to set up and run the actor.
 
 TODO: Explain more, show example
 
+
+### Continuous integration and delivery
+
+TODO: Mention CI/CD, e.g. how to integrate with GiHub etc.
+
 ## Sharing & Community
 
 TODO: Motivation - why building on Apify is easier than building your own SaaS
-
-
-### User profile page
-
-For example:
-
-```
-https://apify.com/jancurn
-```
-
-To improve user and community engagement, we should enable people to upload their custom cover photo and long description in Markdown format (such as README.md) file. The goal is to provide ability to
-
-For example, for our help with the COVID-19 pandemic, we released a new page at https://apify.com/covid-19 with list of relevant actors and datasets. Why not let people do the same? Anyone could create a new team (e.g. called `covid-19`), change branding of the page a bit, upload a Markdown with text content, and the system will automatically show user’s published actors, datasets and key-value stores.
 
 
 ### Shared actors
@@ -1226,16 +1278,8 @@ https://apify.com/jancurn/some-scraper
 ## TODOs
 
 From last meeting
-- Consider renaming `RequestQueue` to just `Queue` and make it more generic
-- Actor input is always JSON, nothing else. To support e.g. images on input,
-  we just need some better SDK and UI.
-- "Rename default store" (not sure what that means)
 
-- Mention CI/CD, e.g. how to integrate with GiHub etc.
-- IDEA: How about having an "event log" for actors?
-  They would be shown in UI, and tell user what happened in the actor.
-  This can be done either in API or by special message to log, which will be parsed.
-  **Or with the notifications/messaging API**
+- In Apify SDK, move non-standard functions elsewhere or mark them as such
 - Add ideas for the permission system
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
 - Maybe we should add "API" section to all the programming interface sections,
