@@ -1,18 +1,16 @@
 # The Actor Programming Model Whitepaper [DRAFT]
 
-**The new way to develop serverless microapss called _actors_
-that are easy to ship to users,
-integrate, and build upon. Actors are a reincarnation of the UNIX philosophy
+**The paper describes new serverless microapss called _actors_
+which are easy to develop, share, integrate, and build upon.
+Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
-**Note that this document is a specification of not-yet-existing framework,
-not a documentation of an existing implementation.
-[Learn more](#word-of-warning)**
+**Beware that not some APIs are not supported on all platforms yet. [Learn more](#word-of-warning)**
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
 [Ondra Urban](https://apify.com/mnmkng), Milan Lepík, and the Apify team.
-January 2022.
+October 2022.
 
 
 ## Contents
