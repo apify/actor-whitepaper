@@ -426,6 +426,8 @@ Advantage of `main()` function: Kills actor even if you forgot `setTimeout()`
 
 #### Node.js
 
+In Node.js the actor code might be either wrapped using the main function:
+
 ```js
 import { Actor } from 'apify';
 
@@ -434,6 +436,20 @@ Actor.main(async () => {
   // ...
 });
 ```
+
+Or in combination with ES modules supporting usage of the top level `await` operator wrapped by `init()` and `exit()` methods:
+
+```js
+import { Actor } from 'apify';
+
+await Actor.init();
+
+const input = await Actor.getInput();
+console.log(input);
+
+await Actor.exit();
+```
+
 
 #### UNIX equivalent
 
