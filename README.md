@@ -1,6 +1,6 @@
 # The Actor Programming Model Whitepaper [DRAFT]
 
-**The paper describes new serverless microapss called _actors_
+**The paper describes new serverless microapps called _actors_
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
