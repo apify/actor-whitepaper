@@ -1,5 +1,12 @@
 # Input Schema File
 
+TODO(@jancurn): Describe this is a dream and too early, currently we only support something else.
+
+NOTE: Currently we only support input schema v1, this document describes how the v2 should look like,
+  but it's not implemented yet.
+
+
+
 A JSON object that defines structure of the input object accepted by the
 actor (see [Input and Output](../README.md#input-and-output) for details).
 The file is referenced from the main [actor file](ACTOR.md) using the `input` directive,

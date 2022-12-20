@@ -33,3 +33,5 @@
 
 
 - NOTE: BTW we have a new API v3 doc with ideas for changes in API https://www.notion.so/apify/API-v3-6fcd240d9621427f9650b741ec6fa06b ?
+
+- For DATASET schema, In future versions let's consider referencing schema using URL, for now let's keep it simple

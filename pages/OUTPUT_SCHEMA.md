@@ -17,7 +17,7 @@ has the right schema. But then, when it comes to kv-store, that's not purely
 output object but INPUT, similarly for overridden dataset or request queue.
 Perhaps the cleanest way would be to set these directly in `.actor/actor.json`.
 
-**TODOs:**
+**TODOs (@jancurn):**
 - Should we enforce users to have at least one item with `visible: true`?  
   Or what about doing it the opposite
   way and letting the user choose what should not be visible?

@@ -1,5 +1,7 @@
 # Dataset Schema File
 
+TODO (@mtrunkat): Mara will finish the specs in this file to be accurate, Jan will polish the text then
+
 Actor results can be saved to append-only object storage
 called [Dataset](https://sdk.apify.com/docs/api/dataset),
 which can be assigned a schema that ensures only objects with certain properties and types
@@ -297,4 +299,3 @@ display: {
 ## TODOs
 
 - JSON schema specification (full or simple) above
-- In future versions let's consider referencing schema using URL, for now let's keep it simple

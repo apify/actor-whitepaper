@@ -71,5 +71,5 @@ Here are the notes comparing the format to the previous version:
 - The `dockerfile` and `readme` directives are optional, the system falls back to reasonable
   defaults, first in `.actor` directory and then in the top-level directory.
 
-TODOs:
+TODOs (@jancurn):
 - The above text needs reformatting, make it more like a reference

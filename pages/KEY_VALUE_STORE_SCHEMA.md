@@ -1,5 +1,6 @@
 # Key-value Store Schema File
 
+
 ## Basic properties
 
 Key-value store schema has two main use cases described in the following examples:
@@ -81,7 +82,9 @@ In addition to this user will be able to list by prefix directly:
 https://api.apify.com/v2/key-value-stores/storeId/keys?prefix=post-images-
 ```
 
-## TODO
+## TODO(@jancurn)
+- Finalize this text, keep `collections` for now
+- xx
 - What is kv-store schema is used by actor to define structure of key-value store it operates on,
   but the developer defines a non-compatible record group for "INPUT" prefix?
   Maybe the default kv-stores should be created with a default record group to cover the "INPUT" prefixes
@@ -90,3 +93,5 @@ https://api.apify.com/v2/key-value-stores/storeId/keys?prefix=post-images-
   ... it's getting quite complicated.
 - What if there's a conflict between record groups?
   Shall we consider the first one matching as if the file is valid for schema?
+
+... just add a note that these conflicting situations are unspecified behavior
