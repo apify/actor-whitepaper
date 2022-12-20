@@ -207,7 +207,7 @@ UNIX programs  | Actors
 Command-line options |	Input object
 Read stdin |	Read from a dataset
 Write to stdout	| Push data to dataset, update actor status
-Write to stderr	| Set exit message
+Write to stderr	| No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.
 File system	| Key-value store
 Process identifier (PID) | Actor run ID
 Process exit code | Actor exit code
@@ -246,7 +246,6 @@ or affect each other by sharing some internal state or storage.
 The actors simply do not have any formal restrictions,
 and they can access whichever external systems they want.
 
-<!-- TODO: From Ondra: Maybe that's a shame. Would be nice to have an API that would send a message to a run and the run would get it as `.on('message', (msg) => { ... })`. Would save people from implementing their own servers in actors. -->
 
 ### Why the name "actor" ?
 
@@ -504,6 +503,8 @@ $ cat file.txt
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an actor starts, by default it is associated with a newly-created empty dataset.
 The user can override it and specify another dataset when running the actor.
+
+TODO (@jancurn): Mention they can add more datasets and use them on the fly.
 
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
 of objects are stored in them. See [Schema files](#schema-files) for more details.
@@ -1240,7 +1241,8 @@ how to build directly on Apify+screenshots.
 
 **Status: Not implemented yet.**
 
-TODO: Explain basic workflow with "apify" - create, run, push etc.
+TODO: Explain basic workflow with "apify" - create, run, push etc. Move the full local support for actors
+ to ideas (see https://github.com/apify/actor-specs/pull/7/files#r794681016 )
 
 Actors can be developed and run locally. To support running other actors, we need to define mapping
 of `username/actor` to local or remote git/https directories with `.actor` sub-directory,

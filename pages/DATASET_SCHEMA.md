@@ -116,6 +116,10 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 
 ## Fields
 
+
+TODO(@mtrunkat): Please finish this part, we'll have to start with JSON schema before adding any other
+. see https://github.com/apify/actor-specs/pull/7/files#r794764956 
+
 One big TODO: What schema definition are we going to support? The most powerful and standardized but
 slow to write is [JSON Schema](https://json-schema.org/). We could start with
 the [Easy JSON Schema](https://github.com/easy-json-schema/easy-json-schema) and add support for JSON
