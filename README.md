@@ -267,7 +267,7 @@ to the actor model known from the computer science.
 
 ### Input and output
 
-TODO: write this text, include examples of input and output objects, possibly also API.
+TODO (Jan): write this text, include examples of input and output objects, possibly also API. 
 
 Both actor input and output is always a JSON file. To support e.g. images on input, we just need some better SDK and UI.
 
@@ -282,7 +282,7 @@ that we can add to JSON returned by the Run API enpoints
 
 ### Storage
 
-TODO...
+TODO... explain also why we have these storage...
 
 ## Installation and setup
 
@@ -360,7 +360,7 @@ this behavior can be overridden in options.
 For example, in Node.js the options object in all commands has `actorRunId`
 field, and `apify actor` CLI command has the `--actor-run-id` flag.
 
-TODO: We decided not to pass `actorRunId` as arg to methods, but use it in constructor
+TODO (Jan): We decided not to pass `actorRunId` as arg to methods, but use it in constructor - fix the above text
 
 ### Get input
 
@@ -371,6 +371,9 @@ Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_I
 The input is an object with properties.
 If the actor defines the input schema, the input object is guaranteed to conform to it.
 For details, see [Input and output](#input-and-output).
+
+TODO (@mnmkng): Ondra will move the init/main section above,
+  and fix those examples, Franta should finalize the Python version
 
 #### Node.js
 
@@ -417,10 +420,6 @@ int main (int argc, char *argv[]) {}
 ### Main function
 
 This is an optional helper to wrap the body of the actor.
-
-**TODO**: Is this even needed? Perhaps just to call `Actor.fail(‘Something failed’)`, but that could be done by the system (e.g. the last line from stderr would go there or full). Let's see...
-How else would we initialize web server to listen for events? Maybe some "subscribe" function?**
-Advantage of `main()` function: Kills actor even if you forgot `setTimeout()`
 
 #### Node.js
 
@@ -636,6 +635,8 @@ These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file usi
 For convenience, rather than using environment vars directly, we provide a helper function
 that returns an object, with TypeScript-defined type.
 
+TODO (@mnmkng): Let's now show getEnv() but the config object from Apify SDK, and explain why it's good to use.
+
 ```
 const env = await Actor.getEnv();
 console.log(env.actorRunId);
@@ -712,7 +713,7 @@ imminent [migration to another server](#TODO), or [Actor exit](#exit-actor).
 
 In the future, this mechanism can be extended to custom events and messages.
 
-TODO: Add a table of events and details of params, plus links, timeouts etc.
+TODO (@mtrunkat): Add a table of events and details of params, plus links, timeouts etc.
 
 #### Node.js
 
@@ -769,8 +770,8 @@ const run = await Actor.call(
   'apify/google-search-scraper',
   { queries: 'test' },
   {
-      // TODO from Ondra: this should have exactly the same names as in client. Currently they are different
-    memoryMbytes: 2048,
+      // TODO (@mnmkng): Please make sure this is like it is in Apify SDK and client
+    memory: 2048,
     defaultKeyValueStoreId: 'NEW_ID',
   },
 );
@@ -779,7 +780,7 @@ const run = await Actor.call(
 const run2 = await Actor.start(
   'apify/google-search-scraper',
   { queries: 'test' },
-  { memoryMbytes: 2048 },
+  { memory: 2048 },
 );
 
 // Note that the output object is always available,
@@ -793,17 +794,14 @@ console.log(`Output object: ${run2.output}`);
 ```bash
 # On stdout, the commands emit actor run object (in text or JSON format),
 # we shouldn't wait for finish, for that it should be e.g. "execute"
-# TODO: Currently this doesn't work!
-#  apify call --memory=1024 --build=beta apify/google-search-scraper
-#   Error: ENOENT: no such file or directory, scandir 'apify_storage/key_value_stores/default'
-# TODO: maybe keep "apify actor:call" or just "actor run" ?
-#  Decision "apify actor xxx" !!!
+# TODO (@mtrunkat): Ensure that all CLI examples use structure like "apify actor xxx"
+#   and that we update CLI to support these commands and parameters (can be breaking change).
 
 $ apify actor call apify/google-search-scraper queries='test\ntest2' \
   countryCode='US'
 $ apify actor call --json apify/google-search-scraper '{ "queries": }'
 $ apify actor call --input=@data.json --json apify/google-search-scraper
-$ apify actor call --memory=1024m --build=beta apify/google-search-scraper
+$ apify actor call --memory=1024 --build=beta apify/google-search-scraper
 $ apify actor call --output-record-key=SCREENSHOT apify/google-search-scraper
 
 # Pass input from stdin
@@ -860,7 +858,9 @@ and throws an error if not.
 
 The target actor inherits the default storages used by the calling actor, unless overridden.
 
-TODO: Describe what happens with output schema
+TODO (@jancurn): Describe what happens with output schema - the output schema of the main first actor run
+  is the one that counts. In the future, the system should ensure the schema of sub-actor is compatible.
+  
 
 #### Node.js
 
@@ -893,7 +893,7 @@ Run another actor or an external HTTP API endpoint after actor run finishes or f
 
 #### Node.js
 
-TODO: Check the API is as is now
+TODO (@mtrunkat): Check the API is as is now - see https://sdk.apify.com/api/apify/interface/WebhookOptions
 
 ```js
 await Actor.addWebhook({
@@ -906,9 +906,6 @@ await Actor.addWebhook({
         "eventData": {{eventData}},
         "resource": {{resource}}
     }`,
-    // Again, it's possible to attach webhook to another running actor.
-    // TODO: 
-    actorRunId: 'RUN_ID',
 });
 ```
 
@@ -956,7 +953,7 @@ and so launch other actors to consume newly added items or files.
 $ ls -l | grep "something" | wc -l
 ```
 
-**TODO:** We could have a special CLI support for creating actor chains using pipe operator,
+**TODO (@jancurn):** **Move to IDEAS.md** We could have a special CLI support for creating actor chains using pipe operator,
 like this:
 
 ```
@@ -1035,6 +1032,9 @@ app.listen(process.env.APIFY_CONTAINER_PORT, () => {
 
 ### Charging money
 
+TODO(@jancurn): Move the `Actor.charge()` to ideas, to keep this simple.
+  Mention just basic monetization in non-API section.
+
 **STATUS: This feature is not implemented yet.**
 
 To run an actor on the Apify platform, the user might need
@@ -1066,7 +1066,7 @@ to perform parts of the job.
 
 - If your actor is charging users, make sure at the earliest time possible  
   that the actor is being run with sufficient credits, by checking the input
-  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO).
+  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO (@jancurn)).
   If the maximum credits are not sufficient for actor's operation with respect
   to the input (e.g. user is requesting too many results for too little money),
   fail the actor immediately with a reasonable error status message for the user,
@@ -1217,7 +1217,7 @@ This behavior might be deprecated in the future.
 
 ## Development
 
-TODO: Write a high-level overview how to build new actors. Provide links 
+TODO (@jancurn): Write a high-level overview how to build new actors. Provide links 
 how to build directly on Apify+screenshots.
 
 ### Local development
@@ -1273,32 +1273,10 @@ https://apify.com/jancurn/some-scraper
 
 
 
-## TODOs
+## TODOs (@jancurn)
 
-From last meeting
-
-- In Apify SDK, move non-standard functions elsewhere or mark them as such
-- Add ideas for the permission system
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
-- Maybe we should add "API" section to all the programming interface sections,
-  so that this is a complete reference. Would be useful also to understand the actor output.
-- To storages, add info about atomic rename, e.g. `setName` function, and link to other operations...
-- Add comparison with other systems, like Lambda etc.
-- Review the [old initial specification](https://docs.google.com/document/d/15qL6Vl2Uztn8DbSp_22o4uhqyEaOHTqhFBlCTvJy700/edit#heading=h.fzd6vjhdt62n) of actors and see what can be reused
-  e.g. pricing stuff on actor invocation, live view containers, 
+- Maybe add comparison with other systems, like Lambda, Modal, Replit, ECS etc. in terms of developer experience 
+  - Maybe mention these in specific points,
 
-Note from Marek regarding permissision:
-
-- Just a note on this, I was thinking about how this could be done systematically, so dropping the notes here:
-
-- By default, the actor should have following permissions that the user would accept when running the actor for the first time:
-  - Write to all the default + named storages linked in the output schema
-  - Proxy - simply because we want all the traffic to run thru the proxy so we don't want actors scraping directly
-- In `actor.json` the actor could request additional permissions, basically anything from [permissions](https://docs.apify.com/access-rights/list-of-permissions#actor-task), for example, `DATASET.READ` to be able to read all the datasets or `SCHEDULER.WRITE` to manage schedules
-
-There is one tricky part:
-- If an actor needs to `.call()` other actors then basically the user must give him full permissions. Otherwise, the actor would have to list all the other actors it's going to call and the user would have to accept all the permissions needed in recursive calls.
-
-Extra question:
-- What to do if the new version of the actor requires more permissions? We should probably require the author to increase a major version and keep users on the old build + email them to accept the updated permissions.
 
