@@ -864,9 +864,6 @@ console.log(`Output object: ${run2.output}`);
 ```bash
 # On stdout, the commands emit actor run object (in text or JSON format),
 # we shouldn't wait for finish, for that it should be e.g. "execute"
-# TODO (@mtrunkat): Ensure that all CLI examples use structure like "apify actor xxx"
-#   and that we update CLI to support these commands and parameters (can be breaking change).
-
 $ apify actor call apify/google-search-scraper queries='test\ntest2' \
   countryCode='US'
 $ apify actor call --json apify/google-search-scraper '{ "queries": }'
