@@ -22,10 +22,6 @@ It looks as follows:
   "output": "./output_schema.json",
   "storages": {
     "keyValueStore": "./key_value_store_schema.json",
-    // NOTE: This expects that Apify platform will clone the whole monorepo and touch
-    //  files in upper directories, enabling sharing schemas between multiple actors.
-    //  Just note that Docker build uses context directory, and no longer has the access.
-    // TODO (@mtrunkat) will check how this really works and should work. Beware of security issues with arbitrary paths...
     "dataset": "../shared-schemas/dataset_schema.json",
     "requestQueue": "./request_queue_schema.json"
   }
