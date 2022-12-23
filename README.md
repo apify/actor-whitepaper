@@ -960,11 +960,9 @@ Run another actor or an external HTTP API endpoint after actor run finishes or f
 
 #### Node.js
 
-TODO (@mtrunkat): Check the API is as is now - see https://sdk.apify.com/api/apify/interface/WebhookOptions
-
 ```js
 await Actor.addWebhook({
-    eventType: ['SUCCEEDED', 'FAILED'],
+    eventType: ['ACTOR.RUN.SUCCEEDED', 'ACTOR.RUN.FAILED'],
     requestUrl: 'http://api.example.com?something=123',
     payloadTemplate: `{
         "userId": {{userId}},
@@ -980,17 +978,17 @@ await Actor.addWebhook({
 
 ```bash
 apify actor add-webhook --actor-run-id=RUN_ID \\
-  --event-types=SUCCEEDED,FAILED \\
+  --event-types=ACTOR.RUN.SUCCEEDED,ACTOR.RUN.FAILED \\
   --request-url=https://api.example.com \\
   --payload-template='{ "test": 123" }'
 
-apify actor add-webhook --event-types=SUCCEEDED \\
+apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
   --request-actor=apify/send-mail \\
   --memory=4096 --build=beta \\
   --payload-template=@template.json
 
 # Or maybe have a simpler API for self-actor?
-apify actor add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail 
+apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
 ```
 
 #### UNIX equivalent
