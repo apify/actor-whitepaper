@@ -771,12 +771,19 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 
 ### System events
 
-Receive system events, e.g. CPU statistics of the running container or information about
-imminent [migration to another server](#TODO), or [Actor exit](#exit-actor).
+Actors are notified by the platform about various events such as a migration to another server,
+[abort operation being triggered by another actor](#abort-another-actor), or on the CPU being overloaded.
 
-In the future, this mechanism can be extended to custom events and messages.
+In the future, this mechanism can be extended to custom events and messages enabling communication between
+actors.
 
-TODO (@mtrunkat): Add a table of events and details of params, plus links, timeouts etc.
+| Event type | Message | Description |
+| ---------- | ------- | ----------- |
+| `cpuInfo` | `{ "isCpuOverloaded": Boolean }` | The event is emitted approximately every second and it indicates whether the actor is using the maximum of available CPU resources. If that’s the case, the actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
+| `migrating` | `void` | Emitted when the actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
+| `aborting` | `void` | When a user aborts an actor run on the Apify platform, they can choose to abort gracefully to allow the actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
+| `persistState` | `{ "isMigrating": Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
+
 
 #### Node.js
 
