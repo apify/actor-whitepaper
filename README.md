@@ -202,15 +202,15 @@ The following table shows equivalents of key concepts of UNIX programs and actor
 
 **TODO:** Add to the table links to the texts below
 
-UNIX programs  | Actors 
-|---|---
-Command-line options |	Input object
-Read stdin |	Read from a dataset
-Write to stdout	| Push data to dataset, update actor status
-Write to stderr	| No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.
-File system	| Key-value store
-Process identifier (PID) | Actor run ID
-Process exit code | Actor exit code
+| UNIX programs            | Actors |
+|--------------------------|---|
+| Command-line options     |	Input object|
+| Read stdin               |	Read from a dataset|
+| Write to stdout	         | Push data to dataset, update actor status|
+| Write to stderr	         | No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.|
+| File system	             | Key-value store|
+ | Process identifier (PID) | Actor run ID|
+ | Process exit code        | Actor exit code|
 
 ### Design goals
 
@@ -361,6 +361,51 @@ field, and `apify actor` CLI command has the `--actor-run-id` flag.
 
 TODO (Jan): We decided not to pass `actorRunId` as arg to methods, but use it in constructor - fix the above text
 
+### Actor initialization
+
+First, the actor should be initialized. During initialization, it prepares to receive events from Apify platform, determines machine and storage configuration and optionally purges previous state from local storage. It will also create a default instance of the Actor class.
+
+It is not required to perform the initialization explicitly, because the actor will initialize on execution of any actor method, but we strongly recommend it to prevent race conditions.
+
+#### Node.js
+ 
+In Node.js the actor is initialized by calling the `init()` method. It should be paired with an `exit()` method which terminates the actor. Use of `exit()` is not required, but recommended. For more information go to [Exit actor](#exit-actor).
+
+```js
+import { Actor } from 'apify';
+
+await Actor.init();
+
+const input = await Actor.getInput();
+console.log(input);
+
+await Actor.exit();
+```
+
+An alternative way of initializing the actor is with a `main()` function. This is useful in environments where the latest JavaScript
+syntax and top level awaits are not supported. The main function is only syntax-sugar for `init()` and `exit()`. It will call `init()` before it executes its callback and `exit()` after the callback resolves. 
+
+```js
+import { Actor } from 'apify';
+
+Actor.main(async () => {
+  const input = await Actor.getInput();
+  // ...
+});
+```
+
+#### Python
+
+TODO: @fnesveda please add Python examples.
+
+#### UNIX equivalent
+
+```c
+int main (int argc, char *argv[]) {
+  ...
+}
+```
+
 ### Get input
 
 Get access to the actor input object passed by the user.
@@ -371,19 +416,11 @@ The input is an object with properties.
 If the actor defines the input schema, the input object is guaranteed to conform to it.
 For details, see [Input and output](#input-and-output).
 
-TODO (@mnmkng): Ondra will move the init/main section above,
-  and fix those examples, Franta should finalize the Python version
-
 #### Node.js
 
 ```js
-import { Actor } from 'apify';
-
-// TODO: Ondra's razor - We should instantiate new object,
-//  to avoid require-time side-effects
-
 const input = await Actor.getInput();
-console.log(input.option1);
+console.log(input);
 
 // prints: { "option1": "aaa", "option2": 456 }
 ```
@@ -391,8 +428,6 @@ console.log(input.option1);
 #### Python
 
 ```python
-from apify import actor
-
 input = actor.get_input()
 print(input)
 ```
@@ -414,45 +449,6 @@ $ command --option1=aaa --option2=bbb
 
 ```c
 int main (int argc, char *argv[]) {}
-```
-
-### Main function
-
-This is an optional helper to wrap the body of the actor.
-
-#### Node.js
-
-In Node.js the actor code might be either wrapped using the main function:
-
-```js
-import { Actor } from 'apify';
-
-Actor.main(async () => {
-  const input = await Actor.getInput();
-  // ...
-});
-```
-
-Or in combination with ES modules supporting usage of the top level `await` operator wrapped by `init()` and `exit()` methods:
-
-```js
-import { Actor } from 'apify';
-
-await Actor.init();
-
-const input = await Actor.getInput();
-console.log(input);
-
-await Actor.exit();
-```
-
-
-#### UNIX equivalent
-
-```c
-int main (int argc, char *argv[]) {
-  ...
-}
 ```
 
 ### Key-value store
@@ -649,17 +645,15 @@ These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file usi
 
 #### Node.js
 
-For convenience, rather than using environment vars directly, we provide a helper function
-that returns an object, with TypeScript-defined type.
+For convenience, rather than using environment vars directly, we provide a `Configuration` class
+that allows reading and updating the actor configuration.
 
-TODO (@mnmkng): Let's now show getEnv() but the config object from Apify SDK, and explain why it's good to use.
+```javascript
+const token = Actor.config.get('token');
 
+// use different token
+Actor.config.set('token', 's0m3n3wt0k3n')
 ```
-const env = await Actor.getEnv();
-console.log(env.actorRunId);
-```
-
-TODO: This might need to be unified with https://sdk.apify.com/docs/api/configuration
 
 #### CLI
 
@@ -782,27 +776,19 @@ returns immediately.
 #### Node.js
 
 ```js
-// Run actor and wait for it to finish
-const run = await Actor.call(
-  'apify/google-search-scraper',
-  { queries: 'test' },
-  {
-      // TODO (@mnmkng): Please make sure this is like it is in Apify SDK and client
-    memory: 2048,
-    defaultKeyValueStoreId: 'NEW_ID',
-  },
+// Start actor and return a Run object
+const run = await Actor.start(
+    'apify/google-search-scraper', // name of the actor to start
+    { queries: 'test' }, // input of the actor
+    { memory: 2048 }, // run configuration
 );
 
-// Run actor and don't wait for it to finish
-const run2 = await Actor.start(
-  'apify/google-search-scraper',
+// Start actor and wait for it to finish
+const run2 = await Actor.call(
+  'apify/google-search-scraper', 
   { queries: 'test' },
   { memory: 2048 },
 );
-
-// Note that the output object is always available,
-// and contains links to results generated according to the output schema
-console.log(`Output object: ${run2.output}`);
 ```
 
 
