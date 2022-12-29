@@ -206,11 +206,11 @@ The following table shows equivalents of key concepts of UNIX programs and actor
 |--------------------------|---|
 | Command-line options     |	Input object|
 | Read stdin               |	Read from a dataset|
-| Write to stdout	         | Push data to dataset, update actor status|
-| Write to stderr	         | No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.|
-| File system	             | Key-value store|
- | Process identifier (PID) | Actor run ID|
- | Process exit code        | Actor exit code|
+| Write to stdout	       | Push data to dataset, update actor status|
+| Write to stderr	       | No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.|
+| File system	           | Key-value store|
+| Process identifier (PID) | Actor run ID|
+| Process exit code        | Actor exit code|
 
 ### Design goals
 
@@ -285,7 +285,9 @@ TODO... explain also why we have these storage... default plus actors can use ot
 
 ### Interactions
 
-Describe chaining, webhooks, running another etc.
+Describe chaining, webhooks, running another, metamorph etc.
+
+....Charging money - basic info?
 
 
 ## Installation and setup
@@ -499,9 +501,8 @@ $ cat file.txt
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an actor starts, by default it is associated with a newly-created empty default dataset.
-The actor can create more datasets or access existing datasets created by other actors.
-
-TODO (@jancurn): Mention they can add more datasets and use them on the fly.
+The actor can create additional datasets or access existing datasets created by other actors,
+and use those as needed.
 
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
 of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.md) for more details.
@@ -907,22 +908,21 @@ posix_spawn();
 
 ### Metamorph
 
-Replace running actor’s Docker image with another actor.
+🪄 This is the most magical actor operation, which replaces running actor’s Docker image with another actor,
+similar to UNIX `exec` command.
+It is used for building new actors on top of existing ones.
+You simply define input schema and write README for a specific use case,
+and then delegate the work to another actor.
 
-This is the most magical actor operation.
-It is extremely useful for building new actors on top of existing ones.
-You simply define a better input schema and user description,
-and internally delegate the work to other actor.
+An actor can metamorph only to actors that have compatible output schema as the main actor,
+in order to ensure logical and consistent outcomes for users. 
+If the output schema of the target actor is not compatible, the system should throw an error.
 
-When metamorphing an actor into another actor, the system checks
-that the other actor has compatible input/output schemas,
-and throws an error if not.
+<!-- TODO: This is not implemented yet -->
 
-The target actor inherits the default storages used by the calling actor, unless overridden.
-
-TODO (@jancurn): Describe what happens with output schema - the output schema of the main first actor run
-  is the one that counts. In the future, the system should ensure the schema of sub-actor is compatible.
-  
+Note that the target actor inherits the default storages used by the calling actor.
+The target actor input is stored to the default key-value store, often under a key such as `INPUT-2`. 
+Internally, the target actor can recursively metamorph into another actor.
 
 #### Node.js
 
@@ -1048,90 +1048,6 @@ app.listen(process.env.ACTOR_LIVE_VIEW_PORT, () => {
   console.log(`Example live view web server running at ${process.env.ACTOR_LIVE_VIEW_URL}`)
 })
 ```
-
-### Charging money
-
-TODO(@jancurn): Move the `Actor.charge()` to ideas, to keep this simple.
-  Mention just basic monetization in non-API section.
-
-**STATUS: This feature is not implemented yet.**
-
-To run an actor on the Apify platform, the user might need
-to purchase a paid plan to cover for the computing resources used, 
-pay a fixed monthly fee for "renting" the actor if it's paid,
-or pay a variable fee for the number of results produced by the actor.
-
-On top of these "static" payment options, actors will eventually support
-a built-in monetization system that enables developers to charge users variable
-amounts, e.g. based on returned number of results,
-complexity of the input, or cost of external APIs used by the actor.
-
-The actor can dynamically charge the current user a specific amount of money
-by calling the `charge` function.
-Users of actors can ensure they will not be charged too much by specifying
-the maximum amount when starting an actor using the `maxChargeCreditsUsd` run option.
-The actor can call the `charge` function as many times as necessary,
-but once the total sum of charged credits would exceed the maximum limit,
-the invocation of the function throws an error.
-
-When a paid actor subsequently starts another paid actor, the charges performed
-by the subsequent actors are taken from the calling actor's credits.
-This enables actor economy, where actors hierarchically pay other actors or external APIs
-to perform parts of the job.
-
-**Rules for building actors with variable charging:**
-
-<!-- TODO: Should be called ACTOR_MAX_CHARGE_CREDITS_USD? -->
-
-- If your actor is charging users, make sure at the earliest time possible  
-  that the actor is being run with sufficient credits, by checking the input
-  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO (@jancurn)).
-  If the maximum credits are not sufficient for actor's operation with respect
-  to the input (e.g. user is requesting too many results for too little money),
-  fail the actor immediately with a reasonable error status message for the user,
-  and don't charge the user anything.
-- Charge the users right **after** you have incurred the costs,
-  not in advance. If the actor fails in the middle or is aborted, the users
-  only need to be charged for results they actually received.
-  Nothing will make users of your actors angrier than charging them for something they didn't receive.
-
-**Integration with input schema**
-
-The actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
-`maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
-per unit of usage specified in the input schema.
-This field can be used by the Apify platform to automatically inform the user about
-maximum possible charge, and automatically set `maxChargeCreditsUsd` for the actor run.
-For example,
-for Google Search Scraper paid by number of pages scraped, this setting would be
-added to `maxPageCount` field which limits the maximum number of pages to scrape.
-Note that the actor doesn't know in advance how many pages it will be able to fetch,
-hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
-
-<!-- TODO: Shall we create another actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
-That could provide for better UX. Probably not, it would be an overkill... -->
-
-#### Node.js
-
-Charge the current user of the actor a specific amount:
-
-```js
-const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
-```
-
-Set the maximum amount to charge when starting an actor.
-
-```js
-const run = await Actor.call(
-  'bob/analyse-images',
-  { imageUrls: ['...'] },
-  {
-      // By default, it's 0, hence actors cannot charge users unless they explicitely allow that.
-      maxChargeCreditsUsd: 5,
-  },
-);
-```
-
 
 ## Actor definition files
 

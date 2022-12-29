@@ -78,3 +78,87 @@ I tried to write a JS example for piping, but figured that piping is not really 
 Note from Jan:
 Indeed, the flow is to start one actor, and pass one of it's storages as default to the other newly started actor. If we had a generic Queue, it could be used nicely for these use case. I'm adding these notes to the doc, so that we can get back to them later.
 
+
+
+### Charging money
+
+TODO(@jancurn): Move the `Actor.charge()` to ideas, to keep this simple.
+Mention just basic monetization in non-API section.
+
+**STATUS: This feature is not implemented yet.**
+
+To run an actor on the Apify platform, the user might need
+to purchase a paid plan to cover for the computing resources used,
+pay a fixed monthly fee for "renting" the actor if it's paid,
+or pay a variable fee for the number of results produced by the actor.
+
+On top of these "static" payment options, actors will eventually support
+a built-in monetization system that enables developers to charge users variable
+amounts, e.g. based on returned number of results,
+complexity of the input, or cost of external APIs used by the actor.
+
+The actor can dynamically charge the current user a specific amount of money
+by calling the `charge` function.
+Users of actors can ensure they will not be charged too much by specifying
+the maximum amount when starting an actor using the `maxChargeCreditsUsd` run option.
+The actor can call the `charge` function as many times as necessary,
+but once the total sum of charged credits would exceed the maximum limit,
+the invocation of the function throws an error.
+
+When a paid actor subsequently starts another paid actor, the charges performed
+by the subsequent actors are taken from the calling actor's credits.
+This enables actor economy, where actors hierarchically pay other actors or external APIs
+to perform parts of the job.
+
+**Rules for building actors with variable charging:**
+
+<!-- TODO: Should be called ACTOR_MAX_CHARGE_CREDITS_USD? -->
+
+- If your actor is charging users, make sure at the earliest time possible  
+  that the actor is being run with sufficient credits, by checking the input
+  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO (@jancurn)).
+  If the maximum credits are not sufficient for actor's operation with respect
+  to the input (e.g. user is requesting too many results for too little money),
+  fail the actor immediately with a reasonable error status message for the user,
+  and don't charge the user anything.
+- Charge the users right **after** you have incurred the costs,
+  not in advance. If the actor fails in the middle or is aborted, the users
+  only need to be charged for results they actually received.
+  Nothing will make users of your actors angrier than charging them for something they didn't receive.
+
+**Integration with input schema**
+
+The actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
+`maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
+per unit of usage specified in the input schema.
+This field can be used by the Apify platform to automatically inform the user about
+maximum possible charge, and automatically set `maxChargeCreditsUsd` for the actor run.
+For example,
+for Google Search Scraper paid by number of pages scraped, this setting would be
+added to `maxPageCount` field which limits the maximum number of pages to scrape.
+Note that the actor doesn't know in advance how many pages it will be able to fetch,
+hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
+
+<!-- TODO: Shall we create another actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
+That could provide for better UX. Probably not, it would be an overkill... -->
+
+#### Node.js
+
+Charge the current user of the actor a specific amount:
+
+```js
+const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
+```
+
+Set the maximum amount to charge when starting an actor.
+
+```js
+const run = await Actor.call(
+  'bob/analyse-images',
+  { imageUrls: ['...'] },
+  {
+      // By default, it's 0, hence actors cannot charge users unless they explicitely allow that.
+      maxChargeCreditsUsd: 5,
+  },
+);
+```
