@@ -1,16 +1,8 @@
 # Dataset Schema File
 
-TODO (@mtrunkat): Mara will finish the specs in this file to be accurate, Jan will polish the text then
+Dataset storage enables you to sequentially save and retrieve data. Each actor run is assigned its own dataset, which is created when the first item is stored to it. Datasets usually contain results from web scraping, crawling or data processing jobs. The data can be visualized as a table where each object is a row and its attributes are the columns. The data can be exported in JSON, CSV, XML, RSS, Excel or HTML formats.
 
-Actor results can be saved to append-only object storage
-called [Dataset](https://sdk.apify.com/docs/api/dataset),
-which can be assigned a schema that ensures only objects with certain properties and types
-are added to the dataset. 
-
-The Dataset schema can be programmatically assigned to dataset on creation or when its empty dataset,
-using the API.
-
-**Dataset schema describes:**
+Dataset can be assigned a schema which describes:
 
 - Content of the dataset, i.e., the schema of objects that are allowed to be added
 - Different views on how we can look at the data, aka transformations
@@ -21,24 +13,21 @@ using the API.
 
 ## Basic properties
 
-- It's immutable
-    - If you want to change the structure, then you need to create a new dataset
-- It's weak
-    - You can always push their additional properties, but schema will ensure that all the listed once are there with a correct type
-    - This is to make actors more compatible, i.e., some actor expects dataset to contain certain fields but does not care about the additional ones
+- Storage is immutable. I.e., if you want to change the structure, then you need to create a new dataset.
+- Its schema is weak. I.e., you can always push their additional properties, but schema will ensure that all the listed once are there with a correct type. This is to make actors more compatible, i.e., some actor expects dataset to contain certain fields but does not care about the additional ones.
 
 There are two ways how to create a dataset with schema:
-- User can start the actor that has dataset schema linked from its
+1. User can start the actor that has dataset schema linked from its
 [OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
-- Or user can do it pragmatically via API (for empty dataset) by
-  - either passing schema as payload to [create dataset](https://docs.apify.com/api#/reference/datasets/dataset-collection/create-dataset) API endpoint
-  - or using the SDK:
+2. Or user can do it pragmatically via API (for empty dataset) by
+    - either by passing the schema as payload to [create dataset](https://docs.apify.com/api#/reference/datasets/dataset-collection/create-dataset) API endpoint.
+    - or using the SDK:
 
-```js
-const dataset = await Apify.openDataset('my-new-dataset', { schema });
-```
+    ```js
+    const dataset = await Apify.openDataset('my-new-dataset', { schema });
+    ```
 
-This also ensures that you are opening a dataset that is compatible with the actor as otherwise, you get an error:
+By opening an **existing** dataset with `schema` parameter, the system ensures that you are opening a dataset that is compatible with the actor as otherwise, you get an error:
 
 ```
 Uncaught Error: Dataset schema is not compatible with the provided schema
@@ -49,10 +38,13 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 ```jsonc
 {
     "actorSpecification": 1,
-    "title": "Eshop products", // optional
-    "description": "Dataset containing the whole product catalog including prices and stock availability.", // optional
-    "fields": { // not supported yer
+    "title": "Eshop products",
+    "description": "Dataset containing the whole product catalog including prices and stock availability.",
+
+    // Not supported yet
+    "fields": {
         "title": "string",  
+        "imageUrl": "string",  
         "priceUsd": "number", 
         "manufacturer": {
             "title": "string", 
@@ -64,34 +56,31 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
         
         ...
     },
+  
     "views": {
         "overview": {
-            "title": "Products overview", // optional
-            "description": "Displays only basic fields such as title and price", // optional
+            "title": "Products overview",
+            "description": "Displays only basic fields such as title and price",
             "transformation": {
-                "flatten":[
-                    "author"
-                    "latestTweets",
-                ],
+                "flatten": ["stockInfo"],
                 "fields": [
-                    "author.name",
-                    "latestTweets.0.tweet",
-                    "someOtherField",
-                    "anotherField",
-                    "nonFlatenedObjectOrArray"
+                    "title",
+                    "imageUrl",
+                    "variants"
                 ]
             },
             "display": {
                 "component": "table",
                 "properties": {
-                    "author.name": {
-                      "label": "Author"
+                    "title": {
+                      "label": "Title"
+                    },                           
+                    "imageUrl": {
+                        "label": "Image",
+                        "format": "image" // optional, in this case the format is overriden to show "image" instead of image link "text". "image" format only works with .jpeg, .png or other image format urls.
                     },
-                    "latestTweets.0.tweet": {
-                      "label": "Latest tweet"
-                    },
-                    "nonFlatenedObjectOrArray":{
-                      "label": "Meta"
+                    "stockInfo.availability": {
+                        "label": "Availability"
                     }
                 }
             }
@@ -104,7 +93,8 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
                     "title",
                     "price",
                     "productVariants"
-                ]
+                ],
+                "unwind": "productVariants"
             },
             "display": {
                 // Simply renders all the available fields. 
@@ -116,33 +106,18 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 }
 ```
 
-## Fields
+## DatasetSchema object definition
 
+| Property           | Type                         | Required | Description                                                                                        |
+| ------------------ | ---------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| actorSpecification | integer                      | true     | Specifies the version of dataset schema <br/>structure document. <br/>Currently only version 1 is available. |
+| fields             | JSON schema | true     | JSON schema object with more formats in the future.             |
+| views              | [DatasetView]          | true     | An array of objects with a description of an API <br/>and UI views.                                                  |
 
-TODO(@mtrunkat): Please finish this part, we'll have to start with JSON schema before adding any other
-. see https://github.com/apify/actor-specs/pull/7/files#r794764956 
+### JSON schema
 
-One big TODO: What schema definition are we going to support? The most powerful and standardized but
-slow to write is [JSON Schema](https://json-schema.org/). We could start with
-the [Easy JSON Schema](https://github.com/easy-json-schema/easy-json-schema) and add support for JSON
-Schema later, but in this case, we will need another property saying what schema is used.
+Items of a dataset can be described by a JSON schema definition. Apify platform then ensures that each object accomplies with the provided schema. In the first version only the standard JSON schema will be supported, i.e.:
 
-NOTE JC: In any case, we need to support field types and required/optional.
-Let's start with Easy JSON schema to keep things simple, we can extend in the future.
-
-Here is a comparison of JSON Schema and Easy JSON Schema:
-
-```jsonc
-{
-  "id": "string",
-  "*name": "string",
-  "*email": "string",
-  "arr": [{
-    "site": "string",
-    "url": "string"
-  }]
-}
-```
 
 ```jsonc
 {
@@ -180,122 +155,51 @@ Here is a comparison of JSON Schema and Easy JSON Schema:
 }
 ```
 
-## Views
-
-Dataset view enables the user to explore certain data ways. For example the
-[Google Search Scraper](https://apify.com/apify/google-search-scraper) enables the user to View 
-the results in multiple ways:
-- One item = one page with two embed arrays of organic results and ads
-- One item = one organic results
-- One item = one search result
-
-The first View in the list is considered to be a default one.
-
-### Views' transformation
-
-Transformation is a combination of a 
-[GET dataset items](https://docs.apify.com/api#/reference/datasets/item-collection/get-items)
-API endpoint parameters. This makes View usable in both UI and API
-where the users can use it to preset the parameters easily, for example:
-
-```
-https://api.apify.com/v2/datasets/[ID]/items?format=[FORMAT]&view=searchResults
-```
-
-instead of this complicated URL in the case of [Google Search Scraper](https://apify.com/apify/google-search-scraper#how-to-get-one-search-result-per-row):
-
-```
-https://api.apify.com/v2/datasets/[ID]/items?format=[FORMAT]&fields=searchQuery,organicResults&unwind=organicResults
-```
-
-And here is the description from the dataset schema:
+with simplifed version comming in the near future:
 
 ```jsonc
-  "transformation": {
-      "fields": [
-          "searchQuery",
-          "organicResults"
-      ],
-      "unwind": "organicResults",
-      "flatten": ["searchQuery"]
-  },
-```
-**Nested objects**
-In order to be able to properly and consistently display nested object data in Excel, CSV, Table UI etc. it is necessary to flatten or unwind the original object. 
-
-Unwind deconstructs the nested children into parent object. eg: with transformation.unwind:[”foo”] the object ```{”foo”:{”bar”:”hello”}}``` is turned into ```{’bar”:”hello”}``` ( Please be aware that in case of the object key conflict, the existing key/value will be replaced by the new key/value )
-
-Flatten transforms the nested object into flat structure. eg: with transformation.flatten:[”foo”] the object ```{”foo”:{”bar”:”hello”}}``` is turned into ```{’foo.bar”:”hello”}``` 
-
-### Display of a view
-
-It's a triplet of `component`, `options`, and `properties` (according to the ReactJS language) that maps dataset fields to template property names.
-
-```
-display: {
-    component: "grid",
-    options: {
-      columns: 6,
-    },
-    properties: {
-        "title":{
-          position:"header"
-        },
-        "image.href":{
-          position:"image"
-        },
-        "field1.field2.url":{
-          position:"link"
-        }
-    }
+{
+  "id": "string",
+  "*name": "string",
+  "*email": "string",
+  "arr": [{
+    "site": "string",
+    "url": "string"
+  }]
 }
 ```
 
 
-## Dataset schema structure definitions
-
-### DatasetSchema object definition
-
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| actorSpecification | integer | true | Specifies the version of dataset schema structure document. Currently only version 1 is available. |
-| fields | JSONSchema compatible object | true | Schema of one dataset object. Use JsonSchema Draft 2020-12 or other compatible format. |
-| views | DatasetView object | true | An object with description of an API and UI views |
-
 ### DatasetView object definition
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| title | string | true | The title is visible in UI in Output tab as well as in the API. |
-| description | string | false | Description is only available in API response. Usage of this field is optional. |
-| transformation | ViewTransformation object | true | The definition of data transformation which is applied when dataset data are loaded from Dataset API. |
-| display | ViewDisplay object | true | The definition of Output tab UI visualisation. |
+| Property       | Type                      | Required | Description                                                                                           |
+| -------------- | ------------------------- | -------- | ----------------------------------------------------------------------------------------------------- |
+| title          | string                    | true     | The title is visible in UI in the Output tab <br/>as well as in the API.                                       |
+| description    | string                    | false    | The description is only available in the API response. <br/>The usage of this field is optional.                       |
+| transformation | ViewTransformation object | true     | The definition of data transformation <br/>is applied when dataset data are loaded from <br/>Dataset API. |
+| display        | ViewDisplay object        | true     | The definition of Output tab UI visualization.                                                        |
 
 ### ViewTransformation object definition
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| fields | string[] | true | Selects fields that is going to be presented on Output. An order of  the fields in matches the order of columns in visualisation UI. In case the fields value is missing it will be presented as “undefined” in UI. |
-| unwind | string | false | Deconstructs the nested children into parent object. eg: with unwind:[”foo”] the object {”foo”:{”bar”:”hello”}} is turned into {’bar”:”hello”} |
-| flatten | string[] | false | Transforms the nested object into flat structure. eg: with flatten:[”foo”] the object {”foo”:{”bar”:”hello”}} is turned into {’foo.bar”:”hello”} |
-| omit | string | false | Removes the specified fields from the output. Nested fields names can used there as well. |
-| limit | integer | false | Maximum number of results returned. Default is all results. |
-| desc | boolean | false | By default results are sorted Ascending based on the write event into dataset. desc:true param will return the newest writes to dataset first. |
+| Property | Type     | Required | Description                                                                                                                                                                                                         |
+| -------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| fields   | string[] | true     | Selects fields that are going to be presented in the output. <br/>The order of fields matches the order of columns <br/>in visualization UI. In case the fields value <br/>is missing, it will be presented as “undefined” in the UI. |
+| unwind   | string   | false    | Deconstructs nested children into parent object, <br/>e.g.: with unwind:[”foo”], the object `{”foo”:{”bar”:”hello”}}`  <br/> is turned into `{’bar”:”hello”}`.                                                                     |
+| flatten  | string[] | false    | Transforms nested object into flat structure. <br/>eg: with flatten:[”foo”] the object `{”foo”:{”bar”:”hello”}}` <br/> is turned into `{’foo.bar”:”hello”}`.                                                                    |
+| omit     | string   | false    | Removes the specified fields from the output. <br/>Nested fields names can be used there as well.                                                                                                                           |
+| limit    | integer  | false    | The maximum number of results returned. <br/>Default is all results.                                                                                                                                                         |
+| desc     | boolean  | false    | By default, results are sorted in ascending based <br/>on the write event into the dataset. desc:true param <br/>will return the newest writes to the dataset first.                                                                      |
 
 ### ViewDisplay object definition
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| component | string | true | Only component “table” is available. |
-| properties | Object with keys matching the Output object’s properties. Each one is configured using ViewDisplayProperty object. | false | In case properties are not set the table will be rendered automatically with fields formatted as Strings, Arrays or Objects. |
+| Property   | Type                                                                                                               | Required | Description                                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| component  | string                                                                                                             | true     | Only component “table” is available.                                                                                         |
+| properties |  Object | false    | Object with keys matching the `transformation.fields` <br/> and ViewDisplayProperty as values. In case properties are not set <br/>the table will be rendered automatically with fields formatted as Strings, <br/>Arrays or Objects. |
 
 ### ViewDisplayProperty object definition
 
-| Property | Type | Required | Description |
-| --- | --- | --- | --- |
-| label | string | false | In case the data are visualised as in Table view. Label will be visible table column’s header. |
-| format | enum(text, number, date, boolean, image, array, object) | false | Describes how Output data values are formatted in order to be rendered in Output tab UI. |
-
-## TODOs
-
-- JSON schema specification (full or simple) above
+| Property | Type                                                    | Required | Description                                                                                    |
+| -------- | ------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| label    | string                                                  | false    | In case the data are visualized as in Table view. <br/>The label will be visible table column’s header. |
+| format   | enum(text, number, date, link, <br/>boolean, image, array, object) | false    | Describes how output data values are formatted <br/>in order to be rendered in the output tab UI.       |

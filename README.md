@@ -17,54 +17,100 @@ October 2022.
 
 <!-- toc -->
 
-- [Introduction](#introduction)
-  * [Overview](#overview)
-  * [What actors are not](#what-actors-are-not)
-  * [Word of warning](#word-of-warning)
-- [Philosophy](#philosophy)
-  * [UNIX programs vs. actors](#unix-programs-vs-actors)
-  * [Design goals](#design-goals)
-  * [Relation to the Actor model](#relation-to-the-actor-model)
-  * [Why the name "actor" ?](#why-the-name-actor-)
-- [Basic concepts](#basic-concepts)
-  * [Input and output](#input-and-output)
-  * [Storage](#storage)
-- [Installation and setup](#installation-and-setup)
-  * [Apify platform](#apify-platform)
-  * [Node.js](#nodejs)
-  * [Python](#python)
-  * [Command-line interface (CLI)](#command-line-interface-cli)
-- [Programming interface](#programming-interface)
-  * [Get input](#get-input)
-  * [Main function](#main-function)
-  * [Key-value store](#key-value-store)
-  * [Push results to dataset](#push-results-to-dataset)
-  * [Exit actor](#exit-actor)
-  * [Environment variables](#environment-variables)
-  * [Actor status](#actor-status)
-  * [System events](#system-events)
-  * [Get memory information](#get-memory-information)
-  * [Start another actor](#start-another-actor)
-  * [Metamorph](#metamorph)
-  * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
-  * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
-  * [Abort another actor](#abort-another-actor)
-  * [Live view web server](#live-view-web-server)
-  * [Charging money](#charging-money)
-- [Actor definition files](#actor-definition-files)
-  * [Actor file](#actor-file)
-  * [Dockerfile](#dockerfile)
-  * [README](#readme)
-  * [Schema files](#schema-files)
-  * [Backward compatibility](#backward-compatibility)
-- [Development](#development)
-  * [Local development](#local-development)
-  * [Deployment to Apify platform](#deployment-to-apify-platform)
-  * [Repackaging existing software as actors](#repackaging-existing-software-as-actors)
-  * [Continuous integration and delivery](#continuous-integration-and-delivery)
-- [Sharing & Community](#sharing--community)
-  * [Shared actors](#shared-actors)
-- [TODOs](#todos)
+- [The Actor Programming Model Whitepaper \[DRAFT\]](#the-actor-programming-model-whitepaper-draft)
+  - [Contents](#contents)
+  - [Introduction](#introduction)
+    - [Overview](#overview)
+    - [What actors are not](#what-actors-are-not)
+    - [Word of warning](#word-of-warning)
+  - [Philosophy](#philosophy)
+    - [UNIX programs vs. actors](#unix-programs-vs-actors)
+    - [Design goals](#design-goals)
+    - [Relation to the Actor model](#relation-to-the-actor-model)
+    - [Why the name "actor" ?](#why-the-name-actor-)
+  - [Basic concepts](#basic-concepts)
+    - [Input and output](#input-and-output)
+    - [Storage](#storage)
+  - [Installation and setup](#installation-and-setup)
+    - [Apify platform](#apify-platform)
+    - [Node.js](#nodejs)
+    - [Python](#python)
+    - [Command-line interface (CLI)](#command-line-interface-cli)
+  - [Programming interface](#programming-interface)
+    - [Get input](#get-input)
+      - [Node.js](#nodejs-1)
+      - [Python](#python-1)
+      - [CLI](#cli)
+      - [UNIX equivalent](#unix-equivalent)
+    - [Main function](#main-function)
+      - [Node.js](#nodejs-2)
+      - [UNIX equivalent](#unix-equivalent-1)
+    - [Key-value store](#key-value-store)
+      - [Node.js](#nodejs-3)
+      - [Python](#python-2)
+      - [UNIX](#unix)
+    - [Push results to dataset](#push-results-to-dataset)
+      - [Node.js](#nodejs-4)
+      - [Python](#python-3)
+      - [CLI](#cli-1)
+      - [UNIX equivalent](#unix-equivalent-2)
+    - [Exit actor](#exit-actor)
+      - [Node.js](#nodejs-5)
+      - [Python](#python-4)
+      - [CLI](#cli-2)
+      - [UNIX equivalent](#unix-equivalent-3)
+    - [Environment variables](#environment-variables)
+      - [Node.js](#nodejs-6)
+      - [CLI](#cli-3)
+      - [UNIX equivalent](#unix-equivalent-4)
+    - [Actor status](#actor-status)
+      - [Node.js](#nodejs-7)
+      - [Python](#python-5)
+      - [CLI](#cli-4)
+    - [System events](#system-events)
+      - [Node.js](#nodejs-8)
+      - [UNIX equivalent](#unix-equivalent-5)
+    - [Get memory information](#get-memory-information)
+      - [Node.js](#nodejs-9)
+      - [UNIX equivalent](#unix-equivalent-6)
+    - [Start another actor](#start-another-actor)
+      - [Node.js](#nodejs-10)
+      - [CLI](#cli-5)
+      - [Slack](#slack)
+      - [API](#api)
+      - [UNIX equivalent](#unix-equivalent-7)
+    - [Metamorph](#metamorph)
+      - [Node.js](#nodejs-11)
+      - [CLI](#cli-6)
+      - [UNIX equivalent](#unix-equivalent-8)
+    - [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
+      - [Node.js](#nodejs-12)
+      - [CLI](#cli-7)
+      - [UNIX equivalent](#unix-equivalent-9)
+    - [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
+      - [UNIX equivalent](#unix-equivalent-10)
+    - [Abort another actor](#abort-another-actor)
+      - [Node.js](#nodejs-13)
+      - [CLI](#cli-8)
+      - [UNIX equivalent](#unix-equivalent-11)
+    - [Live view web server](#live-view-web-server)
+      - [Node.js](#nodejs-14)
+    - [Charging money](#charging-money)
+      - [Node.js](#nodejs-15)
+  - [Actor definition files](#actor-definition-files)
+    - [Actor file](#actor-file)
+    - [Dockerfile](#dockerfile)
+    - [README](#readme)
+    - [Schema files](#schema-files)
+    - [Backward compatibility](#backward-compatibility)
+  - [Development](#development)
+    - [Local development](#local-development)
+    - [Deployment to Apify platform](#deployment-to-apify-platform)
+    - [Repackaging existing software as actors](#repackaging-existing-software-as-actors)
+    - [Continuous integration and delivery](#continuous-integration-and-delivery)
+  - [Sharing \& Community](#sharing--community)
+    - [Shared actors](#shared-actors)
+  - [TODOs (@jancurn)](#todos-jancurn)
 
 <!-- tocstop -->
 
@@ -719,12 +765,19 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 
 ### System events
 
-Receive system events, e.g. CPU statistics of the running container or information about
-imminent [migration to another server](#TODO), or [Actor exit](#exit-actor).
+Actors are notified by the platform about various events such as a migration to another server,
+[abort operation being triggered by another actor](#abort-another-actor), or on the CPU being overloaded.
 
-In the future, this mechanism can be extended to custom events and messages.
+In the future, this mechanism can be extended to custom events and messages enabling communication between
+actors.
 
-TODO (@mtrunkat): Add a table of events and details of params, plus links, timeouts etc.
+| Event type | Message | Description |
+| ---------- | ------- | ----------- |
+| `cpuInfo` | `{ "isCpuOverloaded": Boolean }` | The event is emitted approximately every second and it indicates whether the actor is using the maximum of available CPU resources. If that’s the case, the actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
+| `migrating` | `void` | Emitted when the actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
+| `aborting` | `void` | When a user aborts an actor run on the Apify platform, they can choose to abort gracefully to allow the actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
+| `persistState` | `{ "isMigrating": Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
+
 
 #### Node.js
 
@@ -797,9 +850,6 @@ const run2 = await Actor.call(
 ```bash
 # On stdout, the commands emit actor run object (in text or JSON format),
 # we shouldn't wait for finish, for that it should be e.g. "execute"
-# TODO (@mtrunkat): Ensure that all CLI examples use structure like "apify actor xxx"
-#   and that we update CLI to support these commands and parameters (can be breaking change).
-
 $ apify actor call apify/google-search-scraper queries='test\ntest2' \
   countryCode='US'
 $ apify actor call --json apify/google-search-scraper '{ "queries": }'
@@ -896,11 +946,9 @@ Run another actor or an external HTTP API endpoint after actor run finishes or f
 
 #### Node.js
 
-TODO (@mtrunkat): Check the API is as is now - see https://sdk.apify.com/api/apify/interface/WebhookOptions
-
 ```js
 await Actor.addWebhook({
-    eventType: ['SUCCEEDED', 'FAILED'],
+    eventType: ['ACTOR.RUN.SUCCEEDED', 'ACTOR.RUN.FAILED'],
     requestUrl: 'http://api.example.com?something=123',
     payloadTemplate: `{
         "userId": {{userId}},
@@ -916,17 +964,17 @@ await Actor.addWebhook({
 
 ```bash
 apify actor add-webhook --actor-run-id=RUN_ID \\
-  --event-types=SUCCEEDED,FAILED \\
+  --event-types=ACTOR.RUN.SUCCEEDED,ACTOR.RUN.FAILED \\
   --request-url=https://api.example.com \\
   --payload-template='{ "test": 123" }'
 
-apify actor add-webhook --event-types=SUCCEEDED \\
+apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
   --request-actor=apify/send-mail \\
   --memory=4096 --build=beta \\
   --payload-template=@template.json
 
 # Or maybe have a simpler API for self-actor?
-apify actor add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail 
+apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
 ```
 
 #### UNIX equivalent
