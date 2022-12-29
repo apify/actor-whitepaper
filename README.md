@@ -498,13 +498,13 @@ $ cat file.txt
 ### Push results to dataset
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
-When an actor starts, by default it is associated with a newly-created empty dataset.
-The user can override it and specify another dataset when running the actor.
+When an actor starts, by default it is associated with a newly-created empty default dataset.
+The actor can create more datasets or access existing datasets created by other actors.
 
 TODO (@jancurn): Mention they can add more datasets and use them on the fly.
 
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
-of objects are stored in them. See [Schema files](#schema-files) for more details.
+of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.md) for more details.
 
 #### Node.js
 
@@ -635,24 +635,28 @@ Actors have access to standard process environment variables.
 The Apify platform uses environment variables prefixed with `APIFY_` to pass the actors information
 about the execution context.
 
-<!-- TODO: We should really define these using ACTOR_ to make it Apify-independent! -->
-
-| Environment Variable               | Description                                                                                                                                                                                                                |
+| Environment variable               | Description                                                                                                                                                                                                                |
 |------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `APIFY_ACTOR_RUN_ID`               | ID of the actor run.                                                                                                                                                                                                       |
-| `APIFY_ACTOR_EVENTS_WS_URL`        | Websocket URL where actor may listen for events from Actor platform. See [documentation](https://sdk.apify.com/api/apify/class/PlatformEventManager) for more information.                                       |
-| `APIFY_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
-| `APIFY_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the actor's input and output data are stored.                                                                                                                                    |
-| `APIFY_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
-| `APIFY_INPUT_KEY`                  | The key of the record in the default key-value store that holds the actor input. Typically it's **INPUT**, but it might be something else.                                                             |
-| `APIFY_MEMORY_MBYTES`              | Indicates the size of memory allocated for the actor run, in megabytes. It can be used by actors to optimize their memory usage.                                                                       |
-| `APIFY_STARTED_AT`                 | Date when the actor was started, in ISO 8601 format.                                                                                                                                                                                           |
-| `APIFY_TIMEOUT_AT`                 | Date when the actor will time out, in ISO 8601 format.                                                                                                                                                                          |
-| `APIFY_TOKEN`                      | The API token of the user who started the actor.                                                                                                                                                                      |
-| `APIFY_CONTAINER_PORT`             | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details. |
-| `APIFY_CONTAINER_URL`              | A unique public URL under which the actor run web server is accessible from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details.  |
+| `ACTOR_RUN_ID`                     | ID of the actor run.                                                                                                                                                                                                       |
+| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the actor's input and output data are stored.                                                                                                                                    |
+| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
+| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
+| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the actor input. Typically it's `INPUT`, but it might be something else.                                                             |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the actor run, in megabytes. It can be used by actors to optimize their memory usage.                                                                       |
+| `ACTOR_STARTED_AT`                 | Date when the actor was started, in ISO 8601 format.                                                                                                                                                                                           |
+| `ACTOR_TIMEOUT_AT`                 | Date when the actor will time out, in ISO 8601 format.                                                                                                                                                                          |
+| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
+| `ACTOR_LIVE_VIEW_PORT`             | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details. |
+| `ACTOR_LIVE_VIEW_URL`              | A unique public URL under which the actor run web server is accessible from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details.  |
 
-For the full list of environment variables, see the [Apify documentation](https://docs.apify.com/actors/development/environment-variables).
+**WARNING**: This is not implemented yet. Currently, the actors use environment variables
+prefixed by `APIFY_`. See the full list of environment variables
+in [Apify documentation](https://docs.apify.com/actors/development/environment-variables).
+
+<!--
+  TODO: Implement these env vars, we need to keep the old ones for backwards compatibility
+  Only Apify-specific env vars should have prefix APIFY_, e.g. APIFY_PROXY_PASSWORD, APIFY_TOKEN or APIFY_USER_ID.
+-->
 
 The actor developer can also define custom environment variables
 that are then passed to the actor process both in local development environment or on the Apify platform.
@@ -739,36 +743,60 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 
 ### System events
 
-Actors are notified by the platform about various events such as a migration to another server,
-[abort operation being triggered by another actor](#abort-another-actor), or on the CPU being overloaded.
+Actors are notified by the system about various events such as a migration to another server,
+[abort operation](#abort-another-actor) triggered by another actor, or the CPU being overloaded.
 
-In the future, this mechanism might be extended to custom events and messages enabling communication between
-actors.
+Currently, the system sends the following events:
 
-| Event type     | Data | Description |
+| Event name     | Payload | Description |
 | -------------- | ------- | ----------- |
 | `cpuInfo`      | `{ isCpuOverloaded: Boolean }` | The event is emitted approximately every second and it indicates whether the actor is using the maximum of available CPU resources. If that’s the case, the actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
 | `migrating`    | N/A | Emitted when the actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
 | `aborting`     | N/A | When a user aborts an actor run on the Apify platform, they can choose to abort gracefully to allow the actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
 | `persistState` | `{ isMigrating: Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
 
+In the future, the event mechanism might be extended to custom events and messages enabling communication between
+actors.
+
+Under the hood, actors receive the system events by connecting to a web socket address specified
+by the `ACTOR_EVENTS_WEBSOCKET_URL` environment variable.
+The system sends messages in JSON format in the following structure:
+
+```js
+{
+    // Event name
+    name: String,
+
+    // Time when the event was created, in ISO format
+    createdAt: String,
+          
+    // Optional object with payload      
+    data: Object,
+}
+```
+
+Note that some events (e.g. `persistState`) are not sent by the system via the web socket,
+but generated virtually on the Actor SDK level.
 
 #### Node.js
 
 ```js
-// Add actor event handler
-Actor.on('systemInfo', (data) => {
-    if (data.isCpuOverloaded) console.log('Oh no, the CPU is overloaded!');
+// Add event handler
+Actor.on('cpuInfo', (data) => {
+    if (data.isCpuOverloaded) console.log('Oh no, we need to slow down!');
 });
-```
 
-```js
-// Remove all actor event handlers
+// Remove all handlers for a specific event
 Actor.off('systemInfo');
 
-// Remove a specific actor event handler
+// Remove a specific event handler
 Actor.off('systemInfo', handler);
 ```
+
+#### Python
+
+TODO: @fnesveda Add Python example
+
 
 #### UNIX equivalent
 
@@ -1001,25 +1029,23 @@ to provide a web application for human users, to show actor run details, diagnos
 or to run an arbitrary web app.
 
 On Apify platform, the port on which the actor can launch the public web server,
-is specified by the `APIFY_CONTAINER_PORT` environment variable.
+is specified by the `ACTOR_LIVE_VIEW_PORT` environment variable.
 The web server is then exposed to the public internet on a URL identified 
-by the `APIFY_CONTAINER_URL`, e.g. `https://hard-to-guess-identifier.runs.apify.net`.
-
-<!-- TODO: These should probably be called `ACTOR_LIVE_VIEW_PORT` or `ACTOR_LIVE_VIEW_URL` -->
+by the `ACTOR_LIVE_VIEW_URL`, for example `https://hard-to-guess-identifier.runs.apify.net`.
 
 #### Node.js
 
 ```js
 const express = require('express');
 const app = express();
-const port = process.env.APIFY_CONTAINER_PORT;
+const port = process.env.ACTOR_LIVE_VIEW_PORT;
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.listen(process.env.APIFY_CONTAINER_PORT, () => {
-  console.log(`Example live view web server running at ${process.env.APIFY_CONTAINER_URL}`)
+app.listen(process.env.ACTOR_LIVE_VIEW_PORT, () => {
+  console.log(`Example live view web server running at ${process.env.ACTOR_LIVE_VIEW_URL}`)
 })
 ```
 
