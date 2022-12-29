@@ -281,7 +281,12 @@ that we can add to JSON returned by the Run API enpoints
 
 ### Storage
 
-TODO... explain also why we have these storage...
+TODO... explain also why we have these storage... default plus actors can use others, and anything external
+
+### Interactions
+
+Describe chaining, webhooks, running another etc.
+
 
 ## Installation and setup
 
@@ -350,16 +355,12 @@ $ apify help <command>
 
 ## Programming interface
 
-By default, the following commands are expected to be called from within a context
+The commands described in this section are expected to be called from within a context
 of a running actor, both in local environment or on the Apify platform.
-The information about the current run is taken from `APIFY_ACTOR_RUN_ID`
-environment variable.
-For all commands,
-this behavior can be overridden in options.
-For example, in Node.js the options object in all commands has `actorRunId`
-field, and `apify actor` CLI command has the `--actor-run-id` flag.
-
-TODO (Jan): We decided not to pass `actorRunId` as arg to methods, but use it in constructor - fix the above text
+By default, the identifier of the current actor run is taken from `APIFY_ACTOR_RUN_ID`
+environment variable, but it can be overridden.
+For example, in Node.js you can initialize the `Actor` class using another `actorRunId`,
+or in the `apify actor` CLI command you can pass the `--actor-run-id` flag.
 
 ### Actor initialization
 
@@ -630,18 +631,37 @@ exit(1);
 
 ### Environment variables
 
-Actors have access to standard process environment variables.
+Actors have access to standard process environment variables. 
+The Apify platform uses environment variables prefixed with `APIFY_` to pass the actors information
+about the execution context.
 
-The Apify platform sets information about the actor execution context through
-environment variables such as `APIFY_TOKEN` or `APIFY_ACTOR_RUN_ID` -
-see the [Apify documentation](https://docs.apify.com/actors/development/environment-variables) for the full list.
+<!-- TODO: We should really define these using ACTOR_ to make it Apify-independent! -->
 
-<!-- TODO: We should provide the full list here eventually, for a complete reference. -->
+| Environment Variable               | Description                                                                                                                                                                                                                |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `APIFY_ACTOR_RUN_ID`               | ID of the actor run.                                                                                                                                                                                                       |
+| `APIFY_ACTOR_EVENTS_WS_URL`        | Websocket URL where actor may listen for events from Actor platform. See [documentation](https://sdk.apify.com/api/apify/class/PlatformEventManager) for more information.                                       |
+| `APIFY_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
+| `APIFY_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the actor's input and output data are stored.                                                                                                                                    |
+| `APIFY_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
+| `APIFY_INPUT_KEY`                  | The key of the record in the default key-value store that holds the actor input. Typically it's **INPUT**, but it might be something else.                                                             |
+| `APIFY_MEMORY_MBYTES`              | Indicates the size of memory allocated for the actor run, in megabytes. It can be used by actors to optimize their memory usage.                                                                       |
+| `APIFY_STARTED_AT`                 | Date when the actor was started, in ISO 8601 format.                                                                                                                                                                                           |
+| `APIFY_TIMEOUT_AT`                 | Date when the actor will time out, in ISO 8601 format.                                                                                                                                                                          |
+| `APIFY_TOKEN`                      | The API token of the user who started the actor.                                                                                                                                                                      |
+| `APIFY_CONTAINER_PORT`             | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details. |
+| `APIFY_CONTAINER_URL`              | A unique public URL under which the actor run web server is accessible from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details.  |
 
-Additionally, the actor developer can define custom environment variables
-that are then passed to the actor process both on Apify platform and in local development environment.
-The variables can be secured, to protect API keys and passwords, and avoid committing them to the source code.
-These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive.
+For the full list of environment variables, see the [Apify documentation](https://docs.apify.com/actors/development/environment-variables).
+
+The actor developer can also define custom environment variables
+that are then passed to the actor process both in local development environment or on the Apify platform.
+These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive,
+or manually in the user interface in Apify Console.
+
+The environment variables can be set as secure in order to protect sensitive data such API keys or passwords.
+The value of a secure environment variable is encrypted and can only be retrieved by the actors during their run,
+but not outside the runs. Furthermore, values of secure environment variables are omitted from the log.
 
 #### Node.js
 
@@ -722,25 +742,32 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 Actors are notified by the platform about various events such as a migration to another server,
 [abort operation being triggered by another actor](#abort-another-actor), or on the CPU being overloaded.
 
-In the future, this mechanism can be extended to custom events and messages enabling communication between
+In the future, this mechanism might be extended to custom events and messages enabling communication between
 actors.
 
-| Event type | Message | Description |
-| ---------- | ------- | ----------- |
-| `cpuInfo` | `{ "isCpuOverloaded": Boolean }` | The event is emitted approximately every second and it indicates whether the actor is using the maximum of available CPU resources. If that’s the case, the actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
-| `migrating` | `void` | Emitted when the actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
-| `aborting` | `void` | When a user aborts an actor run on the Apify platform, they can choose to abort gracefully to allow the actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
-| `persistState` | `{ "isMigrating": Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
+| Event type     | Data | Description |
+| -------------- | ------- | ----------- |
+| `cpuInfo`      | `{ isCpuOverloaded: Boolean }` | The event is emitted approximately every second and it indicates whether the actor is using the maximum of available CPU resources. If that’s the case, the actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
+| `migrating`    | N/A | Emitted when the actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
+| `aborting`     | N/A | When a user aborts an actor run on the Apify platform, they can choose to abort gracefully to allow the actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
+| `persistState` | `{ isMigrating: Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
 
 
 #### Node.js
 
-<!-- TODO: Add more info about how it looks: `persistState`, `aborting`, `Actor.off()` ... -->
-
 ```js
+// Add actor event handler
 Actor.on('systemInfo', (data) => {
     if (data.isCpuOverloaded) console.log('Oh no, the CPU is overloaded!');
 });
+```
+
+```js
+// Remove all actor event handlers
+Actor.off('systemInfo');
+
+// Remove a specific actor event handler
+Actor.off('systemInfo', handler);
 ```
 
 #### UNIX equivalent
@@ -939,45 +966,6 @@ $ command1; command2    # (command separator)
 $ command1 && command2  # ("andf" symbol)
 $ command1 || command2  # ("orf" symbol)
 ```
-
-### Pipe result of an actor to another (aka chaining)
-
-Actor can start other actors and
-pass them its own dataset or key-value store.
-For example, the main actor can produce files
-and the spawned others can consume them, from the same storages.
-
-In the future, we could let datasets be cleaned up from the beginning,
-effectively creating a pipe, with custom rolling window.
-Webhooks can be attached to storage operations,
-and so launch other actors to consume newly added items or files.
-
-#### UNIX equivalent
-
-```bash
-$ ls -l | grep "something" | wc -l
-```
-
-**TODO (@jancurn):** **Move to IDEAS.md** We could have a special CLI support for creating actor chains using pipe operator,
-like this:
-
-```
-$ apify call apify/google-search-scraper | apify call apify/send-email queryTerms="aaa\nbbb"
-```
-
-Note from Marek:
-Here we will need some way how to map outputs from old actor to inputs of the following actor, perhaps we could pipeline thru some utility like [jq](https://stedolan.github.io/jq/tutorial/)
-or use some mapping like:
-
-```
---input-dataset-id="$output.defaultDatasetId" --dataset-name="xxx"
-```
-
-Note from Ondra:
-I tried to write a JS example for piping, but figured that piping is not really aligned with how actors work, because piping assumes the output of one program is immediately processed by another program. Actors can produce output like this, but they can't process input like this. Input is provided only once, when the actor starts. Unless we consider e.g. request queue as input. We will have to think about this a bit differently.
-
-Note from Jan:
-Indeed, the flow is to start one actor, and pass one of it's storages as default to the other newly started actor. If we had a generic Queue, it could be used nicely for these use case. I'm adding these notes to the doc, so that we can get back to them later.
 
 
 ### Abort another actor
@@ -1284,5 +1272,5 @@ https://apify.com/jancurn/some-scraper
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
 - Maybe add comparison with other systems, like Lambda, Modal, Replit, ECS etc. in terms of developer experience 
   - Maybe mention these in specific points,
-
+- Review external links and consider replacing them with local links
 

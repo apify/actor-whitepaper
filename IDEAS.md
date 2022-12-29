@@ -1,7 +1,7 @@
 
+# Sandbox for various ideas
 
-
-
+Here you can find random ideas and notes, in no particular order, relevance, or promise they will be implemented.
 
 ## TODOs
 
@@ -18,6 +18,7 @@
   Extra question:
     - What to do if the new version of the actor requires more permissions? We should probably require the author to increase a major version and keep users on the old build + email them to accept the updated permissions.
 
+- We should make env vars independent of Apify, i.e. start them with `ACTOR_`, rather then `APIFY_`
 
 - To storages, add info about atomic rename, e.g. `setName` function, and link to other operations...
 
@@ -35,3 +36,45 @@
 - NOTE: BTW we have a new API v3 doc with ideas for changes in API https://www.notion.so/apify/API-v3-6fcd240d9621427f9650b741ec6fa06b ?
 
 - For DATASET schema, In future versions let's consider referencing schema using URL, for now let's keep it simple
+
+
+
+### Pipe result of an actor to another (aka chaining)
+
+Actor can start other actors and
+pass them its own dataset or key-value store.
+For example, the main actor can produce files
+and the spawned others can consume them, from the same storages.
+
+In the future, we could let datasets be cleaned up from the beginning,
+effectively creating a pipe, with custom rolling window.
+Webhooks can be attached to storage operations,
+and so launch other actors to consume newly added items or files.
+
+#### UNIX equivalent
+
+```bash
+$ ls -l | grep "something" | wc -l
+```
+
+**TODO (@jancurn):** **Move to IDEAS.md** We could have a special CLI support for creating actor chains using pipe operator,
+like this:
+
+```
+$ apify call apify/google-search-scraper | apify call apify/send-email queryTerms="aaa\nbbb"
+```
+
+Note from Marek:
+Here we will need some way how to map outputs from old actor to inputs of the following actor, perhaps we could pipeline thru some utility like [jq](https://stedolan.github.io/jq/tutorial/)
+or use some mapping like:
+
+```
+--input-dataset-id="$output.defaultDatasetId" --dataset-name="xxx"
+```
+
+Note from Ondra:
+I tried to write a JS example for piping, but figured that piping is not really aligned with how actors work, because piping assumes the output of one program is immediately processed by another program. Actors can produce output like this, but they can't process input like this. Input is provided only once, when the actor starts. Unless we consider e.g. request queue as input. We will have to think about this a bit differently.
+
+Note from Jan:
+Indeed, the flow is to start one actor, and pass one of it's storages as default to the other newly started actor. If we had a generic Queue, it could be used nicely for these use case. I'm adding these notes to the doc, so that we can get back to them later.
+
