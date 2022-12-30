@@ -1,16 +1,14 @@
 # The Actor Programming Model Whitepaper [DRAFT]
 
-**The paper describes new serverless microapps called _actors_
+**The whitepaper describes new concept for building serverless microapps called _actors_,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
-**Beware that some features are not supported on all platforms yet. [Learn more](#word-of-warning)**
-
-By [Jan Čurn](https://apify.com/jancurn),
+Written by [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), Milan Lepík, and the Apify team.
-October 2022.
+[Ondra Urban](https://apify.com/mnmkng), Milan Lepík, and the Apify team
+in December 2022.
 
 
 ## Contents
@@ -88,6 +86,15 @@ in a hope to make it a new open standard, and to help community to more effectiv
 build and ship software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
+The goal of this document is to be the north star showing what the
+actor programming model is and what its implementations should support.
+Currently, the most complete implementation of actor model is provided
+by the [Apify SDK for Node.js](https://sdk.apify.com/),
+[Apify CLI](https://docs.apify.com/cli), and 
+[SDK for Python](https://pypi.org/project/apify/) is currently under development.
+Beware that these implementations do not support all features yet. This is work in progress. 
+
+
 ### Overview
 
 Actors are serverless programs running in the cloud.
@@ -150,15 +157,6 @@ As actors are based on Docker, it takes certain amount of time to spin up the co
 and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
 even for highly-optimized Docker images. For long-running jobs, actor execution might be migrated
 to another machine, making it unsuitable for databases.
-
-### Word of warning
-
-Currently, the only available implementation of the actor model is provided by
-[Apify SDK for Node.js](https://sdk.apify.com).
-[Apify SDK for Python](https://pypi.org/project/apify/) is currently under development.
-The goal of this document is to define the north star how Apify's and other implementations
-of actor programming model should look like. We keep working on full implementations
-for Node.js, Python and CLI.
 
 ## Philosophy
 
@@ -261,6 +259,8 @@ Last but no least, our model of actors is similar
 to the actor model known from the computer science.
 
 ## Basic concepts
+
+This section describes basic high-level concepts of the actor programming model. 
 
 ### Input and output
 
