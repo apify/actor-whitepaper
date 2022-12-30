@@ -29,6 +29,7 @@ October 2022.
 - [Basic concepts](#basic-concepts)
   * [Input and output](#input-and-output)
   * [Storage](#storage)
+  * [Interactions](#interactions)
 - [Installation and setup](#installation-and-setup)
   * [Apify platform](#apify-platform)
   * [Node.js](#nodejs)
@@ -47,10 +48,8 @@ October 2022.
   * [Start another actor](#start-another-actor)
   * [Metamorph](#metamorph)
   * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
-  * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
   * [Abort another actor](#abort-another-actor)
   * [Live view web server](#live-view-web-server)
-  * [Charging money](#charging-money)
 - [Actor definition files](#actor-definition-files)
   * [Actor file](#actor-file)
   * [Dockerfile](#dockerfile)
@@ -664,7 +663,7 @@ that are then passed to the actor process both in local development environment 
 These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive,
 or manually in the user interface in Apify Console.
 
-The environment variables can be set as secure in order to protect sensitive data such API keys or passwords.
+The environment variables can be set as secure in order to protect sensitive data such as API keys or passwords.
 The value of a secure environment variable is encrypted and can only be retrieved by the actors during their run,
 but not outside the runs. Furthermore, values of secure environment variables are omitted from the log.
 
