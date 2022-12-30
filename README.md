@@ -5,7 +5,7 @@ which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
-**Beware that not some APIs are not supported on all platforms yet. [Learn more](#word-of-warning)**
+**Beware that some features are not supported on all platforms yet. [Learn more](#word-of-warning)**
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
@@ -29,7 +29,8 @@ October 2022.
 - [Basic concepts](#basic-concepts)
   * [Input and output](#input-and-output)
   * [Storage](#storage)
-  * [Interactions](#interactions)
+  * [Integrations](#integrations)
+  * [Monetization](#monetization)
 - [Installation and setup](#installation-and-setup)
   * [Apify platform](#apify-platform)
   * [Node.js](#nodejs)
@@ -38,7 +39,7 @@ October 2022.
 - [Programming interface](#programming-interface)
   * [Actor initialization](#actor-initialization)
   * [Get input](#get-input)
-  * [Key-value store](#key-value-store)
+  * [Key-value store access](#key-value-store-access)
   * [Push results to dataset](#push-results-to-dataset)
   * [Exit actor](#exit-actor)
   * [Environment variables](#environment-variables)
@@ -154,6 +155,7 @@ to another machine, making it unsuitable for databases.
 
 Currently, the only available implementation of the actor model is provided by
 [Apify SDK for Node.js](https://sdk.apify.com).
+[Apify SDK for Python](https://pypi.org/project/apify/) is currently under development.
 The goal of this document is to define the north star how Apify's and other implementations
 of actor programming model should look like. We keep working on full implementations
 for Node.js, Python and CLI.
@@ -199,24 +201,21 @@ Actors provide a simple user interface and documentation to help users interact 
 
 The following table shows equivalents of key concepts of UNIX programs and actors.
 
-**TODO:** Add to the table links to the texts below
-
 | UNIX programs            | Actors |
-|--------------------------|---|
-| Command-line options     |	Input object|
-| Read stdin               |	Read from a dataset|
-| Write to stdout	       | Push data to dataset, update actor status|
-| Write to stderr	       | No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.|
-| File system	           | Key-value store|
-| Process identifier (PID) | Actor run ID|
-| Process exit code        | Actor exit code|
+|--------------------------|------------------|
+| Command-line options     | [Input object](#get-input) |
+| Read stdin               | No direct equivalent, you can [read from a dataset](#dataset) specified in the input.|
+| Write to stdout	       | [Push results to dataset](#push-results-to-dataset), set [actor status](#actor-status)|
+| Write to stderr	       | No direct equivalent, you can write errors to log, set error status message, or push failed dataset items into an "error" dataset.|
+| File system	           | [Key-value store](#key-value-store-access)|
+| Process identifier (PID) | Actor run ID |
+| Process exit code        | [Actor exit code](#exit-actor) |
 
 ### Design goals
 
 - Each actor should do just one thing, and do it well.
-- Keep it as simple as possible, but not simpler.
-- When in doubt, optimize for the users of the actors, help them understand what the actor does
-- ?
+- Optimize for the users of the actors, help them understand what the actor does, easily run it, and integrate.
+- Keep the system as simple as possible, so that actors can be built and used by the top 90% of developers.
 
 ### Relation to the Actor model
 
@@ -269,7 +268,6 @@ TODO (Jan): write this text, include examples of input and output objects, possi
 
 Both actor input and output is always a JSON file. To support e.g. images on input, we just need some better SDK and UI.
 
-
 Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format.
 There would be properties like in the output_schema.json file, with e.g. URL to dataset,
 log file, kv-store, live view etc. So it would be an auto-generated field "output"
@@ -282,9 +280,19 @@ that we can add to JSON returned by the Run API enpoints
 
 TODO... explain also why we have these storage... default plus actors can use others, and anything external
 
-### Interactions
+#### Key-value store
+
+#### Dataset
+
+#### Request queue
+
+Owing to the 
+
+### Integrations
 
 Describe chaining, webhooks, running another, metamorph etc.
+
+### Monetization
 
 ....Charging money - basic info?
 
@@ -453,7 +461,7 @@ $ command --option1=aaa --option2=bbb
 int main (int argc, char *argv[]) {}
 ```
 
-### Key-value store
+### Key-value store access
 
 Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
@@ -646,8 +654,8 @@ about the execution context.
 | `ACTOR_STARTED_AT`                 | Date when the actor was started, in ISO 8601 format.                                                                                                                                                                                           |
 | `ACTOR_TIMEOUT_AT`                 | Date when the actor will time out, in ISO 8601 format.                                                                                                                                                                          |
 | `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
-| `ACTOR_LIVE_VIEW_PORT`             | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details. |
-| `ACTOR_LIVE_VIEW_URL`              | A unique public URL under which the actor run web server is accessible from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details.  |
+| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details. |
+| `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the actor run web server is accessible from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details.  |
 
 **WARNING**: This is not implemented yet. Currently, the actors use environment variables
 prefixed by `APIFY_`. See the full list of environment variables
@@ -795,7 +803,7 @@ Actor.off('systemInfo', handler);
 
 #### Python
 
-TODO: @fnesveda Add Python example
+TODO: @fnesveda Add Python example, here and elsewhere too
 
 
 #### UNIX equivalent
@@ -1028,23 +1036,22 @@ to provide a web application for human users, to show actor run details, diagnos
 or to run an arbitrary web app.
 
 On Apify platform, the port on which the actor can launch the public web server,
-is specified by the `ACTOR_LIVE_VIEW_PORT` environment variable.
+is specified by the `ACTOR_WEB_SERVER_PORT` environment variable.
 The web server is then exposed to the public internet on a URL identified 
-by the `ACTOR_LIVE_VIEW_URL`, for example `https://hard-to-guess-identifier.runs.apify.net`.
+by the `ACTOR_WEB_SERVER_URL`, for example `https://hard-to-guess-identifier.runs.apify.net`.
 
 #### Node.js
 
 ```js
 const express = require('express');
 const app = express();
-const port = process.env.ACTOR_LIVE_VIEW_PORT;
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.listen(process.env.ACTOR_LIVE_VIEW_PORT, () => {
-  console.log(`Example live view web server running at ${process.env.ACTOR_LIVE_VIEW_URL}`)
+app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
+  console.log(`Example live view web server running at ${process.env.ACTOR_WEB_SERVER_URL}`)
 })
 ```
 
@@ -1105,22 +1112,23 @@ Good documentation makes good actors!
 
 ### Schema files
 
-The structure of actor's [input and output](#input-and-output) can optionally be
+The structure of actor's [input and output](#input-and-output) can be optionally
 dictated by the input and output schema files.
 These files list properties accepted by actor on input, and properties that the actor produces on output,
 respectively.
 The input and output schema files are used to render a user interface
-for people to make it easy to run the actor,
+to make it easy to run the actor manually,
 to generate API documentation, render the view of actor's output,
-and enable connecting actor outputs to inputs of another actor for rich workflows. 
+validate the input,
+and to enable connecting actor outputs to input of another actor for rich workflows. 
 
-The input and output schema is defined by two JSON files that are referenced 
+The input and output schema is defined by two JSON files that are linked 
 from the [Actor file](#actor-file):
 
 - [Input schema file](./pages/INPUT_SCHEMA.md)
 - [Output schema file](./pages/OUTPUT_SCHEMA.md)
 
-Both input and output schemas can reference schema files 
+Both input and output schema files can additionally reference schema files 
 for specific storages:
 
 - [Dataset schema file](./pages/DATASET_SCHEMA.md)
@@ -1128,25 +1136,24 @@ for specific storages:
 - [Request queue schema file](./pages/REQUEST_QUEUE_SCHEMA.md)
 
 These storage schemas are used to ensure that stored objects or files 
-fulfil certain criteria, their fields have certain types, etc.
+fulfil specific criteria, their fields have certain types, etc.
 On Apify platform, the schemas can be applied to the storages directly,
 without actors.
 
-<!-- TODO: Is this true? -->
-All the storage schemas are weak, in a sense that if the schema doesn't define a property,
+Note that all the storage schemas are weak, in a sense that if the schema doesn't define a property,
 such property can be added to the storage and have an arbitrary type.
 Only properties explicitly mentioned by the schema
 are validated. This is an important feature which allows extensibility.
 For example, a data deduplication actor might require on input datasets
-that have `uuid: String` field in objects, but not care about anything else.
+that have an `uuid: String` field in objects, but it does not care about other fields.
 
 
 ### Backward compatibility
 
 If the `.actor/actor.json` file is missing,
 the system falls back to the legacy mode,
-looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
-files in the actor's top-level directory, and uses them instead.
+and looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
+files in the actor's top-level directory instead.
 This behavior might be deprecated in the future.
 
 ## Development

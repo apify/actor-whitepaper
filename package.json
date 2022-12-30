@@ -3,10 +3,11 @@
   "version": "0.0.1",
   "description": "This is just to generate table of content in Markdown files",
   "devDependencies": {
+    "markdown-link-check": "^3.10.3",
     "markdown-toc": "^1.2.0"
   },
   "scripts": {
-    "build-toc": "./node_modules/.bin/markdown-toc README.md -i --maxdepth 3"
+    "build-toc": "./node_modules/.bin/markdown-toc README.md -i --maxdepth 3 && ./node_modules/.bin/markdown-link-check README.md"
   },
   "repository": {
     "type": "git",
