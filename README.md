@@ -17,100 +17,54 @@ October 2022.
 
 <!-- toc -->
 
-- [The Actor Programming Model Whitepaper \[DRAFT\]](#the-actor-programming-model-whitepaper-draft)
-  - [Contents](#contents)
-  - [Introduction](#introduction)
-    - [Overview](#overview)
-    - [What actors are not](#what-actors-are-not)
-    - [Word of warning](#word-of-warning)
-  - [Philosophy](#philosophy)
-    - [UNIX programs vs. actors](#unix-programs-vs-actors)
-    - [Design goals](#design-goals)
-    - [Relation to the Actor model](#relation-to-the-actor-model)
-    - [Why the name "actor" ?](#why-the-name-actor-)
-  - [Basic concepts](#basic-concepts)
-    - [Input and output](#input-and-output)
-    - [Storage](#storage)
-  - [Installation and setup](#installation-and-setup)
-    - [Apify platform](#apify-platform)
-    - [Node.js](#nodejs)
-    - [Python](#python)
-    - [Command-line interface (CLI)](#command-line-interface-cli)
-  - [Programming interface](#programming-interface)
-    - [Get input](#get-input)
-      - [Node.js](#nodejs-1)
-      - [Python](#python-1)
-      - [CLI](#cli)
-      - [UNIX equivalent](#unix-equivalent)
-    - [Main function](#main-function)
-      - [Node.js](#nodejs-2)
-      - [UNIX equivalent](#unix-equivalent-1)
-    - [Key-value store](#key-value-store)
-      - [Node.js](#nodejs-3)
-      - [Python](#python-2)
-      - [UNIX](#unix)
-    - [Push results to dataset](#push-results-to-dataset)
-      - [Node.js](#nodejs-4)
-      - [Python](#python-3)
-      - [CLI](#cli-1)
-      - [UNIX equivalent](#unix-equivalent-2)
-    - [Exit actor](#exit-actor)
-      - [Node.js](#nodejs-5)
-      - [Python](#python-4)
-      - [CLI](#cli-2)
-      - [UNIX equivalent](#unix-equivalent-3)
-    - [Environment variables](#environment-variables)
-      - [Node.js](#nodejs-6)
-      - [CLI](#cli-3)
-      - [UNIX equivalent](#unix-equivalent-4)
-    - [Actor status](#actor-status)
-      - [Node.js](#nodejs-7)
-      - [Python](#python-5)
-      - [CLI](#cli-4)
-    - [System events](#system-events)
-      - [Node.js](#nodejs-8)
-      - [UNIX equivalent](#unix-equivalent-5)
-    - [Get memory information](#get-memory-information)
-      - [Node.js](#nodejs-9)
-      - [UNIX equivalent](#unix-equivalent-6)
-    - [Start another actor](#start-another-actor)
-      - [Node.js](#nodejs-10)
-      - [CLI](#cli-5)
-      - [Slack](#slack)
-      - [API](#api)
-      - [UNIX equivalent](#unix-equivalent-7)
-    - [Metamorph](#metamorph)
-      - [Node.js](#nodejs-11)
-      - [CLI](#cli-6)
-      - [UNIX equivalent](#unix-equivalent-8)
-    - [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
-      - [Node.js](#nodejs-12)
-      - [CLI](#cli-7)
-      - [UNIX equivalent](#unix-equivalent-9)
-    - [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
-      - [UNIX equivalent](#unix-equivalent-10)
-    - [Abort another actor](#abort-another-actor)
-      - [Node.js](#nodejs-13)
-      - [CLI](#cli-8)
-      - [UNIX equivalent](#unix-equivalent-11)
-    - [Live view web server](#live-view-web-server)
-      - [Node.js](#nodejs-14)
-    - [Charging money](#charging-money)
-      - [Node.js](#nodejs-15)
-  - [Actor definition files](#actor-definition-files)
-    - [Actor file](#actor-file)
-    - [Dockerfile](#dockerfile)
-    - [README](#readme)
-    - [Schema files](#schema-files)
-    - [Backward compatibility](#backward-compatibility)
-  - [Development](#development)
-    - [Local development](#local-development)
-    - [Deployment to Apify platform](#deployment-to-apify-platform)
-    - [Repackaging existing software as actors](#repackaging-existing-software-as-actors)
-    - [Continuous integration and delivery](#continuous-integration-and-delivery)
-  - [Sharing \& Community](#sharing--community)
-    - [Shared actors](#shared-actors)
-  - [TODOs (@jancurn)](#todos-jancurn)
+- [Introduction](#introduction)
+  * [Overview](#overview)
+  * [What actors are not](#what-actors-are-not)
+  * [Word of warning](#word-of-warning)
+- [Philosophy](#philosophy)
+  * [UNIX programs vs. actors](#unix-programs-vs-actors)
+  * [Design goals](#design-goals)
+  * [Relation to the Actor model](#relation-to-the-actor-model)
+  * [Why the name "actor" ?](#why-the-name-actor-)
+- [Basic concepts](#basic-concepts)
+  * [Input and output](#input-and-output)
+  * [Storage](#storage)
+- [Installation and setup](#installation-and-setup)
+  * [Apify platform](#apify-platform)
+  * [Node.js](#nodejs)
+  * [Python](#python)
+  * [Command-line interface (CLI)](#command-line-interface-cli)
+- [Programming interface](#programming-interface)
+  * [Actor initialization](#actor-initialization)
+  * [Get input](#get-input)
+  * [Key-value store](#key-value-store)
+  * [Push results to dataset](#push-results-to-dataset)
+  * [Exit actor](#exit-actor)
+  * [Environment variables](#environment-variables)
+  * [Actor status](#actor-status)
+  * [System events](#system-events)
+  * [Get memory information](#get-memory-information)
+  * [Start another actor](#start-another-actor)
+  * [Metamorph](#metamorph)
+  * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
+  * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
+  * [Abort another actor](#abort-another-actor)
+  * [Live view web server](#live-view-web-server)
+  * [Charging money](#charging-money)
+- [Actor definition files](#actor-definition-files)
+  * [Actor file](#actor-file)
+  * [Dockerfile](#dockerfile)
+  * [README](#readme)
+  * [Schema files](#schema-files)
+  * [Backward compatibility](#backward-compatibility)
+- [Development](#development)
+  * [Local development](#local-development)
+  * [Deployment to Apify platform](#deployment-to-apify-platform)
+  * [Repackaging existing software as actors](#repackaging-existing-software-as-actors)
+  * [Continuous integration and delivery](#continuous-integration-and-delivery)
+- [Sharing & Community](#sharing--community)
+  * [Shared actors](#shared-actors)
+- [TODOs (@jancurn)](#todos-jancurn)
 
 <!-- tocstop -->
 
@@ -252,11 +206,11 @@ The following table shows equivalents of key concepts of UNIX programs and actor
 |--------------------------|---|
 | Command-line options     |	Input object|
 | Read stdin               |	Read from a dataset|
-| Write to stdout	         | Push data to dataset, update actor status|
-| Write to stderr	         | No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.|
-| File system	             | Key-value store|
- | Process identifier (PID) | Actor run ID|
- | Process exit code        | Actor exit code|
+| Write to stdout	       | Push data to dataset, update actor status|
+| Write to stderr	       | No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.|
+| File system	           | Key-value store|
+| Process identifier (PID) | Actor run ID|
+| Process exit code        | Actor exit code|
 
 ### Design goals
 
@@ -327,7 +281,14 @@ that we can add to JSON returned by the Run API enpoints
 
 ### Storage
 
-TODO... explain also why we have these storage...
+TODO... explain also why we have these storage... default plus actors can use others, and anything external
+
+### Interactions
+
+Describe chaining, webhooks, running another, metamorph etc.
+
+....Charging money - basic info?
+
 
 ## Installation and setup
 
@@ -396,16 +357,12 @@ $ apify help <command>
 
 ## Programming interface
 
-By default, the following commands are expected to be called from within a context
+The commands described in this section are expected to be called from within a context
 of a running actor, both in local environment or on the Apify platform.
-The information about the current run is taken from `APIFY_ACTOR_RUN_ID`
-environment variable.
-For all commands,
-this behavior can be overridden in options.
-For example, in Node.js the options object in all commands has `actorRunId`
-field, and `apify actor` CLI command has the `--actor-run-id` flag.
-
-TODO (Jan): We decided not to pass `actorRunId` as arg to methods, but use it in constructor - fix the above text
+By default, the identifier of the current actor run is taken from `APIFY_ACTOR_RUN_ID`
+environment variable, but it can be overridden.
+For example, in Node.js you can initialize the `Actor` class using another `actorRunId`,
+or in the `apify actor` CLI command you can pass the `--actor-run-id` flag.
 
 ### Actor initialization
 
@@ -543,13 +500,12 @@ $ cat file.txt
 ### Push results to dataset
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
-When an actor starts, by default it is associated with a newly-created empty dataset.
-The user can override it and specify another dataset when running the actor.
-
-TODO (@jancurn): Mention they can add more datasets and use them on the fly.
+When an actor starts, by default it is associated with a newly-created empty default dataset.
+The actor can create additional datasets or access existing datasets created by other actors,
+and use those as needed.
 
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
-of objects are stored in them. See [Schema files](#schema-files) for more details.
+of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.md) for more details.
 
 #### Node.js
 
@@ -676,18 +632,41 @@ exit(1);
 
 ### Environment variables
 
-Actors have access to standard process environment variables.
+Actors have access to standard process environment variables. 
+The Apify platform uses environment variables prefixed with `APIFY_` to pass the actors information
+about the execution context.
 
-The Apify platform sets information about the actor execution context through
-environment variables such as `APIFY_TOKEN` or `APIFY_ACTOR_RUN_ID` -
-see the [Apify documentation](https://docs.apify.com/actors/development/environment-variables) for the full list.
+| Environment variable               | Description                                                                                                                                                                                                                |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ACTOR_RUN_ID`                     | ID of the actor run.                                                                                                                                                                                                       |
+| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the actor's input and output data are stored.                                                                                                                                    |
+| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
+| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
+| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the actor input. Typically it's `INPUT`, but it might be something else.                                                             |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the actor run, in megabytes. It can be used by actors to optimize their memory usage.                                                                       |
+| `ACTOR_STARTED_AT`                 | Date when the actor was started, in ISO 8601 format.                                                                                                                                                                                           |
+| `ACTOR_TIMEOUT_AT`                 | Date when the actor will time out, in ISO 8601 format.                                                                                                                                                                          |
+| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
+| `ACTOR_LIVE_VIEW_PORT`             | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details. |
+| `ACTOR_LIVE_VIEW_URL`              | A unique public URL under which the actor run web server is accessible from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details.  |
 
-<!-- TODO: We should provide the full list here eventually, for a complete reference. -->
+**WARNING**: This is not implemented yet. Currently, the actors use environment variables
+prefixed by `APIFY_`. See the full list of environment variables
+in [Apify documentation](https://docs.apify.com/actors/development/environment-variables).
 
-Additionally, the actor developer can define custom environment variables
-that are then passed to the actor process both on Apify platform and in local development environment.
-The variables can be secured, to protect API keys and passwords, and avoid committing them to the source code.
-These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive.
+<!--
+  TODO: Implement these env vars, we need to keep the old ones for backwards compatibility
+  Only Apify-specific env vars should have prefix APIFY_, e.g. APIFY_PROXY_PASSWORD, APIFY_TOKEN or APIFY_USER_ID.
+-->
+
+The actor developer can also define custom environment variables
+that are then passed to the actor process both in local development environment or on the Apify platform.
+These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive,
+or manually in the user interface in Apify Console.
+
+The environment variables can be set as secure in order to protect sensitive data such API keys or passwords.
+The value of a secure environment variable is encrypted and can only be retrieved by the actors during their run,
+but not outside the runs. Furthermore, values of secure environment variables are omitted from the log.
 
 #### Node.js
 
@@ -765,29 +744,60 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 
 ### System events
 
-Actors are notified by the platform about various events such as a migration to another server,
-[abort operation being triggered by another actor](#abort-another-actor), or on the CPU being overloaded.
+Actors are notified by the system about various events such as a migration to another server,
+[abort operation](#abort-another-actor) triggered by another actor, or the CPU being overloaded.
 
-In the future, this mechanism can be extended to custom events and messages enabling communication between
+Currently, the system sends the following events:
+
+| Event name     | Payload | Description |
+| -------------- | ------- | ----------- |
+| `cpuInfo`      | `{ isCpuOverloaded: Boolean }` | The event is emitted approximately every second and it indicates whether the actor is using the maximum of available CPU resources. If that’s the case, the actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
+| `migrating`    | N/A | Emitted when the actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
+| `aborting`     | N/A | When a user aborts an actor run on the Apify platform, they can choose to abort gracefully to allow the actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
+| `persistState` | `{ isMigrating: Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
+
+In the future, the event mechanism might be extended to custom events and messages enabling communication between
 actors.
 
-| Event type | Message | Description |
-| ---------- | ------- | ----------- |
-| `cpuInfo` | `{ "isCpuOverloaded": Boolean }` | The event is emitted approximately every second and it indicates whether the actor is using the maximum of available CPU resources. If that’s the case, the actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
-| `migrating` | `void` | Emitted when the actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
-| `aborting` | `void` | When a user aborts an actor run on the Apify platform, they can choose to abort gracefully to allow the actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
-| `persistState` | `{ "isMigrating": Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
+Under the hood, actors receive the system events by connecting to a web socket address specified
+by the `ACTOR_EVENTS_WEBSOCKET_URL` environment variable.
+The system sends messages in JSON format in the following structure:
 
+```js
+{
+    // Event name
+    name: String,
+
+    // Time when the event was created, in ISO format
+    createdAt: String,
+          
+    // Optional object with payload      
+    data: Object,
+}
+```
+
+Note that some events (e.g. `persistState`) are not sent by the system via the web socket,
+but generated virtually on the Actor SDK level.
 
 #### Node.js
 
-<!-- TODO: Add more info about how it looks: `persistState`, `aborting`, `Actor.off()` ... -->
-
 ```js
-Actor.on('systemInfo', (data) => {
-    if (data.isCpuOverloaded) console.log('Oh no, the CPU is overloaded!');
+// Add event handler
+Actor.on('cpuInfo', (data) => {
+    if (data.isCpuOverloaded) console.log('Oh no, we need to slow down!');
 });
+
+// Remove all handlers for a specific event
+Actor.off('systemInfo');
+
+// Remove a specific event handler
+Actor.off('systemInfo', handler);
 ```
+
+#### Python
+
+TODO: @fnesveda Add Python example
+
 
 #### UNIX equivalent
 
@@ -898,22 +908,21 @@ posix_spawn();
 
 ### Metamorph
 
-Replace running actor’s Docker image with another actor.
+🪄 This is the most magical actor operation, which replaces running actor’s Docker image with another actor,
+similar to UNIX `exec` command.
+It is used for building new actors on top of existing ones.
+You simply define input schema and write README for a specific use case,
+and then delegate the work to another actor.
 
-This is the most magical actor operation.
-It is extremely useful for building new actors on top of existing ones.
-You simply define a better input schema and user description,
-and internally delegate the work to other actor.
+An actor can metamorph only to actors that have compatible output schema as the main actor,
+in order to ensure logical and consistent outcomes for users. 
+If the output schema of the target actor is not compatible, the system should throw an error.
 
-When metamorphing an actor into another actor, the system checks
-that the other actor has compatible input/output schemas,
-and throws an error if not.
+<!-- TODO: This is not implemented yet -->
 
-The target actor inherits the default storages used by the calling actor, unless overridden.
-
-TODO (@jancurn): Describe what happens with output schema - the output schema of the main first actor run
-  is the one that counts. In the future, the system should ensure the schema of sub-actor is compatible.
-  
+Note that the target actor inherits the default storages used by the calling actor.
+The target actor input is stored to the default key-value store, often under a key such as `INPUT-2`. 
+Internally, the target actor can recursively metamorph into another actor.
 
 #### Node.js
 
@@ -986,45 +995,6 @@ $ command1 && command2  # ("andf" symbol)
 $ command1 || command2  # ("orf" symbol)
 ```
 
-### Pipe result of an actor to another (aka chaining)
-
-Actor can start other actors and
-pass them its own dataset or key-value store.
-For example, the main actor can produce files
-and the spawned others can consume them, from the same storages.
-
-In the future, we could let datasets be cleaned up from the beginning,
-effectively creating a pipe, with custom rolling window.
-Webhooks can be attached to storage operations,
-and so launch other actors to consume newly added items or files.
-
-#### UNIX equivalent
-
-```bash
-$ ls -l | grep "something" | wc -l
-```
-
-**TODO (@jancurn):** **Move to IDEAS.md** We could have a special CLI support for creating actor chains using pipe operator,
-like this:
-
-```
-$ apify call apify/google-search-scraper | apify call apify/send-email queryTerms="aaa\nbbb"
-```
-
-Note from Marek:
-Here we will need some way how to map outputs from old actor to inputs of the following actor, perhaps we could pipeline thru some utility like [jq](https://stedolan.github.io/jq/tutorial/)
-or use some mapping like:
-
-```
---input-dataset-id="$output.defaultDatasetId" --dataset-name="xxx"
-```
-
-Note from Ondra:
-I tried to write a JS example for piping, but figured that piping is not really aligned with how actors work, because piping assumes the output of one program is immediately processed by another program. Actors can produce output like this, but they can't process input like this. Input is provided only once, when the actor starts. Unless we consider e.g. request queue as input. We will have to think about this a bit differently.
-
-Note from Jan:
-Indeed, the flow is to start one actor, and pass one of it's storages as default to the other newly started actor. If we had a generic Queue, it could be used nicely for these use case. I'm adding these notes to the doc, so that we can get back to them later.
-
 
 ### Abort another actor
 
@@ -1059,111 +1029,25 @@ to provide a web application for human users, to show actor run details, diagnos
 or to run an arbitrary web app.
 
 On Apify platform, the port on which the actor can launch the public web server,
-is specified by the `APIFY_CONTAINER_PORT` environment variable.
+is specified by the `ACTOR_LIVE_VIEW_PORT` environment variable.
 The web server is then exposed to the public internet on a URL identified 
-by the `APIFY_CONTAINER_URL`, e.g. `https://hard-to-guess-identifier.runs.apify.net`.
-
-<!-- TODO: These should probably be called `ACTOR_LIVE_VIEW_PORT` or `ACTOR_LIVE_VIEW_URL` -->
+by the `ACTOR_LIVE_VIEW_URL`, for example `https://hard-to-guess-identifier.runs.apify.net`.
 
 #### Node.js
 
 ```js
 const express = require('express');
 const app = express();
-const port = process.env.APIFY_CONTAINER_PORT;
+const port = process.env.ACTOR_LIVE_VIEW_PORT;
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.listen(process.env.APIFY_CONTAINER_PORT, () => {
-  console.log(`Example live view web server running at ${process.env.APIFY_CONTAINER_URL}`)
+app.listen(process.env.ACTOR_LIVE_VIEW_PORT, () => {
+  console.log(`Example live view web server running at ${process.env.ACTOR_LIVE_VIEW_URL}`)
 })
 ```
-
-### Charging money
-
-TODO(@jancurn): Move the `Actor.charge()` to ideas, to keep this simple.
-  Mention just basic monetization in non-API section.
-
-**STATUS: This feature is not implemented yet.**
-
-To run an actor on the Apify platform, the user might need
-to purchase a paid plan to cover for the computing resources used, 
-pay a fixed monthly fee for "renting" the actor if it's paid,
-or pay a variable fee for the number of results produced by the actor.
-
-On top of these "static" payment options, actors will eventually support
-a built-in monetization system that enables developers to charge users variable
-amounts, e.g. based on returned number of results,
-complexity of the input, or cost of external APIs used by the actor.
-
-The actor can dynamically charge the current user a specific amount of money
-by calling the `charge` function.
-Users of actors can ensure they will not be charged too much by specifying
-the maximum amount when starting an actor using the `maxChargeCreditsUsd` run option.
-The actor can call the `charge` function as many times as necessary,
-but once the total sum of charged credits would exceed the maximum limit,
-the invocation of the function throws an error.
-
-When a paid actor subsequently starts another paid actor, the charges performed
-by the subsequent actors are taken from the calling actor's credits.
-This enables actor economy, where actors hierarchically pay other actors or external APIs
-to perform parts of the job.
-
-**Rules for building actors with variable charging:**
-
-<!-- TODO: Should be called ACTOR_MAX_CHARGE_CREDITS_USD? -->
-
-- If your actor is charging users, make sure at the earliest time possible  
-  that the actor is being run with sufficient credits, by checking the input
-  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO (@jancurn)).
-  If the maximum credits are not sufficient for actor's operation with respect
-  to the input (e.g. user is requesting too many results for too little money),
-  fail the actor immediately with a reasonable error status message for the user,
-  and don't charge the user anything.
-- Charge the users right **after** you have incurred the costs,
-  not in advance. If the actor fails in the middle or is aborted, the users
-  only need to be charged for results they actually received.
-  Nothing will make users of your actors angrier than charging them for something they didn't receive.
-
-**Integration with input schema**
-
-The actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
-`maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
-per unit of usage specified in the input schema.
-This field can be used by the Apify platform to automatically inform the user about
-maximum possible charge, and automatically set `maxChargeCreditsUsd` for the actor run.
-For example,
-for Google Search Scraper paid by number of pages scraped, this setting would be
-added to `maxPageCount` field which limits the maximum number of pages to scrape.
-Note that the actor doesn't know in advance how many pages it will be able to fetch,
-hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
-
-<!-- TODO: Shall we create another actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
-That could provide for better UX. Probably not, it would be an overkill... -->
-
-#### Node.js
-
-Charge the current user of the actor a specific amount:
-
-```js
-const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
-```
-
-Set the maximum amount to charge when starting an actor.
-
-```js
-const run = await Actor.call(
-  'bob/analyse-images',
-  { imageUrls: ['...'] },
-  {
-      // By default, it's 0, hence actors cannot charge users unless they explicitely allow that.
-      maxChargeCreditsUsd: 5,
-  },
-);
-```
-
 
 ## Actor definition files
 
@@ -1330,5 +1214,5 @@ https://apify.com/jancurn/some-scraper
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
 - Maybe add comparison with other systems, like Lambda, Modal, Replit, ECS etc. in terms of developer experience 
   - Maybe mention these in specific points,
-
+- Review external links and consider replacing them with local links
 
