@@ -414,7 +414,7 @@ $ apify help <command>
 
 The commands described in this section are expected to be called from within a context
 of a running actor, both in local environment or on the Apify platform.
-By default, the identifier of the current actor run is taken from `APIFY_ACTOR_RUN_ID`
+By default, the identifier of the current actor run is taken from `ACTOR_RUN_ID`
 environment variable, but it can be overridden.
 For example, in Node.js you can initialize the `Actor` class using another `actorRunId`,
 or in the `apify actor` CLI command you can pass the `--actor-run-id` flag.
@@ -688,7 +688,7 @@ exit(1);
 ### Environment variables
 
 Actors have access to standard process environment variables. 
-The Apify platform uses environment variables prefixed with `APIFY_` to pass the actors information
+The Apify platform uses environment variables prefixed with `ACTOR_` to pass the actors information
 about the execution context.
 
 | Environment variable               | Description                                                                                                                                                                                                                |
@@ -705,13 +705,14 @@ about the execution context.
 | `ACTOR_WEB_SERVER_PORT`            | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details. |
 | `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the actor run web server is accessible from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details.  |
 
-**WARNING**: This is not implemented yet. Currently, the actors use environment variables
+**WARNING/TODO**: This is not implemented yet. Currently, the actors use environment variables
 prefixed by `APIFY_`. See the full list of environment variables
 in [Apify documentation](https://docs.apify.com/actors/development/environment-variables).
 
 <!--
   TODO: Implement these env vars, we need to keep the old ones for backwards compatibility
   Only Apify-specific env vars should have prefix APIFY_, e.g. APIFY_PROXY_PASSWORD, APIFY_TOKEN or APIFY_USER_ID.
+  Mention these additional env vars in the text
 -->
 
 The actor developer can also define custom environment variables
@@ -738,7 +739,7 @@ Actor.config.set('token', 's0m3n3wt0k3n')
 #### CLI
 
 ```bash
-$ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
+$ echo "$ACTOR_RUN_ID started at $ACTOR_STARTED_AT"
 ```
 
 
