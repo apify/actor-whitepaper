@@ -18,14 +18,14 @@ in December 2022.
 - [Introduction](#introduction)
   * [Overview](#overview)
   * [What actors are not](#what-actors-are-not)
-  * [Word of warning](#word-of-warning)
 - [Philosophy](#philosophy)
   * [UNIX programs vs. actors](#unix-programs-vs-actors)
   * [Design goals](#design-goals)
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "actor" ?](#why-the-name-actor-)
 - [Basic concepts](#basic-concepts)
-  * [Input and output](#input-and-output)
+  * [Input](#input)
+  * [Output](#output)
   * [Storage](#storage)
   * [Integrations](#integrations)
   * [Monetization](#monetization)
@@ -260,11 +260,59 @@ to the actor model known from the computer science.
 
 ## Basic concepts
 
-This section describes basic high-level concepts of the actor programming model. 
+This section describes core features of actors and what they are good for. 
 
-### Input and output
+### Input
 
 TODO (Jan): write this text, include examples of input and output objects, possibly also API. 
+
+Each actor accepts an input JSON object, which tells it what it should do.
+The properties and values of the input object have
+a similar role as command-line arguments when running a program in a UNIX-like operating system.
+
+For example, an input object for an actor `bob/screenshot-taker` can look like this:
+
+```json
+{
+  "url": "http://www.example.com",
+  "width": 800,
+  "height": 600
+}
+```
+
+The input object is passed to the actor by the caller when starting the actor using API, in user interface, CLI, scheduler, etc.
+The actor can access the value of the input object using the [`getInput()`](#get-input) function.
+
+In order to specify what kind of input object an actor expects,
+the actor developer can define an [Input schema file](./pages/INPUT_SCHEMA.md).
+For example, the input schema for actor `bob/screenshot-taker` will look like this:
+
+```json
+TODO
+```
+
+The input schema is used by the system to:
+
+- Validate the passed input JSON object on actor run
+- Generate API documentation on web or in CLI
+- Render user interface for actors to make it easy for users to run them
+- Enable integration of multiple actors
+
+TODO: Show screenshot with example
+
+
+### Output
+
+Similarly as input, each actor can also generate an output.
+
+
+The documentation and the input/output schemas make it possible for people to easily 
+understand what the actor does, enter the required inputs both in user interface or API,
+and integrate the results of the actor into their other workflows. Actors can easily call
+and interact with each other, enabling building more complex systems on top of simple ones.
+
+
+
 
 Both actor input and output is always a JSON file. To support e.g. images on input, we just need some better SDK and UI.
 
