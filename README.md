@@ -146,117 +146,6 @@ specification is to motivate creation of new runtime environments outside of Api
 The ultimate goal of the actor programming model is to make it as simple as possible
 for people to develop, run, and integrate software automation tools.
 
-### What actors are not
-
-Actors are best suited for batch operations that take an input, perform an isolated job for a user,
-and potentially produce some output.
-However, actors are currently not best suited for continuous computing or storage workloads, such
-as running a live website, API backend, or database.
-
-As actors are based on Docker, it takes certain amount of time to spin up the container
-and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
-even for highly-optimized Docker images. For long-running jobs, actor execution might be migrated
-to another machine, making it unsuitable for databases.
-
-## Philosophy
-
-Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)** from the 1970s:
-
-1. **Make each program do one thing well**. To do a new job, build afresh rather than complicate old programs by adding new “features”.
-2. Expect the **output of every program to become the input to another, as yet unknown, program**. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
-3. Design and build software, even operating systems, to be **tried early**, ideally within weeks. Don’t hesitate to throw away the clumsy parts and rebuild them.
-4. **Use tools in preference to unskilled help** to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you’ve finished using them.
-
-The UNIX philosophy is arguably one of the most important software engineering paradigms
-which, together with other favorable design choices of UNIX operating systems,
-ushered the computer and internet revolution.
-By combining smaller parts
-that can be developed and used independently (programs),
-it suddenly became possible to build, manage and gradually evolve ever more complex computing systems.
-Even today's modern mobile devices are effectively UNIX-based machines that run a lot of programs
-interacting with each other, and provide a terminal
-which looks very much like early UNIX terminals. In fact, terminal is just another program.
-
-The UNIX-style programs represent a great way to package software for usage
-on a local computer. The programs can be easily used stand-alone,
-but also in combination and in scripts
-in order to perform much more complex tasks than an individual program ever could,
-which in turn can be packaged as new programs.
-
-The idea of actors is to bring benefits of UNIX-style programs
-from a local computer into an environment of cloud
-where programs run on multiple computers
-communicating over a network that is subject to latency and partitioning,
-there is no global atomic filesystem,
-and where programs are invoked via API calls rather than system calls.
-
-Each actor should do just one thing and do it well.
-Actors can be used stand-alone, as well as combined or scripted into more complex
-systems, which in turn can become new actors.
-Actors provide a simple user interface and documentation to help users interact with them.
-
-### UNIX programs vs. actors
-
-The following table shows equivalents of key concepts of UNIX programs and actors.
-
-| UNIX programs            | Actors |
-|--------------------------|------------------|
-| Command-line options     | [Input object](#get-input) |
-| Read stdin               | No direct equivalent, you can [read from a dataset](#dataset) specified in the input.|
-| Write to stdout	       | [Push results to dataset](#push-results-to-dataset), set [actor status](#actor-status)|
-| Write to stderr	       | No direct equivalent, you can write errors to log, set error status message, or push failed dataset items into an "error" dataset.|
-| File system	           | [Key-value store](#key-value-store-access)|
-| Process identifier (PID) | Actor run ID |
-| Process exit code        | [Actor exit code](#exit-actor) |
-
-### Design goals
-
-- Each actor should do just one thing, and do it well.
-- Optimize for the users of the actors, help them understand what the actor does, easily run it, and integrate.
-- Keep the system as simple as possible, so that actors can be built and used by the top 90% of developers.
-
-### Relation to the Actor model
-
-Note that actors are only loosely related to
-the **actor model** known from computer science.
-According to [Wikipedia](https://en.wikipedia.org/wiki/Actor_model):
-
-> The actor model in computer science is a mathematical model of concurrent computation
-> that treats actor as the universal primitive of concurrent computation.
-> In response to a message it receives, an actor can: make local decisions,
-> create more actors, send more messages, and determine how to respond to the
-> next message received. Actors may modify their own private state,
-> but can only affect each other indirectly through messaging
-> (removing the need for lock-based synchronization).
-
-While the theoretical actor model is conceptually very similar to "our" actor programming model,
-this similarity is rather coincidental. 
-Our primary focus was always on practical software engineering utility, not an
-implementation of a formal mathematical model.
-
-For example, our actors
-do not provide any standard message passing mechanism. The actors might communicate together
-directly via HTTP requests (see [Live view](#live-view)),
-manipulate each other's operation using the Apify platform API (e.g. abort another actor),
-or affect each other by sharing some internal state or storage.
-The actors simply do not have any formal restrictions,
-and they can access whichever external systems they want.
-
-
-### Why the name "actor" ?
-
-In movies and theater, an _actor_ is someone who gets a script
-and plays a role according to that script. 
-Our actors also perform an act on someone's behalf, using a provided script,
-and thus we considered the name "actor" as a good description.
-Also, an "actor" evokes an idea of a person, which is a helpful way to think of and talk about
-actors as independent entities.
-
-Coincidentally, in the web automation world it became common to call libraries
-using names related to theater, such as Puppeteer or Playwright,
-confirming "actor" was a good choice.
-Last but no least, our model of actors is similar
-to the actor model known from the computer science.
 
 ## Basic concepts
 
@@ -365,6 +254,118 @@ Describe chaining, webhooks, running another, metamorph etc.
 ### Monetization
 
 ....Charging money - basic info?
+
+### What actors are not
+
+Actors are best suited for batch operations that take an input, perform an isolated job for a user,
+and potentially produce some output.
+However, actors are currently not best suited for continuous computing or storage workloads, such
+as running a live website, API backend, or database.
+
+As actors are based on Docker, it takes certain amount of time to spin up the container
+and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
+even for highly-optimized Docker images. For long-running jobs, actor execution might be migrated
+to another machine, making it unsuitable for databases.
+
+## Philosophy
+
+Actors are inspired by the **[UNIX philosophy](https://en.wikipedia.org/wiki/Unix_philosophy)** from the 1970s:
+
+1. **Make each program do one thing well**. To do a new job, build afresh rather than complicate old programs by adding new “features”.
+2. Expect the **output of every program to become the input to another, as yet unknown, program**. Don’t clutter output with extraneous information. Avoid stringently columnar or binary input formats. Don’t insist on interactive input.
+3. Design and build software, even operating systems, to be **tried early**, ideally within weeks. Don’t hesitate to throw away the clumsy parts and rebuild them.
+4. **Use tools in preference to unskilled help** to lighten a programming task, even if you have to detour to build the tools and expect to throw some of them out after you’ve finished using them.
+
+The UNIX philosophy is arguably one of the most important software engineering paradigms
+which, together with other favorable design choices of UNIX operating systems,
+ushered the computer and internet revolution.
+By combining smaller parts
+that can be developed and used independently (programs),
+it suddenly became possible to build, manage and gradually evolve ever more complex computing systems.
+Even today's modern mobile devices are effectively UNIX-based machines that run a lot of programs
+interacting with each other, and provide a terminal
+which looks very much like early UNIX terminals. In fact, terminal is just another program.
+
+The UNIX-style programs represent a great way to package software for usage
+on a local computer. The programs can be easily used stand-alone,
+but also in combination and in scripts
+in order to perform much more complex tasks than an individual program ever could,
+which in turn can be packaged as new programs.
+
+The idea of actors is to bring benefits of UNIX-style programs
+from a local computer into an environment of cloud
+where programs run on multiple computers
+communicating over a network that is subject to latency and partitioning,
+there is no global atomic filesystem,
+and where programs are invoked via API calls rather than system calls.
+
+Each actor should do just one thing and do it well.
+Actors can be used stand-alone, as well as combined or scripted into more complex
+systems, which in turn can become new actors.
+Actors provide a simple user interface and documentation to help users interact with them.
+
+### UNIX programs vs. actors
+
+The following table shows equivalents of key concepts of UNIX programs and actors.
+
+| UNIX programs            | Actors |
+|--------------------------|------------------|
+| Command-line options     | [Input object](#get-input) |
+| Read stdin               | No direct equivalent, you can [read from a dataset](#dataset) specified in the input.|
+| Write to stdout	       | [Push results to dataset](#push-results-to-dataset), set [actor status](#actor-status)|
+| Write to stderr	       | No direct equivalent, you can write errors to log, set error status message, or push failed dataset items into an "error" dataset.|
+| File system	           | [Key-value store](#key-value-store-access)|
+| Process identifier (PID) | Actor run ID |
+| Process exit code        | [Actor exit code](#exit-actor) |
+
+### Design goals
+
+- Each actor should do just one thing, and do it well.
+- Optimize for the users of the actors, help them understand what the actor does, easily run it, and integrate.
+- Keep the system as simple as possible, so that actors can be built and used by the top 90% of developers.
+
+### Relation to the Actor model
+
+Note that actors are only loosely related to
+the **actor model** known from computer science.
+According to [Wikipedia](https://en.wikipedia.org/wiki/Actor_model):
+
+> The actor model in computer science is a mathematical model of concurrent computation
+> that treats actor as the universal primitive of concurrent computation.
+> In response to a message it receives, an actor can: make local decisions,
+> create more actors, send more messages, and determine how to respond to the
+> next message received. Actors may modify their own private state,
+> but can only affect each other indirectly through messaging
+> (removing the need for lock-based synchronization).
+
+While the theoretical actor model is conceptually very similar to "our" actor programming model,
+this similarity is rather coincidental.
+Our primary focus was always on practical software engineering utility, not an
+implementation of a formal mathematical model.
+
+For example, our actors
+do not provide any standard message passing mechanism. The actors might communicate together
+directly via HTTP requests (see [Live view](#live-view)),
+manipulate each other's operation using the Apify platform API (e.g. abort another actor),
+or affect each other by sharing some internal state or storage.
+The actors simply do not have any formal restrictions,
+and they can access whichever external systems they want.
+
+
+### Why the name "actor" ?
+
+In movies and theater, an _actor_ is someone who gets a script
+and plays a role according to that script.
+Our actors also perform an act on someone's behalf, using a provided script,
+and thus we considered the name "actor" as a good description.
+Also, an "actor" evokes an idea of a person, which is a helpful way to think of and talk about
+actors as independent entities.
+
+Coincidentally, in the web automation world it became common to call libraries
+using names related to theater, such as Puppeteer or Playwright,
+confirming "actor" was a good choice.
+Last but no least, our model of actors is similar
+to the actor model known from the computer science.
 
 
 ## Installation and setup
