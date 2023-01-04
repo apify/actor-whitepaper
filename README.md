@@ -260,11 +260,10 @@ to the actor model known from the computer science.
 
 ## Basic concepts
 
-This section describes core features of actors and what they are good for. 
+This section describes core features of actors, what they are good for,
+and how actors differ from other serverless computing platforms. 
 
 ### Input
-
-TODO (Jan): write this text, include examples of input and output objects, possibly also API. 
 
 Each actor accepts an input JSON object, which tells it what it should do.
 The properties and values of the input object have
@@ -281,7 +280,7 @@ For example, an input object for an actor `bob/screenshot-taker` can look like t
 ```
 
 The input object is passed to the actor by the caller when starting the actor using API, in user interface, CLI, scheduler, etc.
-The actor can access the value of the input object using the [`getInput()`](#get-input) function.
+The actor can access the value of the input object using the [Get input](#get-input) function.
 
 In order to specify what kind of input object an actor expects,
 the actor developer can define an [Input schema file](./pages/INPUT_SCHEMA.md).
@@ -293,17 +292,35 @@ TODO
 
 The input schema is used by the system to:
 
-- Validate the passed input JSON object on actor run
-- Generate API documentation on web or in CLI
-- Render user interface for actors to make it easy for users to run them
-- Enable integration of multiple actors
+- Validate the passed input JSON object on actor run,
+  so that actors don't need to perform input validation and error handling in their code
+- Generate actor API documentation and integration code examples on the web or in CLI
+- Render user interface for actors to make it easy for users to run and test actors manually
+- Enable integration of actors into workflow automation pipelines
 
-TODO: Show screenshot with example
+**TODO: Show screenshots with web interface, API docs, and code examples**
 
+### Run
+
+The actors run within an isolated Docker container with access to local file system and network,
+and they can perform an arbitrary computing activity or call external APIs.
+Actors often generate some results, which can be consumed by the caller or passed to other systems.
+
+To enable processing of actor's results in a standardized way, the actors
+can store their results into specialized [Key-value store](#key-value-store) or [Dataset](#dataset) storages,
+from which they can be easily exported using API or integrated in other actors.
 
 ### Output
 
-Similarly as input, each actor can also generate an output.
+
+
+
+
+The actor 
+
+
+Similar to input, actors can also generate an output.
+
 
 
 The documentation and the input/output schemas make it possible for people to easily 
@@ -698,12 +715,12 @@ about the execution context.
 | `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
 | `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
 | `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the actor input. Typically it's `INPUT`, but it might be something else.                                                             |
-| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the actor run, in megabytes. It can be used by actors to optimize their memory usage.                                                                       |
-| `ACTOR_STARTED_AT`                 | Date when the actor was started, in ISO 8601 format.                                                                                                                                                                                           |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the actor run, in megabytes (1,000,000 bytes). It can be used by actors to optimize their memory usage.                                                                       |
+| `ACTOR_STARTED_AT`                 | Date when the actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                                                                                                                          |
 | `ACTOR_TIMEOUT_AT`                 | Date when the actor will time out, in ISO 8601 format.                                                                                                                                                                          |
 | `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
-| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details. |
-| `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the actor run web server is accessible from the outside world. See [Container web server]({{@link actors/running.md#container-web-server}}) section for more details.  |
+| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for more details. |
+| `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for more details.  |
 
 **WARNING/TODO**: This is not implemented yet. Currently, the actors use environment variables
 prefixed by `APIFY_`. See the full list of environment variables
