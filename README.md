@@ -27,7 +27,7 @@ in December 2022.
   * [What actors are not](#what-actors-are-not)
 - [Philosophy](#philosophy)
   * [UNIX programs vs. actors](#unix-programs-vs-actors)
-  * [Design goals](#design-goals)
+  * [Design principles](#design-principles)
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "actor" ?](#why-the-name-actor-)
 - [Installation and setup](#installation-and-setup)
@@ -155,8 +155,8 @@ and how actors differ from other serverless computing platforms.
 
 ### Input
 
-Each actor accepts an input JSON object, which tells it what it should do.
-The properties and values of the input object have
+Each actor accepts an **input object**, which tells it what it should do.
+The object is passed in JSON format, and its properties have
 a similar role as command-line arguments when running a program in a UNIX-like operating system.
 
 For example, an input object for an actor `bob/screenshot-taker` can look like this:
@@ -193,60 +193,90 @@ The input schema is used by the system to:
 
 **TODO: Show screenshots with web interface, API docs, and code examples**
 
-### Run
+### Run environment
 
 The actors run within an isolated Docker container with access to local file system and network,
 and they can perform an arbitrary computing activity or call external APIs.
-Actors often generate some results, which can be consumed by the caller or passed to other systems.
+The **standard output** of the actor's program (stdout and stderr) is printed out and logged,
+which is useful for debugging.
 
-To enable processing of actor's results in a standardized way, the actors
-can store their results into specialized [Key-value store](#key-value-store) or [Dataset](#dataset) storages,
+In order to inform the users about the progress, the actors might set a [**status message**](#actor-status),
+which is then displayed in the user interface and also available via API.
+
+Running actors can also launch a [**live-view web server**](#live-view-web-server),
+which is assigned a unique local or public URL to receive HTTP requests. For example,
+this is useful for messaging and interaction between actors, for running request-response REST APIs, or 
+providing a full-featured website.
+
+The actors can store their working data or results into specialized **storages**
+called [Key-value store](#key-value-store) and [Dataset](#dataset) storages,
 from which they can be easily exported using API or integrated in other actors.
 
 ### Output
 
-While input object provides a standardized way to invoke an actor,
-the actors also generate an output object,
-To provide a standardized way
+While the input object provides a standardized way to invoke actors,
+the actors can also generate an **output object**, which is a standardized way to display, consume and integrate
+actors' results.
 
+The actor results are typically fully available only once the actor run finishes,
+but the consumers of the results might want to access partial results during the run.
+Therefore, the actors don't generate the output object directly, but rather
+define an [Output schema file](./pages/OUTPUT_SCHEMA.md), which contains
+instruction how to generate the output object. The output object is stored
+to the Actor run object under the `output` property, and returned via API immediately after
+the actor is started, without the need to wait for it to finish or generate the actual results.
 
+The output object is similar to input object, as it contains properties and values.
+For example, for the `bob/screenshot-taker` actor the output object can look like this:
 
-The actor 
+```json
+TODO
+```
 
+The output object is generated automatically by the system based on the output schema file,
+which can look as follows:
 
-Similar to input, actors can also generate an output.
+```json
+TODO
+```
 
-
-
-The documentation and the input/output schemas make it possible for people to easily 
-understand what the actor does, enter the required inputs both in user interface or API,
-and integrate the results of the actor into their other workflows. Actors can easily call
-and interact with each other, enabling building more complex systems on top of simple ones.
-
-
-
-
-Both actor input and output is always a JSON file. To support e.g. images on input, we just need some better SDK and UI.
-
-Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format.
-There would be properties like in the output_schema.json file, with e.g. URL to dataset,
-log file, kv-store, live view etc. So it would be an auto-generated field "output"
-that we can add to JSON returned by the Run API enpoints
-(e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
-- Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
-- `output` will be a property of run object generated from Output schema
+The output schema and output object can then be used by callers of actors to figure where to find
+actor results, how to display them to users, or simplify plugging of actors in workflow automation pipelines.
 
 ### Storage
 
+
 TODO... explain also why we have these storage... default plus actors can use others, and anything external
+
+Each 
+The Apify platform includes three types of storage you can use both in your actors and outside the Apify
+platform via API, the Apify SDK and Apify's JavaScript API client and Python API client.
+
 
 #### Key-value store
 
+The key-value store is ideal for saving data records such as files, screenshots of web pages,
+and PDFs or for persisting your actors' state. The records are accessible under a unique name and can be written and read quickly.
+
+
+
+The KeyValueStore class represents a key-value store, a simple data storage that is used for saving and reading
+data records or files. Each data record is represented by a unique key and associated with a MIME content type.
+Key-value stores are ideal for saving screenshots, crawler inputs and outputs, web pages, PDFs or to persist the state of crawlers.
+
+Each crawler run is associated with a default key-value store, which is created exclusively for the run.
+By convention, the crawler input and output are stored into the default key-value store under the INPUT and OUTPUT key,
+respectively. Typically, input and output are JSON files, although it can be any other format.
+To access the default key-value store directly, you can use the KeyValueStore.getValue and KeyValueStore.setValue convenience functions.
+
 #### Dataset
 
-#### Request queue
+Dataset storage allows you to store a series of data objects such as results from web scraping, crawling or data processing jobs. You can export your datasets in JSON, CSV, XML, RSS, Excel or HTML formats.
 
-Owing to the 
+The Dataset represents a store for structured data where each object stored has the same attributes,
+such as online store products or real estate offers. You can imagine it as a table, where each object is
+a row and its attributes are columns. Dataset is an append-only storage - you can only add new records to
+it but you cannot modify or remove existing records. Typically it is used to store crawling results.
 
 ### Integrations
 
@@ -266,7 +296,7 @@ as running a live website, API backend, or database.
 As actors are based on Docker, it takes certain amount of time to spin up the container
 and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
 even for highly-optimized Docker images. For long-running jobs, actor execution might be migrated
-to another machine, making it unsuitable for databases.
+to another machine, making it unsuitable for running databases.
 
 ## Philosophy
 
@@ -319,7 +349,7 @@ The following table shows equivalents of key concepts of UNIX programs and actor
 | Process identifier (PID) | Actor run ID |
 | Process exit code        | [Actor exit code](#exit-actor) |
 
-### Design goals
+### Design principles
 
 - Each actor should do just one thing, and do it well.
 - Optimize for the users of the actors, help them understand what the actor does, easily run it, and integrate.
@@ -381,9 +411,10 @@ in an online IDE.
 
 ### Node.js
 
-To [apify](https://www.npmjs.com/package/apify) NPM package contains everything
-that you need to start building actors locally in Node.js.
-Just install the package to your project by running: 
+The most complete implementation of actor system is provided by the Apify SDK for Node.js,
+via the [apify](https://www.npmjs.com/package/apify) NPM package. The package contains everything
+that you need to start building actors locally.
+You can install it to your Node.js project by running: 
 
 ```bash
 $ npm install apify
@@ -391,8 +422,9 @@ $ npm install apify
 
 ### Python
 
-To build actors in Python, simply install the [apify](https://pypi.org/project/apify/) PyPi package
-to your project:
+To build actors in Python, simply install the Apify SDK for Python,
+via the [apify](https://pypi.org/project/apify/) PyPi package
+into your project:
 
 ```bash
 $ pip3 install apify
