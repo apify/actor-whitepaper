@@ -279,7 +279,8 @@ For example, an input object for an actor `bob/screenshot-taker` can look like t
 }
 ```
 
-The input object is passed to the actor by the caller when starting the actor using API, in user interface, CLI, scheduler, etc.
+The input object represents a standardized way for the caller to control the actor's activity,
+whether starting it using API, in user interface, CLI, or scheduler.
 The actor can access the value of the input object using the [Get input](#get-input) function.
 
 In order to specify what kind of input object an actor expects,
@@ -293,10 +294,12 @@ TODO
 The input schema is used by the system to:
 
 - Validate the passed input JSON object on actor run,
-  so that actors don't need to perform input validation and error handling in their code
-- Generate actor API documentation and integration code examples on the web or in CLI
-- Render user interface for actors to make it easy for users to run and test actors manually
-- Enable integration of actors into workflow automation pipelines
+  so that actors don't need to perform input validation and error handling in their code.
+- Render user interface for actors to make it easy for users to run and test them manually
+- Generate actor API documentation and integration code examples on the web or in CLI, 
+  making actors easy for users to integrate the actors.
+- Simplify integration of actors into automation workflows such as Zapier or Make, by providing smart connectors
+  that smartly pre-populate and link actor input properties
 
 **TODO: Show screenshots with web interface, API docs, and code examples**
 
@@ -312,7 +315,9 @@ from which they can be easily exported using API or integrated in other actors.
 
 ### Output
 
-
+While input object provides a standardized way to invoke an actor,
+the actors also generate an output object,
+To provide a standardized way
 
 
 
