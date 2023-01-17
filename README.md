@@ -7,8 +7,8 @@ for programs running in the cloud.**
 
 Written by [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), Milan Lepík, and the Apify team
-in December 2022.
+[Ondra Urban](https://apify.com/mnmkng), and the Apify team
+in January 2023.
 
 
 ## Contents
@@ -245,29 +245,35 @@ actor results, how to display them to users, or simplify plugging of actors in w
 
 ### Storage
 
+The actor system provides two specialized storages that can be used by actors for storing files and results:
+**Key-value store** and **Dataset**, respectively. For each actor run,
+the system automatically creates both these storages 
+in empty state, and makes them readily available for the actor.
 
-TODO... explain also why we have these storage... default plus actors can use others, and anything external
+Besides these default storages, actors are free to create new or
+access other existing key-value stores and datasets, either by ID or a name that can be set to them.
+The storages are accessible through an API and SDK also externally, for example,
+to download results when the actor finishes.
 
-Each 
-The Apify platform includes three types of storage you can use both in your actors and outside the Apify
-platform via API, the Apify SDK and Apify's JavaScript API client and Python API client.
-
+Note that the actors are free to access any other external storage through any third-party API.
 
 #### Key-value store
 
-The key-value store is ideal for saving data records such as files, screenshots of web pages,
-and PDFs or for persisting your actors' state. The records are accessible under a unique name and can be written and read quickly.
+The key-value store is a simple data storage that is used for saving and reading
+files or data records. The records are represented by a unique text key and the data associated with a MIME content type.
+Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of actors.
+
+Each actor run is associated with a default empty key-value store, which is created exclusively for the run.
+The [actor input](#input) is stored as JSON file into the default key-value store under the key defined by
+the `ACTOR_INPUT_KEY` environment variable (usually `INPUT`).
+The actor can read this object using the [Get input](#get-input) function.
+
+The actor can read and write records to key-value stores using the API. For details,
+see [Key-value store access](#key-value-store-access).
 
 
+Output + schema...
 
-The KeyValueStore class represents a key-value store, a simple data storage that is used for saving and reading
-data records or files. Each data record is represented by a unique key and associated with a MIME content type.
-Key-value stores are ideal for saving screenshots, crawler inputs and outputs, web pages, PDFs or to persist the state of crawlers.
-
-Each crawler run is associated with a default key-value store, which is created exclusively for the run.
-By convention, the crawler input and output are stored into the default key-value store under the INPUT and OUTPUT key,
-respectively. Typically, input and output are JSON files, although it can be any other format.
-To access the default key-value store directly, you can use the KeyValueStore.getValue and KeyValueStore.setValue convenience functions.
 
 #### Dataset
 
@@ -278,11 +284,17 @@ such as online store products or real estate offers. You can imagine it as a tab
 a row and its attributes are columns. Dataset is an append-only storage - you can only add new records to
 it but you cannot modify or remove existing records. Typically it is used to store crawling results.
 
+Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
+When an actor starts, by default it is associated with a newly-created empty default dataset.
+The actor can create additional datasets or access existing datasets created by other actors,
+and use those as needed.
+
 ### Integrations
 
 Describe chaining, webhooks, running another, metamorph etc.
 
-### Monetization
+
+### Publishing & Monetization
 
 ....Charging money - basic info?
 
@@ -579,13 +591,17 @@ when running the actor.
 
 ```js
 // Save object to store (stringified to JSON)
-await Actor.setValue('my-state', { something: 123 });
+await Actor.setValue('my_state', { something: 123 });
 
 // Save binary file to store with content type
-await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
+await Actor.setValue('screenshot.png', buffer, { contentType: 'image/png' });
 
 // Get record from store (automatically parsed from JSON)
-const value = await Actor.getValue('my-state');
+const value = await Actor.getValue('my_state');
+
+// Access another key-value store by its name
+const store = await Actor.openKeyValueStore('screenshots-store');
+await store.setValue('screenshot.png', buffer, { contentType: 'image/png' });
 ```
 
 #### Python
@@ -1018,9 +1034,9 @@ $ command <arg1>, <arg2>, … &
 posix_spawn();
 ```
 
-### Metamorph
+### Metamorph 🪄
 
-🪄 This is the most magical actor operation, which replaces running actor’s Docker image with another actor,
+This is the most magical actor operation, which replaces running actor’s Docker image with another actor,
 similar to UNIX `exec` command.
 It is used for building new actors on top of existing ones.
 You simply define input schema and write README for a specific use case,
@@ -1159,6 +1175,12 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
   console.log(`Example live view web server running at ${process.env.ACTOR_WEB_SERVER_URL}`)
 })
 ```
+
+
+### Migration to another server
+
+TODO...
+
 
 ## Actor definition files
 
