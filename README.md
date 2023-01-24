@@ -90,9 +90,10 @@ as well as encourage new implementations of the model in other programming langu
 The goal of this document is to be the north star showing what the
 actor programming model is and what its implementations should support.
 Currently, the most complete implementation of actor model is provided
-by the [Apify SDK for Node.js](https://sdk.apify.com/),
-[Apify CLI](https://docs.apify.com/cli), and 
-[SDK for Python](https://pypi.org/project/apify/) is currently under development.
+by the Apify platform, with SDKs for 
+[Node.js](https://sdk.apify.com/) and
+[Python](https://pypi.org/project/apify/),
+and a [command-line interface](https://docs.apify.com/cli).
 Beware that these implementations do not support all features yet. This is work in progress. 
 
 
@@ -225,6 +226,8 @@ define an [Output schema file](./pages/OUTPUT_SCHEMA.md), which contains
 instruction how to generate the output object. The output object is stored
 to the Actor run object under the `output` property, and returned via API immediately after
 the actor is started, without the need to wait for it to finish or generate the actual results.
+
+TODO: Consider storing the object also to key-value store...
 
 The output object is similar to input object, as it contains properties and values.
 For example, for the `bob/screenshot-taker` actor the output object can look like this:
