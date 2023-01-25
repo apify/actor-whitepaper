@@ -78,6 +78,8 @@ I tried to write a JS example for piping, but figured that piping is not really 
 Note from Jan:
 Indeed, the flow is to start one actor, and pass one of it's storages as default to the other newly started actor. If we had a generic Queue, it could be used nicely for these use case. I'm adding these notes to the doc, so that we can get back to them later.
 
+Jan: I'd get rid of the Request queue from actor specification, and kept it as Apify's extension only.
+
 
 
 ### Charging money

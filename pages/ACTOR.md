@@ -69,3 +69,6 @@ Here are the notes comparing the format to the previous version:
 
 TODOs (@jancurn):
 - The above text needs reformatting, make it more like a reference
+
+
+- Add "scripts" section, see https://apifier.slack.com/archives/C04HB9V90DT/p1672826248186569 
