@@ -1,16 +1,14 @@
 # The Actor Programming Model Whitepaper [DRAFT]
 
-**The paper describes new serverless microapps called _actors_
+**The whitepaper describes new concept for building serverless microapps called _actors_,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
-**Beware that not some APIs are not supported on all platforms yet. [Learn more](#word-of-warning)**
-
-By [Jan Čurn](https://apify.com/jancurn),
+Written by [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), Milan Lepík, and the Apify team.
-October 2022.
+[Ondra Urban](https://apify.com/mnmkng), and the Apify team
+in January 2023.
 
 
 ## Contents
@@ -19,25 +17,28 @@ October 2022.
 
 - [Introduction](#introduction)
   * [Overview](#overview)
+- [Basic concepts](#basic-concepts)
+  * [Input](#input)
+  * [Run](#run)
+  * [Output](#output)
+  * [Storage](#storage)
+  * [Integrations](#integrations)
+  * [Monetization](#monetization)
   * [What actors are not](#what-actors-are-not)
-  * [Word of warning](#word-of-warning)
 - [Philosophy](#philosophy)
   * [UNIX programs vs. actors](#unix-programs-vs-actors)
-  * [Design goals](#design-goals)
+  * [Design principles](#design-principles)
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "actor" ?](#why-the-name-actor-)
-- [Basic concepts](#basic-concepts)
-  * [Input and output](#input-and-output)
-  * [Storage](#storage)
 - [Installation and setup](#installation-and-setup)
   * [Apify platform](#apify-platform)
   * [Node.js](#nodejs)
   * [Python](#python)
   * [Command-line interface (CLI)](#command-line-interface-cli)
 - [Programming interface](#programming-interface)
+  * [Actor initialization](#actor-initialization)
   * [Get input](#get-input)
-  * [Main function](#main-function)
-  * [Key-value store](#key-value-store)
+  * [Key-value store access](#key-value-store-access)
   * [Push results to dataset](#push-results-to-dataset)
   * [Exit actor](#exit-actor)
   * [Environment variables](#environment-variables)
@@ -47,10 +48,8 @@ October 2022.
   * [Start another actor](#start-another-actor)
   * [Metamorph](#metamorph)
   * [Attach webhook to an actor run](#attach-webhook-to-an-actor-run)
-  * [Pipe result of an actor to another (aka chaining)](#pipe-result-of-an-actor-to-another-aka-chaining)
   * [Abort another actor](#abort-another-actor)
   * [Live view web server](#live-view-web-server)
-  * [Charging money](#charging-money)
 - [Actor definition files](#actor-definition-files)
   * [Actor file](#actor-file)
   * [Dockerfile](#dockerfile)
@@ -64,7 +63,7 @@ October 2022.
   * [Continuous integration and delivery](#continuous-integration-and-delivery)
 - [Sharing & Community](#sharing--community)
   * [Shared actors](#shared-actors)
-- [TODOs](#todos)
+- [TODOs (@jancurn)](#todos-jancurn)
 
 <!-- tocstop -->
 
@@ -87,6 +86,16 @@ we're releasing this specification of the actor programming model to the public,
 in a hope to make it a new open standard, and to help community to more effectively
 build and ship software automation tools,
 as well as encourage new implementations of the model in other programming languages.
+
+The goal of this document is to be the north star showing what the
+actor programming model is and what its implementations should support.
+Currently, the most complete implementation of actor model is provided
+by the Apify platform, with SDKs for 
+[Node.js](https://sdk.apify.com/) and
+[Python](https://pypi.org/project/apify/),
+and a [command-line interface](https://docs.apify.com/cli).
+Beware that these implementations do not support all features yet. This is work in progress. 
+
 
 ### Overview
 
@@ -139,6 +148,159 @@ specification is to motivate creation of new runtime environments outside of Api
 The ultimate goal of the actor programming model is to make it as simple as possible
 for people to develop, run, and integrate software automation tools.
 
+
+## Basic concepts
+
+This section describes core features of actors, what they are good for,
+and how actors differ from other serverless computing platforms. 
+
+### Input
+
+Each actor accepts an **input object**, which tells it what it should do.
+The object is passed in JSON format, and its properties have
+a similar role as command-line arguments when running a program in a UNIX-like operating system.
+
+For example, an input object for an actor `bob/screenshot-taker` can look like this:
+
+```json
+{
+  "url": "http://www.example.com",
+  "width": 800,
+  "height": 600
+}
+```
+
+The input object represents a standardized way for the caller to control the actor's activity,
+whether starting it using API, in user interface, CLI, or scheduler.
+The actor can access the value of the input object using the [Get input](#get-input) function.
+
+In order to specify what kind of input object an actor expects,
+the actor developer can define an [Input schema file](./pages/INPUT_SCHEMA.md).
+For example, the input schema for actor `bob/screenshot-taker` will look like this:
+
+```json
+TODO
+```
+
+The input schema is used by the system to:
+
+- Validate the passed input JSON object on actor run,
+  so that actors don't need to perform input validation and error handling in their code.
+- Render user interface for actors to make it easy for users to run and test them manually
+- Generate actor API documentation and integration code examples on the web or in CLI, 
+  making actors easy for users to integrate the actors.
+- Simplify integration of actors into automation workflows such as Zapier or Make, by providing smart connectors
+  that smartly pre-populate and link actor input properties
+
+**TODO: Show screenshots with web interface, API docs, and code examples**
+
+### Run environment
+
+The actors run within an isolated Docker container with access to local file system and network,
+and they can perform an arbitrary computing activity or call external APIs.
+The **standard output** of the actor's program (stdout and stderr) is printed out and logged,
+which is useful for debugging.
+
+In order to inform the users about the progress, the actors might set a [**status message**](#actor-status),
+which is then displayed in the user interface and also available via API.
+
+Running actors can also launch a [**live-view web server**](#live-view-web-server),
+which is assigned a unique local or public URL to receive HTTP requests. For example,
+this is useful for messaging and interaction between actors, for running request-response REST APIs, or 
+providing a full-featured website.
+
+The actors can store their working data or results into specialized **storages**
+called [Key-value store](#key-value-store) and [Dataset](#dataset) storages,
+from which they can be easily exported using API or integrated in other actors.
+
+### Output
+
+While the input object provides a standardized way to invoke actors,
+the actors can also generate an **output object**, which is a standardized way to display, consume and integrate
+actors' results.
+
+The actor results are typically fully available only once the actor run finishes,
+but the consumers of the results might want to access partial results during the run.
+Therefore, the actors don't generate the output object directly, but rather
+define an [Output schema file](./pages/OUTPUT_SCHEMA.md), which contains
+instruction how to generate the output object. The output object is stored
+to the Actor run object under the `output` property, and returned via API immediately after
+the actor is started, without the need to wait for it to finish or generate the actual results.
+
+TODO: Consider storing the object also to key-value store...
+
+The output object is similar to input object, as it contains properties and values.
+For example, for the `bob/screenshot-taker` actor the output object can look like this:
+
+```json
+TODO
+```
+
+The output object is generated automatically by the system based on the output schema file,
+which can look as follows:
+
+```json
+TODO
+```
+
+The output schema and output object can then be used by callers of actors to figure where to find
+actor results, how to display them to users, or simplify plugging of actors in workflow automation pipelines.
+
+### Storage
+
+The actor system provides two specialized storages that can be used by actors for storing files and results:
+**Key-value store** and **Dataset**, respectively. For each actor run,
+the system automatically creates both these storages 
+in empty state, and makes them readily available for the actor.
+
+Besides these default storages, actors are free to create new or
+access other existing key-value stores and datasets, either by ID or a name that can be set to them.
+The storages are accessible through an API and SDK also externally, for example,
+to download results when the actor finishes.
+
+Note that the actors are free to access any other external storage through any third-party API.
+
+#### Key-value store
+
+The key-value store is a simple data storage that is used for saving and reading
+files or data records. The records are represented by a unique text key and the data associated with a MIME content type.
+Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of actors.
+
+Each actor run is associated with a default empty key-value store, which is created exclusively for the run.
+The [actor input](#input) is stored as JSON file into the default key-value store under the key defined by
+the `ACTOR_INPUT_KEY` environment variable (usually `INPUT`).
+The actor can read this object using the [Get input](#get-input) function.
+
+The actor can read and write records to key-value stores using the API. For details,
+see [Key-value store access](#key-value-store-access).
+
+
+Output + schema...
+
+
+#### Dataset
+
+Dataset storage allows you to store a series of data objects such as results from web scraping, crawling or data processing jobs. You can export your datasets in JSON, CSV, XML, RSS, Excel or HTML formats.
+
+The Dataset represents a store for structured data where each object stored has the same attributes,
+such as online store products or real estate offers. You can imagine it as a table, where each object is
+a row and its attributes are columns. Dataset is an append-only storage - you can only add new records to
+it but you cannot modify or remove existing records. Typically it is used to store crawling results.
+
+Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
+When an actor starts, by default it is associated with a newly-created empty default dataset.
+The actor can create additional datasets or access existing datasets created by other actors,
+and use those as needed.
+
+### Integrations
+
+Describe chaining, webhooks, running another, metamorph etc.
+
+
+### Publishing & Monetization
+
+....Charging money - basic info?
+
 ### What actors are not
 
 Actors are best suited for batch operations that take an input, perform an isolated job for a user,
@@ -149,15 +311,7 @@ as running a live website, API backend, or database.
 As actors are based on Docker, it takes certain amount of time to spin up the container
 and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
 even for highly-optimized Docker images. For long-running jobs, actor execution might be migrated
-to another machine, making it unsuitable for databases.
-
-### Word of warning
-
-Currently, the only available implementation of the actor model is provided by
-[Apify SDK for Node.js](https://sdk.apify.com).
-The goal of this document is to define the north star how Apify's and other implementations
-of actor programming model should look like. We keep working on full implementations
-for Node.js, Python and CLI.
+to another machine, making it unsuitable for running databases.
 
 ## Philosophy
 
@@ -200,24 +354,21 @@ Actors provide a simple user interface and documentation to help users interact 
 
 The following table shows equivalents of key concepts of UNIX programs and actors.
 
-**TODO:** Add to the table links to the texts below
+| UNIX programs            | Actors |
+|--------------------------|------------------|
+| Command-line options     | [Input object](#get-input) |
+| Read stdin               | No direct equivalent, you can [read from a dataset](#dataset) specified in the input.|
+| Write to stdout	       | [Push results to dataset](#push-results-to-dataset), set [actor status](#actor-status)|
+| Write to stderr	       | No direct equivalent, you can write errors to log, set error status message, or push failed dataset items into an "error" dataset.|
+| File system	           | [Key-value store](#key-value-store-access)|
+| Process identifier (PID) | Actor run ID |
+| Process exit code        | [Actor exit code](#exit-actor) |
 
-UNIX programs  | Actors 
-|---|---
-Command-line options |	Input object
-Read stdin |	Read from a dataset
-Write to stdout	| Push data to dataset, update actor status
-Write to stderr	| No direct equivalent, just write error to log and set error message. Or push failed datasetitems to another dataset.
-File system	| Key-value store
-Process identifier (PID) | Actor run ID
-Process exit code | Actor exit code
-
-### Design goals
+### Design principles
 
 - Each actor should do just one thing, and do it well.
-- Keep it as simple as possible, but not simpler.
-- When in doubt, optimize for the users of the actors, help them understand what the actor does
-- ?
+- Optimize for the users of the actors, help them understand what the actor does, easily run it, and integrate.
+- Keep the system as simple as possible, so that actors can be built and used by the top 90% of developers.
 
 ### Relation to the Actor model
 
@@ -234,7 +385,7 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Actor_model):
 > (removing the need for lock-based synchronization).
 
 While the theoretical actor model is conceptually very similar to "our" actor programming model,
-this similarity is rather coincidental. 
+this similarity is rather coincidental.
 Our primary focus was always on practical software engineering utility, not an
 implementation of a formal mathematical model.
 
@@ -250,7 +401,7 @@ and they can access whichever external systems they want.
 ### Why the name "actor" ?
 
 In movies and theater, an _actor_ is someone who gets a script
-and plays a role according to that script. 
+and plays a role according to that script.
 Our actors also perform an act on someone's behalf, using a provided script,
 and thus we considered the name "actor" as a good description.
 Also, an "actor" evokes an idea of a person, which is a helpful way to think of and talk about
@@ -262,26 +413,6 @@ confirming "actor" was a good choice.
 Last but no least, our model of actors is similar
 to the actor model known from the computer science.
 
-## Basic concepts
-
-### Input and output
-
-TODO (Jan): write this text, include examples of input and output objects, possibly also API. 
-
-Both actor input and output is always a JSON file. To support e.g. images on input, we just need some better SDK and UI.
-
-
-Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format.
-There would be properties like in the output_schema.json file, with e.g. URL to dataset,
-log file, kv-store, live view etc. So it would be an auto-generated field "output"
-that we can add to JSON returned by the Run API enpoints
-(e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
-- Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
-- `output` will be a property of run object generated from Output schema
-
-### Storage
-
-TODO... explain also why we have these storage...
 
 ## Installation and setup
 
@@ -295,9 +426,10 @@ in an online IDE.
 
 ### Node.js
 
-To [apify](https://www.npmjs.com/package/apify) NPM package contains everything
-that you need to start building actors locally in Node.js.
-Just install the package to your project by running: 
+The most complete implementation of actor system is provided by the Apify SDK for Node.js,
+via the [apify](https://www.npmjs.com/package/apify) NPM package. The package contains everything
+that you need to start building actors locally.
+You can install it to your Node.js project by running: 
 
 ```bash
 $ npm install apify
@@ -305,8 +437,9 @@ $ npm install apify
 
 ### Python
 
-To build actors in Python, simply install the [apify](https://pypi.org/project/apify/) PyPi package
-to your project:
+To build actors in Python, simply install the Apify SDK for Python,
+via the [apify](https://pypi.org/project/apify/) PyPi package
+into your project:
 
 ```bash
 $ pip3 install apify
@@ -350,16 +483,57 @@ $ apify help <command>
 
 ## Programming interface
 
-By default, the following commands are expected to be called from within a context
+The commands described in this section are expected to be called from within a context
 of a running actor, both in local environment or on the Apify platform.
-The information about the current run is taken from `APIFY_ACTOR_RUN_ID`
-environment variable.
-For all commands,
-this behavior can be overridden in options.
-For example, in Node.js the options object in all commands has `actorRunId`
-field, and `apify actor` CLI command has the `--actor-run-id` flag.
+By default, the identifier of the current actor run is taken from `ACTOR_RUN_ID`
+environment variable, but it can be overridden.
+For example, in Node.js you can initialize the `Actor` class using another `actorRunId`,
+or in the `apify actor` CLI command you can pass the `--actor-run-id` flag.
 
-TODO (Jan): We decided not to pass `actorRunId` as arg to methods, but use it in constructor - fix the above text
+### Actor initialization
+
+First, the actor should be initialized. During initialization, it prepares to receive events from Apify platform, determines machine and storage configuration and optionally purges previous state from local storage. It will also create a default instance of the Actor class.
+
+It is not required to perform the initialization explicitly, because the actor will initialize on execution of any actor method, but we strongly recommend it to prevent race conditions.
+
+#### Node.js
+ 
+In Node.js the actor is initialized by calling the `init()` method. It should be paired with an `exit()` method which terminates the actor. Use of `exit()` is not required, but recommended. For more information go to [Exit actor](#exit-actor).
+
+```js
+import { Actor } from 'apify';
+
+await Actor.init();
+
+const input = await Actor.getInput();
+console.log(input);
+
+await Actor.exit();
+```
+
+An alternative way of initializing the actor is with a `main()` function. This is useful in environments where the latest JavaScript
+syntax and top level awaits are not supported. The main function is only syntax-sugar for `init()` and `exit()`. It will call `init()` before it executes its callback and `exit()` after the callback resolves. 
+
+```js
+import { Actor } from 'apify';
+
+Actor.main(async () => {
+  const input = await Actor.getInput();
+  // ...
+});
+```
+
+#### Python
+
+TODO: @fnesveda please add Python examples.
+
+#### UNIX equivalent
+
+```c
+int main (int argc, char *argv[]) {
+  ...
+}
+```
 
 ### Get input
 
@@ -371,19 +545,11 @@ The input is an object with properties.
 If the actor defines the input schema, the input object is guaranteed to conform to it.
 For details, see [Input and output](#input-and-output).
 
-TODO (@mnmkng): Ondra will move the init/main section above,
-  and fix those examples, Franta should finalize the Python version
-
 #### Node.js
 
 ```js
-import { Actor } from 'apify';
-
-// TODO: Ondra's razor - We should instantiate new object,
-//  to avoid require-time side-effects
-
 const input = await Actor.getInput();
-console.log(input.option1);
+console.log(input);
 
 // prints: { "option1": "aaa", "option2": 456 }
 ```
@@ -391,8 +557,6 @@ console.log(input.option1);
 #### Python
 
 ```python
-from apify import actor
-
 input = actor.get_input()
 print(input)
 ```
@@ -416,46 +580,7 @@ $ command --option1=aaa --option2=bbb
 int main (int argc, char *argv[]) {}
 ```
 
-### Main function
-
-This is an optional helper to wrap the body of the actor.
-
-#### Node.js
-
-In Node.js the actor code might be either wrapped using the main function:
-
-```js
-import { Actor } from 'apify';
-
-Actor.main(async () => {
-  const input = await Actor.getInput();
-  // ...
-});
-```
-
-Or in combination with ES modules supporting usage of the top level `await` operator wrapped by `init()` and `exit()` methods:
-
-```js
-import { Actor } from 'apify';
-
-await Actor.init();
-
-const input = await Actor.getInput();
-console.log(input);
-
-await Actor.exit();
-```
-
-
-#### UNIX equivalent
-
-```c
-int main (int argc, char *argv[]) {
-  ...
-}
-```
-
-### Key-value store
+### Key-value store access
 
 Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
@@ -469,13 +594,17 @@ when running the actor.
 
 ```js
 // Save object to store (stringified to JSON)
-await Actor.setValue('my-state', { something: 123 });
+await Actor.setValue('my_state', { something: 123 });
 
 // Save binary file to store with content type
-await Actor.setValue('screenshot', buffer, { contentType: 'image/png' });
+await Actor.setValue('screenshot.png', buffer, { contentType: 'image/png' });
 
 // Get record from store (automatically parsed from JSON)
-const value = await Actor.getValue('my-state');
+const value = await Actor.getValue('my_state');
+
+// Access another key-value store by its name
+const store = await Actor.openKeyValueStore('screenshots-store');
+await store.setValue('screenshot.png', buffer, { contentType: 'image/png' });
 ```
 
 #### Python
@@ -501,13 +630,12 @@ $ cat file.txt
 ### Push results to dataset
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
-When an actor starts, by default it is associated with a newly-created empty dataset.
-The user can override it and specify another dataset when running the actor.
-
-TODO (@jancurn): Mention they can add more datasets and use them on the fly.
+When an actor starts, by default it is associated with a newly-created empty default dataset.
+The actor can create additional datasets or access existing datasets created by other actors,
+and use those as needed.
 
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
-of objects are stored in them. See [Schema files](#schema-files) for more details.
+of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.md) for more details.
 
 #### Node.js
 
@@ -634,37 +762,59 @@ exit(1);
 
 ### Environment variables
 
-Actors have access to standard process environment variables.
+Actors have access to standard process environment variables. 
+The Apify platform uses environment variables prefixed with `ACTOR_` to pass the actors information
+about the execution context.
 
-The Apify platform sets information about the actor execution context through
-environment variables such as `APIFY_TOKEN` or `APIFY_ACTOR_RUN_ID` -
-see the [Apify documentation](https://docs.apify.com/actors/development/environment-variables) for the full list.
+| Environment variable               | Description                                                                                                                                                                                                                |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ACTOR_RUN_ID`                     | ID of the actor run.                                                                                                                                                                                                       |
+| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the actor's input and output data are stored.                                                                                                                                    |
+| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
+| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
+| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the actor input. Typically it's `INPUT`, but it might be something else.                                                             |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the actor run, in megabytes (1,000,000 bytes). It can be used by actors to optimize their memory usage.                                                                       |
+| `ACTOR_STARTED_AT`                 | Date when the actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                                                                                                                          |
+| `ACTOR_TIMEOUT_AT`                 | Date when the actor will time out, in ISO 8601 format.                                                                                                                                                                          |
+| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
+| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for more details. |
+| `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for more details.  |
 
-<!-- TODO: We should provide the full list here eventually, for a complete reference. -->
+**WARNING/TODO**: This is not implemented yet. Currently, the actors use environment variables
+prefixed by `APIFY_`. See the full list of environment variables
+in [Apify documentation](https://docs.apify.com/actors/development/environment-variables).
 
-Additionally, the actor developer can define custom environment variables
-that are then passed to the actor process both on Apify platform and in local development environment.
-The variables can be secured, to protect API keys and passwords, and avoid committing them to the source code.
-These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive.
+<!--
+  TODO: Implement these env vars, we need to keep the old ones for backwards compatibility
+  Only Apify-specific env vars should have prefix APIFY_, e.g. APIFY_PROXY_PASSWORD, APIFY_TOKEN or APIFY_USER_ID.
+  Mention these additional env vars in the text
+-->
+
+The actor developer can also define custom environment variables
+that are then passed to the actor process both in local development environment or on the Apify platform.
+These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive,
+or manually in the user interface in Apify Console.
+
+The environment variables can be set as secure in order to protect sensitive data such as API keys or passwords.
+The value of a secure environment variable is encrypted and can only be retrieved by the actors during their run,
+but not outside the runs. Furthermore, values of secure environment variables are omitted from the log.
 
 #### Node.js
 
-For convenience, rather than using environment vars directly, we provide a helper function
-that returns an object, with TypeScript-defined type.
+For convenience, rather than using environment vars directly, we provide a `Configuration` class
+that allows reading and updating the actor configuration.
 
-TODO (@mnmkng): Let's now show getEnv() but the config object from Apify SDK, and explain why it's good to use.
+```javascript
+const token = Actor.config.get('token');
 
+// use different token
+Actor.config.set('token', 's0m3n3wt0k3n')
 ```
-const env = await Actor.getEnv();
-console.log(env.actorRunId);
-```
-
-TODO: This might need to be unified with https://sdk.apify.com/docs/api/configuration
 
 #### CLI
 
 ```bash
-$ echo "$APIFY_ACTOR_RUN_ID started at $APIFY_ACTOR_RUN_STARTED_AT"
+$ echo "$ACTOR_RUN_ID started at $ACTOR_STARTED_AT"
 ```
 
 
@@ -725,22 +875,60 @@ $ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pag
 
 ### System events
 
-Receive system events, e.g. CPU statistics of the running container or information about
-imminent [migration to another server](#TODO), or [Actor exit](#exit-actor).
+Actors are notified by the system about various events such as a migration to another server,
+[abort operation](#abort-another-actor) triggered by another actor, or the CPU being overloaded.
 
-In the future, this mechanism can be extended to custom events and messages.
+Currently, the system sends the following events:
 
-TODO (@mtrunkat): Add a table of events and details of params, plus links, timeouts etc.
+| Event name     | Payload | Description |
+| -------------- | ------- | ----------- |
+| `cpuInfo`      | `{ isCpuOverloaded: Boolean }` | The event is emitted approximately every second and it indicates whether the actor is using the maximum of available CPU resources. If that’s the case, the actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
+| `migrating`    | N/A | Emitted when the actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
+| `aborting`     | N/A | When a user aborts an actor run on the Apify platform, they can choose to abort gracefully to allow the actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
+| `persistState` | `{ isMigrating: Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
+
+In the future, the event mechanism might be extended to custom events and messages enabling communication between
+actors.
+
+Under the hood, actors receive the system events by connecting to a web socket address specified
+by the `ACTOR_EVENTS_WEBSOCKET_URL` environment variable.
+The system sends messages in JSON format in the following structure:
+
+```js
+{
+    // Event name
+    name: String,
+
+    // Time when the event was created, in ISO format
+    createdAt: String,
+          
+    // Optional object with payload      
+    data: Object,
+}
+```
+
+Note that some events (e.g. `persistState`) are not sent by the system via the web socket,
+but generated virtually on the Actor SDK level.
 
 #### Node.js
 
-<!-- TODO: Add more info about how it looks: `persistState`, `aborting`, `Actor.off()` ... -->
-
 ```js
-Actor.on('systemInfo', (data) => {
-    if (data.isCpuOverloaded) console.log('Oh no, the CPU is overloaded!');
+// Add event handler
+Actor.on('cpuInfo', (data) => {
+    if (data.isCpuOverloaded) console.log('Oh no, we need to slow down!');
 });
+
+// Remove all handlers for a specific event
+Actor.off('systemInfo');
+
+// Remove a specific event handler
+Actor.off('systemInfo', handler);
 ```
+
+#### Python
+
+TODO: @fnesveda Add Python example, here and elsewhere too
+
 
 #### UNIX equivalent
 
@@ -782,27 +970,19 @@ returns immediately.
 #### Node.js
 
 ```js
-// Run actor and wait for it to finish
-const run = await Actor.call(
-  'apify/google-search-scraper',
-  { queries: 'test' },
-  {
-      // TODO (@mnmkng): Please make sure this is like it is in Apify SDK and client
-    memory: 2048,
-    defaultKeyValueStoreId: 'NEW_ID',
-  },
+// Start actor and return a Run object
+const run = await Actor.start(
+    'apify/google-search-scraper', // name of the actor to start
+    { queries: 'test' }, // input of the actor
+    { memory: 2048 }, // run configuration
 );
 
-// Run actor and don't wait for it to finish
-const run2 = await Actor.start(
-  'apify/google-search-scraper',
+// Start actor and wait for it to finish
+const run2 = await Actor.call(
+  'apify/google-search-scraper', 
   { queries: 'test' },
   { memory: 2048 },
 );
-
-// Note that the output object is always available,
-// and contains links to results generated according to the output schema
-console.log(`Output object: ${run2.output}`);
 ```
 
 
@@ -811,9 +991,6 @@ console.log(`Output object: ${run2.output}`);
 ```bash
 # On stdout, the commands emit actor run object (in text or JSON format),
 # we shouldn't wait for finish, for that it should be e.g. "execute"
-# TODO (@mtrunkat): Ensure that all CLI examples use structure like "apify actor xxx"
-#   and that we update CLI to support these commands and parameters (can be breaking change).
-
 $ apify actor call apify/google-search-scraper queries='test\ntest2' \
   countryCode='US'
 $ apify actor call --json apify/google-search-scraper '{ "queries": }'
@@ -860,24 +1037,23 @@ $ command <arg1>, <arg2>, … &
 posix_spawn();
 ```
 
-### Metamorph
+### Metamorph 🪄
 
-Replace running actor’s Docker image with another actor.
+This is the most magical actor operation, which replaces running actor’s Docker image with another actor,
+similar to UNIX `exec` command.
+It is used for building new actors on top of existing ones.
+You simply define input schema and write README for a specific use case,
+and then delegate the work to another actor.
 
-This is the most magical actor operation.
-It is extremely useful for building new actors on top of existing ones.
-You simply define a better input schema and user description,
-and internally delegate the work to other actor.
+An actor can metamorph only to actors that have compatible output schema as the main actor,
+in order to ensure logical and consistent outcomes for users. 
+If the output schema of the target actor is not compatible, the system should throw an error.
 
-When metamorphing an actor into another actor, the system checks
-that the other actor has compatible input/output schemas,
-and throws an error if not.
+<!-- TODO: This is not implemented yet -->
 
-The target actor inherits the default storages used by the calling actor, unless overridden.
-
-TODO (@jancurn): Describe what happens with output schema - the output schema of the main first actor run
-  is the one that counts. In the future, the system should ensure the schema of sub-actor is compatible.
-  
+Note that the target actor inherits the default storages used by the calling actor.
+The target actor input is stored to the default key-value store, often under a key such as `INPUT-2`. 
+Internally, the target actor can recursively metamorph into another actor.
 
 #### Node.js
 
@@ -910,11 +1086,9 @@ Run another actor or an external HTTP API endpoint after actor run finishes or f
 
 #### Node.js
 
-TODO (@mtrunkat): Check the API is as is now - see https://sdk.apify.com/api/apify/interface/WebhookOptions
-
 ```js
 await Actor.addWebhook({
-    eventType: ['SUCCEEDED', 'FAILED'],
+    eventType: ['ACTOR.RUN.SUCCEEDED', 'ACTOR.RUN.FAILED'],
     requestUrl: 'http://api.example.com?something=123',
     payloadTemplate: `{
         "userId": {{userId}},
@@ -930,17 +1104,17 @@ await Actor.addWebhook({
 
 ```bash
 apify actor add-webhook --actor-run-id=RUN_ID \\
-  --event-types=SUCCEEDED,FAILED \\
+  --event-types=ACTOR.RUN.SUCCEEDED,ACTOR.RUN.FAILED \\
   --request-url=https://api.example.com \\
   --payload-template='{ "test": 123" }'
 
-apify actor add-webhook --event-types=SUCCEEDED \\
+apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
   --request-actor=apify/send-mail \\
   --memory=4096 --build=beta \\
   --payload-template=@template.json
 
 # Or maybe have a simpler API for self-actor?
-apify actor add-webhook --event-types=SUCCEEDED --request-actor=apify/send-mail 
+apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
 ```
 
 #### UNIX equivalent
@@ -951,45 +1125,6 @@ $ command1; command2    # (command separator)
 $ command1 && command2  # ("andf" symbol)
 $ command1 || command2  # ("orf" symbol)
 ```
-
-### Pipe result of an actor to another (aka chaining)
-
-Actor can start other actors and
-pass them its own dataset or key-value store.
-For example, the main actor can produce files
-and the spawned others can consume them, from the same storages.
-
-In the future, we could let datasets be cleaned up from the beginning,
-effectively creating a pipe, with custom rolling window.
-Webhooks can be attached to storage operations,
-and so launch other actors to consume newly added items or files.
-
-#### UNIX equivalent
-
-```bash
-$ ls -l | grep "something" | wc -l
-```
-
-**TODO (@jancurn):** **Move to IDEAS.md** We could have a special CLI support for creating actor chains using pipe operator,
-like this:
-
-```
-$ apify call apify/google-search-scraper | apify call apify/send-email queryTerms="aaa\nbbb"
-```
-
-Note from Marek:
-Here we will need some way how to map outputs from old actor to inputs of the following actor, perhaps we could pipeline thru some utility like [jq](https://stedolan.github.io/jq/tutorial/)
-or use some mapping like:
-
-```
---input-dataset-id="$output.defaultDatasetId" --dataset-name="xxx"
-```
-
-Note from Ondra:
-I tried to write a JS example for piping, but figured that piping is not really aligned with how actors work, because piping assumes the output of one program is immediately processed by another program. Actors can produce output like this, but they can't process input like this. Input is provided only once, when the actor starts. Unless we consider e.g. request queue as input. We will have to think about this a bit differently.
-
-Note from Jan:
-Indeed, the flow is to start one actor, and pass one of it's storages as default to the other newly started actor. If we had a generic Queue, it could be used nicely for these use case. I'm adding these notes to the doc, so that we can get back to them later.
 
 
 ### Abort another actor
@@ -1025,110 +1160,29 @@ to provide a web application for human users, to show actor run details, diagnos
 or to run an arbitrary web app.
 
 On Apify platform, the port on which the actor can launch the public web server,
-is specified by the `APIFY_CONTAINER_PORT` environment variable.
+is specified by the `ACTOR_WEB_SERVER_PORT` environment variable.
 The web server is then exposed to the public internet on a URL identified 
-by the `APIFY_CONTAINER_URL`, e.g. `https://hard-to-guess-identifier.runs.apify.net`.
-
-<!-- TODO: These should probably be called `ACTOR_LIVE_VIEW_PORT` or `ACTOR_LIVE_VIEW_URL` -->
+by the `ACTOR_WEB_SERVER_URL`, for example `https://hard-to-guess-identifier.runs.apify.net`.
 
 #### Node.js
 
 ```js
 const express = require('express');
 const app = express();
-const port = process.env.APIFY_CONTAINER_PORT;
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.listen(process.env.APIFY_CONTAINER_PORT, () => {
-  console.log(`Example live view web server running at ${process.env.APIFY_CONTAINER_URL}`)
+app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
+  console.log(`Example live view web server running at ${process.env.ACTOR_WEB_SERVER_URL}`)
 })
 ```
 
-### Charging money
 
-TODO(@jancurn): Move the `Actor.charge()` to ideas, to keep this simple.
-  Mention just basic monetization in non-API section.
+### Migration to another server
 
-**STATUS: This feature is not implemented yet.**
-
-To run an actor on the Apify platform, the user might need
-to purchase a paid plan to cover for the computing resources used, 
-pay a fixed monthly fee for "renting" the actor if it's paid,
-or pay a variable fee for the number of results produced by the actor.
-
-On top of these "static" payment options, actors will eventually support
-a built-in monetization system that enables developers to charge users variable
-amounts, e.g. based on returned number of results,
-complexity of the input, or cost of external APIs used by the actor.
-
-The actor can dynamically charge the current user a specific amount of money
-by calling the `charge` function.
-Users of actors can ensure they will not be charged too much by specifying
-the maximum amount when starting an actor using the `maxChargeCreditsUsd` run option.
-The actor can call the `charge` function as many times as necessary,
-but once the total sum of charged credits would exceed the maximum limit,
-the invocation of the function throws an error.
-
-When a paid actor subsequently starts another paid actor, the charges performed
-by the subsequent actors are taken from the calling actor's credits.
-This enables actor economy, where actors hierarchically pay other actors or external APIs
-to perform parts of the job.
-
-**Rules for building actors with variable charging:**
-
-<!-- TODO: Should be called ACTOR_MAX_CHARGE_CREDITS_USD? -->
-
-- If your actor is charging users, make sure at the earliest time possible  
-  that the actor is being run with sufficient credits, by checking the input
-  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO (@jancurn)).
-  If the maximum credits are not sufficient for actor's operation with respect
-  to the input (e.g. user is requesting too many results for too little money),
-  fail the actor immediately with a reasonable error status message for the user,
-  and don't charge the user anything.
-- Charge the users right **after** you have incurred the costs,
-  not in advance. If the actor fails in the middle or is aborted, the users
-  only need to be charged for results they actually received.
-  Nothing will make users of your actors angrier than charging them for something they didn't receive.
-
-**Integration with input schema**
-
-The actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
-`maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
-per unit of usage specified in the input schema.
-This field can be used by the Apify platform to automatically inform the user about
-maximum possible charge, and automatically set `maxChargeCreditsUsd` for the actor run.
-For example,
-for Google Search Scraper paid by number of pages scraped, this setting would be
-added to `maxPageCount` field which limits the maximum number of pages to scrape.
-Note that the actor doesn't know in advance how many pages it will be able to fetch,
-hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
-
-<!-- TODO: Shall we create another actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
-That could provide for better UX. Probably not, it would be an overkill... -->
-
-#### Node.js
-
-Charge the current user of the actor a specific amount:
-
-```js
-const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
-```
-
-Set the maximum amount to charge when starting an actor.
-
-```js
-const run = await Actor.call(
-  'bob/analyse-images',
-  { imageUrls: ['...'] },
-  {
-      // By default, it's 0, hence actors cannot charge users unless they explicitely allow that.
-      maxChargeCreditsUsd: 5,
-  },
-);
-```
+TODO...
 
 
 ## Actor definition files
@@ -1188,22 +1242,23 @@ Good documentation makes good actors!
 
 ### Schema files
 
-The structure of actor's [input and output](#input-and-output) can optionally be
+The structure of actor's [input and output](#input-and-output) can be optionally
 dictated by the input and output schema files.
 These files list properties accepted by actor on input, and properties that the actor produces on output,
 respectively.
 The input and output schema files are used to render a user interface
-for people to make it easy to run the actor,
+to make it easy to run the actor manually,
 to generate API documentation, render the view of actor's output,
-and enable connecting actor outputs to inputs of another actor for rich workflows. 
+validate the input,
+and to enable connecting actor outputs to input of another actor for rich workflows. 
 
-The input and output schema is defined by two JSON files that are referenced 
+The input and output schema is defined by two JSON files that are linked 
 from the [Actor file](#actor-file):
 
 - [Input schema file](./pages/INPUT_SCHEMA.md)
 - [Output schema file](./pages/OUTPUT_SCHEMA.md)
 
-Both input and output schemas can reference schema files 
+Both input and output schema files can additionally reference schema files 
 for specific storages:
 
 - [Dataset schema file](./pages/DATASET_SCHEMA.md)
@@ -1211,25 +1266,24 @@ for specific storages:
 - [Request queue schema file](./pages/REQUEST_QUEUE_SCHEMA.md)
 
 These storage schemas are used to ensure that stored objects or files 
-fulfil certain criteria, their fields have certain types, etc.
+fulfil specific criteria, their fields have certain types, etc.
 On Apify platform, the schemas can be applied to the storages directly,
 without actors.
 
-<!-- TODO: Is this true? -->
-All the storage schemas are weak, in a sense that if the schema doesn't define a property,
+Note that all the storage schemas are weak, in a sense that if the schema doesn't define a property,
 such property can be added to the storage and have an arbitrary type.
 Only properties explicitly mentioned by the schema
 are validated. This is an important feature which allows extensibility.
 For example, a data deduplication actor might require on input datasets
-that have `uuid: String` field in objects, but not care about anything else.
+that have an `uuid: String` field in objects, but it does not care about other fields.
 
 
 ### Backward compatibility
 
 If the `.actor/actor.json` file is missing,
 the system falls back to the legacy mode,
-looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
-files in the actor's top-level directory, and uses them instead.
+and looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
+files in the actor's top-level directory instead.
 This behavior might be deprecated in the future.
 
 ## Development
@@ -1296,5 +1350,5 @@ https://apify.com/jancurn/some-scraper
 - Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
 - Maybe add comparison with other systems, like Lambda, Modal, Replit, ECS etc. in terms of developer experience 
   - Maybe mention these in specific points,
-
+- Review external links and consider replacing them with local links
 
