@@ -58,6 +58,7 @@ there's no point to include storage schema here again, as it's done elsewhere.
       "title": "Product images", //optional
       "description": "Yaddada", //optional
       "collections": ["screenshots"] // optional, default means all collections in key-value-store
+      "target": "@productImages" // Key-value store defined in "ACTOR.json"
     },
     
     // If the users want to reference a single file, they do it via selecting a collection
@@ -66,7 +67,7 @@ there's no point to include storage schema here again, as it's done elsewhere.
       "type": "key-value-store",
       "title": "API server", // optional
       "collections": ["monitoringReport"],
-      "target": "default" //optional
+      "target": "@default" // optional, default store
     },
 
     // Live view
