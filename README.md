@@ -768,7 +768,11 @@ about the execution context.
 
 | Environment variable               | Description                                                                                                                                                                                                                |
 |------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ACTOR_ID`                         | ID of the actor. |
 | `ACTOR_RUN_ID`                     | ID of the actor run.                                                                                                                                                                                                       |
+| `ACTOR_BUILD_ID`                   | ID of the actor build. |
+| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current actor build. |
+| `ACTOR_TASK_ID`                    | ID of the saved actor task. |
 | `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the actor's input and output data are stored.                                                                                                                                    |
 | `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
 | `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
@@ -779,6 +783,7 @@ about the execution context.
 | `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
 | `ACTOR_WEB_SERVER_PORT`            | TCP port on which the actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for more details. |
 | `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for more details.  |
+| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result actor. |
 
 **WARNING/TODO**: This is not implemented yet. Currently, the actors use environment variables
 prefixed by `APIFY_`. See the full list of environment variables
