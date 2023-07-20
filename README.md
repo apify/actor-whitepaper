@@ -1339,6 +1339,9 @@ TODO: Mention CI/CD, e.g. how to integrate with GiHub etc.
 
 TODO: Motivation - why building on Apify is easier than building your own SaaS
 
+TODO: Ground rules:
+- User of actor should never need to look into log to understand what happened, e.g. why the actor failed.
+  This info must be in the status message
 
 ### Shared actors
 
