@@ -20,6 +20,8 @@ It looks as follows:
   "readme": "./ACTOR.md", // if omitted, it checks "./ACTOR.md" and "../README.md"
   "input": "./input_schema.json",
   "output": "./output_schema.json",
+  "minMemoryMbytes": 128, // optional number, min memory in megabytes allowed for running this Actor
+  "maxMemoryMbytes": 4096, // optional number, max memory in megabytes allowed for running this Actor
   "storages": {
     "keyValueStore": "./key_value_store_schema.json",
     "dataset": "../shared-schemas/dataset_schema.json",
