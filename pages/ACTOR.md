@@ -26,9 +26,9 @@ It looks as follows:
     "keyValueStore": "./key_value_store_schema.json",
     "dataset": {
       // The default dataset uses a propper linked schema here.
-      "default": "../shared-schemas/default_dataset_schema.json",
+      "@default": "../shared-schemas/default_dataset_schema.json",
       // Here we don't want to validate so we use only a title and description.
-      "invalidItems": { "title": "Invalid items", "description": "Dataset items not matching the schema" }
+      "@invalidItems": { "title": "Invalid items", "description": "Dataset items not matching the schema" }
     },
     "requestQueue": "../shared-schemas/request_queue_schema.json" // Support of shared schemas in monorepo
   }
@@ -42,19 +42,21 @@ Apify platform will then create unnamed datasets (or we do lazy creation) and as
   "storages": {
     ...
     "datasets": {
-      "default": "n4erFvn7gb2h43wZs",
-      "invalidItems": "228oAtKGLehjnh8eS"
+      "@default": "n4erFvn7gb2h43wZs",
+      "@invalidItems": "228oAtKGLehjnh8eS"
     }
     ...
   }
   ...
 ```
 
-Apify platform (or CLI) will then pass these IDs to the Actor via environment variable:
+The Apify platform (or CLI) will then pass these IDs to the Actor via environment variable `ACTOR_DATASET_IDS`:
 
 ```
-ACTOR_DEFAULT_DATASET_ID=n4erFvn7gb2h43wZs
-ACTOR_INVALID_ITEMS_DATASET_ID=228oAtKGLehjnh8eS
+{
+      "@default": "n4erFvn7gb2h43wZs",
+      "@invalidItems": "228oAtKGLehjnh8eS"
+}
 ```
 
 Usage in SDKs:
@@ -71,16 +73,7 @@ try {
 }
 ```
 
-Or with a shortcut:
-
-```js
-const dataset = await Apify.openDataset('@default', { invalidItemsDatasetName: '@invalidItems' });
-
-await dataset.pushData(item);
-```
-
 ---
-
 
 The `.actor/actor.json` replaces the legacy `apify.json` file.
 Here are the notes comparing the format to the previous version:
