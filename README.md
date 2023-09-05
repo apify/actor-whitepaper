@@ -99,7 +99,7 @@ Beware that these implementations do not support all features yet. This is work 
 
 ### Overview
 
-Actors are serverless programs running in the cloud.
+Actors are serverless programs or agents running in the cloud.
 They can perform anything from simple actions such as
 filling out a web form or sending an email,
 to complex operations such as crawling an entire website,
