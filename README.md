@@ -70,7 +70,7 @@ in January 2023.
 ## Introduction
 
 This document explains how to develop _actors_,
-a new kind of serverless microapps for general-purpose language-agnostic computing and automation jobs.
+a new kind of serverless microapps (or agents, programs, ...) for general-purpose language-agnostic computing and automation jobs.
 The main design goal for actors is to make it easy for developers build and ship reusable
 cloud software tools, which are also easy to run
 and integrate by potentially not-too-technical users.
