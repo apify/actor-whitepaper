@@ -13,13 +13,12 @@ Dataset can be assigned a schema which describes:
 
 ## Basic properties
 
-- Storage is immutable. I.e., if you want to change the structure, then you need to create a new dataset.
-- Its schema is weak. I.e., you can always push their additional properties, but schema will ensure that all the listed once are there with a correct type. This is to make actors more compatible, i.e., some actor expects dataset to contain certain fields but does not care about the additional ones.
+Dataset is **immutable**. I.e., if you want to change the structure, then you need to create a new dataset and push the transformed data into it. Dataset schema is **weak**. I.e., you can always push their additional properties, but schema will ensure that all the listed once are there with a correct type. This is to make actors more compatible, i.e., some actor expects dataset to contain certain fields but does not care about the additional ones.
 
 There are two ways how to create a dataset with schema:
 1. User can start the actor that has dataset schema linked from its
 [OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
-2. Or user can do it pragmatically via API (for empty dataset) by
+1. Or user can do it pragmatically via API (for empty dataset) by
     - either by passing the schema as payload to [create dataset](https://docs.apify.com/api#/reference/datasets/dataset-collection/create-dataset) API endpoint.
     - or using the SDK:
 
@@ -27,11 +26,13 @@ There are two ways how to create a dataset with schema:
     const dataset = await Apify.openDataset('my-new-dataset', { schema });
     ```
 
-By opening an **existing** dataset with `schema` parameter, the system ensures that you are opening a dataset that is compatible with the actor as otherwise, you get an error:
+By opening an **existing** dataset with `schema` parameter, the system ensures that you are opening a dataset that is compatible with the expected schema and otherwise, you get an error:
 
 ```
 Uncaught Error: Dataset schema is not compatible with the provided schema
 ```
+
+The schema of an existing dataset is compatible if it's a superset of an expected dataset schema.
 
 ## Structure
 
@@ -41,20 +42,16 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
     "title": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
 
-    // Not supported yet
-    "fields": {
-        "title": "string",  
-        "imageUrl": "string",  
-        "priceUsd": "number", 
-        "manufacturer": {
-            "title": "string", 
-            "url": "number",
-        },
-        "productVariants": [{
-            "color": "?string"
-        }],
-        
-        ...
+    // Schema describing the structure of the dataset. We will allow a JSON Schema here but also a simpler version, see below.  
+    "schema": {
+      "$schema": "https://apify.com/specs/schemas/2023-09/easy-json-schema",
+      "id": "string",
+      "*name": "string",
+      "*email": "string",
+      "arr": [{
+        "site": "string",
+        "url": "string"
+      }]
     },
   
     "views": {
@@ -111,54 +108,16 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 | Property           | Type                         | Required | Description                                                                                        |
 | ------------------ | ---------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
 | actorSpecification | integer                      | true     | Specifies the version of dataset schema <br/>structure document. <br/>Currently only version 1 is available. |
-| fields             | JSON schema | true     | JSON schema object with more formats in the future.             |
-| views              | [DatasetView]          | true     | An array of objects with a description of an API <br/>and UI views.                                                  |
+| schema             | (Easy) JSON schema           | true     | A schema describing the structure of the dataset. |
+| views              | [DatasetView]                | true     | An array of objects with a description of an API <br/>and UI views. |
 
 ### JSON schema
 
-Items of a dataset can be described by a JSON schema definition. Apify platform then ensures that each object accomplies with the provided schema. In the first version only the standard JSON schema will be supported, i.e.:
+Items of a dataset can be described by a JSON Schema definition. Apify platform then ensures that each object accomplies with the provided schema. We will later allow to use the full featured JSON Schema, but for now, we will use a simpler alternative. The Easy JSON Schema is a feature subset of JSON Schema that is easy to read and write:
 
-
-```jsonc
+```json
 {
-  "type": "object",
-  "required": [
-    "name",
-    "email"
-  ],
-  "properties": {
-    "id": {
-      "type": "string"
-    },
-    "name": {
-      "type": "string"
-    },
-    "email": {
-      "type": "string"
-    },
-    "arr": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [],
-        "properties": {
-          "site": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-with simplifed version comming in the near future:
-
-```jsonc
-{
+  "$schema": "https://apify.com/specs/schemas/2023-09/easy-json-schema", // This contains the JSON schema of our fork of easy JSON schema and its version (date)
   "id": "string",
   "*name": "string",
   "*email": "string",
@@ -169,6 +128,30 @@ with simplifed version comming in the near future:
 }
 ```
 
+The schema above then compiles into the following object:
+
+```json
+{
+  "$id": "https://example.com/address.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "An address similar to http://microformats.org/wiki/h-card",
+  "type": "object",
+  "properties": {
+    "post-office-box": { "type": "string" },
+    "extended-address": { "type": "string" },
+    "street-address": { "type": "string" },
+    "locality": { "type": "string" },
+    "region": { "type": "string" },
+    "postal-code": { "type": "string" },
+    "country-name": { "type": "string"  }
+  },
+  "required": [ "locality", "region", "country-name" ],
+  "dependentRequired": {
+    "post-office-box": [ "street-address" ],
+    "extended-address": [ "street-address" ]
+  }
+}
+```
 
 ### DatasetView object definition
 
@@ -203,3 +186,13 @@ with simplifed version comming in the near future:
 | -------- | ------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
 | label    | string                                                  | false    | In case the data are visualized as in Table view. <br/>The label will be visible table column’s header. |
 | format   | enum(text, number, date, link, <br/>boolean, image, array, object) | false    | Describes how output data values are formatted <br/>in order to be rendered in the output tab UI.       |
+
+## API behavior
+
+### Invalid item pushed to the dataset
+
+If invalid item is pushed to the dataset then API throws and error and does not push it into the dataset.
+
+If the user pushes a batch of multiple items and one of the items is invalid, the whole batch is refused with an error. 
+
+TODO: Later, we plan to extend the API with a multi-status response code enabling the API to accept some items and refuse the rest.
