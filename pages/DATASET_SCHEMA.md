@@ -186,3 +186,13 @@ The schema above then compiles into the following object:
 | -------- | ------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
 | label    | string                                                  | false    | In case the data are visualized as in Table view. <br/>The label will be visible table column’s header. |
 | format   | enum(text, number, date, link, <br/>boolean, image, array, object) | false    | Describes how output data values are formatted <br/>in order to be rendered in the output tab UI.       |
+
+## API behavior
+
+### Invalid item pushed to the dataset
+
+If invalid item is pushed to the dataset then API throws and error and does not push it into the dataset.
+
+If the user pushes a batch of multiple items and one of the items is invalid, the whole batch is refused with an error. 
+
+TODO: Later, we plan to extend the API with a multi-status response code enabling the API to accept some items and refuse the rest.
