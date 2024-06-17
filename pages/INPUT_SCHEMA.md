@@ -8,12 +8,12 @@ NOTE: Currently we only support input schema v1, this document describes how the
 
 
 A JSON object that defines structure of the input object accepted by the
-actor (see [Input and Output](../README.md#input-and-output) for details).
-The file is referenced from the main [actor file](ACTOR.md) using the `input` directive,
+Actor (see [Input and Output](../README.md#input-and-output) for details).
+The file is referenced from the main [Actor file](ACTOR.md) using the `input` directive,
 and it is typically stored in `.actor/input-schema.json`.
 
-**Backwards compatibility:** If the main actor file is missing,
-the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/development/input-schema) in actor's top-level directory (if present).
+**Backwards compatibility:** If the main Actor file is missing,
+the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/development/input-schema) in Actor's top-level directory (if present).
 
 Changes to the legacy `INPUT_SCHEMA.json`:
 - We removed `title`, it is largely useless.
@@ -69,17 +69,17 @@ restricted by the referenced schema to make sure that selected storage is compat
 NOTE from Mara: The idea was that we should have an input type for any system resource,
 so perhaps even for the user. But it's a super low priority.
 
-The use case for `actor` could be for example a testing actor with 3 inputs:
-- actor to be tested
+The use case for `actor` could be for example a testing Actor with 3 inputs:
+- Actor to be tested
 - test function containing for example Jest unit test over the output
-- input for the actor
+- input for the Actor
 
-and the testing actor would call the given actor with a given output and in the end execute tests if the results are correct.
+and the testing Actor would call the given Actor with a given output and in the end execute tests if the results are correct.
 Similarly you could have a `runId` on input but maybe there is no good usecase.
 
 
 TODO JC: Not sure how `actor` and `actorRun` are supposed to work? For example, if `actor`
-is a reference to other actor to be called, why not use webhook?
+is a reference to other Actor to be called, why not use webhook?
 And how about `actorRun` ???
 
 
@@ -100,7 +100,7 @@ For example:
     "type": "keyValueStore",
     "description": "Screenshots to be compressed",
     "schema": "./input_key_value_store_schema.json",
-    // Specify records groups from the schema that actor is interested in.
+    // Specify records groups from the schema that Actor is interested in.
     // Note that a recordGroup can be a single file too!
     "recordGroups": ["screenshots", "images"]
   }
@@ -111,11 +111,11 @@ datasets or key-value stores with matching schema. This feature will make it eas
 and pipe results from one to another.
 Note from Franta: It would be cool to have an option in the dropdown to create a
 new dataset/key-value store with the right schema,
-if it's the first time you're running some actor,
+if it's the first time you're running some Actor,
 and then in the next runs you could reuse it.
 
-Note that the actor's default dataset cannot be used as input, as it doesn't exist before the 
-actor is started. That's quite logical. But it also means that if the actor wants
+Note that the Actor's default dataset cannot be used as input, as it doesn't exist before the 
+Actor is started. That's quite logical. But it also means that if the Actor wants
 the default dataset to be set certain schema, this needs to be done in Output schema.
 
 ## TODOs

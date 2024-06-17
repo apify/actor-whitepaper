@@ -1,6 +1,6 @@
 # Dataset Schema File
 
-Dataset storage enables you to sequentially save and retrieve data. Each actor run is assigned its own dataset, which is created when the first item is stored to it. Datasets usually contain results from web scraping, crawling or data processing jobs. The data can be visualized as a table where each object is a row and its attributes are the columns. The data can be exported in JSON, CSV, XML, RSS, Excel or HTML formats.
+Dataset storage enables you to sequentially save and retrieve data. Each Actor run is assigned its own dataset, which is created when the first item is stored to it. Datasets usually contain results from web scraping, crawling or data processing jobs. The data can be visualized as a table where each object is a row and its attributes are the columns. The data can be exported in JSON, CSV, XML, RSS, Excel or HTML formats.
 
 Dataset can be assigned a schema which describes:
 
@@ -14,10 +14,10 @@ Dataset can be assigned a schema which describes:
 ## Basic properties
 
 - Storage is immutable. I.e., if you want to change the structure, then you need to create a new dataset.
-- Its schema is weak. I.e., you can always push their additional properties, but schema will ensure that all the listed once are there with a correct type. This is to make actors more compatible, i.e., some actor expects dataset to contain certain fields but does not care about the additional ones.
+- Its schema is weak. I.e., you can always push their additional properties, but schema will ensure that all the listed once are there with a correct type. This is to make actors more compatible, i.e., some Actor expects dataset to contain certain fields but does not care about the additional ones.
 
 There are two ways how to create a dataset with schema:
-1. User can start the actor that has dataset schema linked from its
+1. User can start the Actor that has dataset schema linked from its
 [OUTPUT_SCHEMA.json](./OUTPUT_SCHEMA.md)
 2. Or user can do it pragmatically via API (for empty dataset) by
     - either by passing the schema as payload to [create dataset](https://docs.apify.com/api#/reference/datasets/dataset-collection/create-dataset) API endpoint.
@@ -27,7 +27,7 @@ There are two ways how to create a dataset with schema:
     const dataset = await Apify.openDataset('my-new-dataset', { schema });
     ```
 
-By opening an **existing** dataset with `schema` parameter, the system ensures that you are opening a dataset that is compatible with the actor as otherwise, you get an error:
+By opening an **existing** dataset with `schema` parameter, the system ensures that you are opening a dataset that is compatible with the Actor as otherwise, you get an error:
 
 ```
 Uncaught Error: Dataset schema is not compatible with the provided schema

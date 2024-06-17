@@ -1,13 +1,13 @@
 {
     // The system will generate OUTPUT.json file and save it there right away, according to the schema below,
-    // so the consumers can read it right away after start of actor. This is done before writing INPUT.json
+    // so the consumers can read it right away after start of Actor. This is done before writing INPUT.json
     "searchResults": {
         "title": "Search results",
-        "description": "The main results of the actor, each record is one Google SERPs page.",
+        "description": "The main results of the Actor, each record is one Google SERPs page.",
         "type": "dataset", // or "default-dataset"  ?
-        // How to tell the system it should use default dataset, or named? Or what if actor caller
+        // How to tell the system it should use default dataset, or named? Or what if Actor caller
         // could say which dataset/kv-store should be used for the run (new or existing with name),
-        // and "dataset" here would just mean that dataset produced by the actor.
+        // and "dataset" here would just mean that dataset produced by the Actor.
         "default": true,
         "schemaFile": "./schemas/GOOGLE_SERPS_DATASET_SCHEMA.json"
     },

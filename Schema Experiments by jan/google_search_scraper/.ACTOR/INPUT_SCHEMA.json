@@ -10,7 +10,7 @@
     "countryCode": {
         "title": "Country",
         "type": "string",
-        "description": "Country determines the IP address of the proxy used for the query and the Google Search domain (e.g. <code>google.es</code> for Spain). The values must be lower-cased <a href=\"https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2\" target=\"_blank\">ISO 3166</a> country codes supported by Google. By default, the actor uses United States (<code>google.com</code>).<br><br>This setting only applies to <strong>Search queries</strong>, but not to <strong>URLs</strong>.",
+        "description": "Country determines the IP address of the proxy used for the query and the Google Search domain (e.g. <code>google.es</code> for Spain). The values must be lower-cased <a href=\"https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2\" target=\"_blank\">ISO 3166</a> country codes supported by Google. By default, the Actor uses United States (<code>google.com</code>).<br><br>This setting only applies to <strong>Search queries</strong>, but not to <strong>URLs</strong>.",
         "default": "",
         "editor": "select",
         "enum": [
@@ -693,7 +693,7 @@
     "maxPagesPerQuery": {
         "title": "Max pages per query",
         "type": "integer",
-        "description": "The maximum number of search result pages crawled for each search query or URL. Note that a value greater than one might significantly slow down the actor.",
+        "description": "The maximum number of search result pages crawled for each search query or URL. Note that a value greater than one might significantly slow down the Actor.",
         "default": 1,
         "minimum": 1
     },
