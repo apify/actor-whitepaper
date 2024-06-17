@@ -1,6 +1,6 @@
 {
     "formatVersion": 2,
-    // No username here, actor can be deployed to any account
+    // No username here, Actor can be deployed to any account
     "name": "google-search-scraper",
     // We're pushing towards having human readable names shown for actors everywhere,
     // so we should probably let users define it here, even if they run this code outside of Apify.

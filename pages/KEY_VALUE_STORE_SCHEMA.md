@@ -22,8 +22,8 @@ UI and API.
 }
 ```
 
-2. Some actor stores a specific record, and we want to ensure the content type to be HTML and embed it into the run view.
-A good example is [monitoring](https://apify.com/apify/monitoring#check-frequency) actor that generates HTML report that we would
+2. Some Actor stores a specific record, and we want to ensure the content type to be HTML and embed it into the run view.
+A good example is [monitoring](https://apify.com/apify/monitoring#check-frequency) Actor that generates HTML report that we would
 like to embed to run view for the user once the monitoring is finished.
 
 ```jsonc
@@ -85,11 +85,11 @@ https://api.apify.com/v2/key-value-stores/storeId/keys?prefix=post-images-
 ## TODO(@jancurn)
 - Finalize this text, keep `collections` for now
 - xx
-- What is kv-store schema is used by actor to define structure of key-value store it operates on,
+- What is kv-store schema is used by Actor to define structure of key-value store it operates on,
   but the developer defines a non-compatible record group for "INPUT" prefix?
   Maybe the default kv-stores should be created with a default record group to cover the "INPUT" prefixes
   and give them JSON types. Then, we'd never need to worry about existing records.
-  But it's a breaking change for some actors... maybe we can only do this for V2 actors with actor file...
+  But it's a breaking change for some actors... maybe we can only do this for V2 actors with Actor file...
   ... it's getting quite complicated.
 - What if there's a conflict between record groups?
   Shall we consider the first one matching as if the file is valid for schema?
