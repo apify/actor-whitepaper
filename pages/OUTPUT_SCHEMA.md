@@ -86,11 +86,11 @@ there's no point to include storage schema here again, as it's done elsewhere.
 
 ## Examples of ideal Actor run UI
 
-- For the majority of actors, we want to see the dataset with new records being added in realtime
+- For the majority of Actors, we want to see the dataset with new records being added in realtime
 - For [Google Spreadsheet Import](https://apify.com/lukaskrivka/google-sheets),
   we want to first display Live View for the user to set up OAUTH, and once 
    this is set up, then we want to display the log next time.
-- For technical actors, it might be a log
+- For technical Actors, it might be a log
 - For [HTML to PDF convertor](https://apify.com/jancurn/url-to-pdf) it's a single record from key-value store
 - For [Monitoring](https://apify.com/apify/monitoring-runner) it's log during the runtime and a single HTML record in an iframe in the end
 - For an Actor that has failed, it's the log

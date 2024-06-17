@@ -13,7 +13,7 @@ The file is referenced from the main [Actor file](ACTOR.md) using the `input` di
 and it is typically stored in `.actor/input-schema.json`.
 
 **Backwards compatibility:** If the main Actor file is missing,
-the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/actors/development/input-schema) in Actor's top-level directory (if present).
+the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/Actors/development/input-schema) in Actor's top-level directory (if present).
 
 Changes to the legacy `INPUT_SCHEMA.json`:
 - We removed `title`, it is largely useless.
@@ -61,7 +61,7 @@ We have currently five input types:
 
 Other types like `DefaultDataset` must start with upper case.
 
-And in order to make actors easy to pipeline, we should also add `actor`, `actorRun` types and also
+And in order to make Actors easy to pipeline, we should also add `actor`, `actorRun` types and also
 `dataset`, `keyValueStore` and `requestQueue` types, each optionally
 restricted by the referenced schema to make sure that selected storage is compatible.
 
@@ -107,7 +107,7 @@ For example:
 ```
 
 This example would be rendered in Input UI as a search/dropdown that would only list named
-datasets or key-value stores with matching schema. This feature will make it easy to integrate actors,
+datasets or key-value stores with matching schema. This feature will make it easy to integrate Actors,
 and pipe results from one to another.
 Note from Franta: It would be cool to have an option in the dropdown to create a
 new dataset/key-value store with the right schema,

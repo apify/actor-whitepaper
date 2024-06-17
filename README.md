@@ -24,9 +24,9 @@ in June 2024.
   * [Storage](#storage)
   * [Integrations](#integrations)
   * [Publishing & Monetization](#publishing--monetization)
-  * [What actors are not](#what-actors-are-not)
+  * [What Actors are not](#what-Actors-are-not)
 - [Philosophy](#philosophy)
-  * [UNIX programs vs. actors](#unix-programs-vs-actors)
+  * [UNIX programs vs. Actors](#unix-programs-vs-Actors)
   * [Design principles](#design-principles)
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "Actor" ?](#why-the-name-actor-)
@@ -60,10 +60,10 @@ in June 2024.
 - [Development](#development)
   * [Local development](#local-development)
   * [Deployment to Apify platform](#deployment-to-apify-platform)
-  * [Repackaging existing software as actors](#repackaging-existing-software-as-actors)
+  * [Repackaging existing software as Actors](#repackaging-existing-software-as-Actors)
   * [Continuous integration and delivery](#continuous-integration-and-delivery)
 - [Sharing & Community](#sharing--community)
-  * [Shared actors](#shared-actors)
+  * [Shared Actors](#shared-Actors)
 - [TODOs (@jancurn)](#todos-jancurn)
 
 <!-- tocstop -->
@@ -72,11 +72,11 @@ in June 2024.
 
 This document explains how to develop _actors_,
 a new kind of serverless microapps (or agents, programs, ...) for general-purpose language-agnostic computing and automation jobs.
-The main design goal for actors is to make it easy for developers build and ship reusable
+The main design goal for Actors is to make it easy for developers build and ship reusable
 cloud software tools, which are also easy to run
 and integrate by potentially not-too-technical users.
 
-The actors were first introduced by [Apify](https://apify.com/) in late 2017,
+The Actors were first introduced by [Apify](https://apify.com/) in late 2017,
 as a way to easily build, package, and ship web scraping and web automation tools to customers.
 Over the next years, Apify kept developing the concept and applied
 it successfully to thousands of real-world use cases in many business areas,
@@ -107,7 +107,7 @@ to complex operations such as crawling an entire website,
 or removing duplicates from a large dataset.
 Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
 
-Basically, actors are programs packaged as Docker images,
+Basically, Actors are programs packaged as Docker images,
 which accept a well-defined JSON input, perform
 an action, and optionally produce a well-defined JSON output.
 
@@ -126,11 +126,11 @@ and integrate the results of the Actor into their other workflows.
 Actors can easily call and interact with each other, enabling building more complex
 systems on top of simple ones.
 
-The actors can be published
+The Actors can be published
 on the [Apify platform](https://apify.com/store),
 which automatically generates a rich website with documentation
 and a practical user interface, in order to encourage people to try the Actor right away.
-The Apify platform takes care of securely hosting the actors' Docker containers
+The Apify platform takes care of securely hosting the Actors' Docker containers
 and scaling the computing, storage and network resources as needed,
 so neither Actor developers nor the users need to deal with the infrastructure.
 It just works.
@@ -138,12 +138,12 @@ It just works.
 The Apify platform provides an open API, cron-style scheduler, webhooks
 and [integrations](https://apify.com/integrations)
 to services such as Zapier or Make, which make it easy for users
-to integrate actors into their existing workflows. Additionally, the Actor developers
-can set a price tag for the usage of their actors, and thus make
-[passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-actors-b0392278d085/)
+to integrate Actors into their existing workflows. Additionally, the Actor developers
+can set a price tag for the usage of their Actors, and thus make
+[passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-Actors-b0392278d085/)
 to have an incentive to keep developing and improving the Actor for the users.
 
-Currently, actors can run locally or on the Apify platform. However, one of the goals of this open 
+Currently, Actors can run locally or on the Apify platform. However, one of the goals of this open 
 specification is to motivate creation of new runtime environments outside of Apify.
 
 The ultimate goal of the Actor programming model is to make it as simple as possible
@@ -152,8 +152,8 @@ for people to develop, run, and integrate software automation tools.
 
 ## Basic concepts
 
-This section describes core features of actors, what they are good for,
-and how actors differ from other serverless computing platforms. 
+This section describes core features of Actors, what they are good for,
+and how Actors differ from other serverless computing platforms. 
 
 ### Input
 
@@ -186,43 +186,43 @@ TODO
 The input schema is used by the system to:
 
 - Validate the passed input JSON object on Actor run,
-  so that actors don't need to perform input validation and error handling in their code.
-- Render user interface for actors to make it easy for users to run and test them manually
+  so that Actors don't need to perform input validation and error handling in their code.
+- Render user interface for Actors to make it easy for users to run and test them manually
 - Generate Actor API documentation and integration code examples on the web or in CLI, 
-  making actors easy for users to integrate the actors.
-- Simplify integration of actors into automation workflows such as Zapier or Make, by providing smart connectors
+  making Actors easy for users to integrate the Actors.
+- Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
   that smartly pre-populate and link Actor input properties
 
 **TODO: Show screenshots with manual input in Console, generated API docs, and code examples for that Actor **
 
 ### Run environment
 
-The actors run within an isolated Docker container with access to local file system and network,
+The Actors run within an isolated Docker container with access to local file system and network,
 and they can perform an arbitrary computing activity or call external APIs.
 The **standard output** of the Actor's program (stdout and stderr) is printed out and logged,
 which is useful for development and debugging.
 
-To inform the users about the progress, the actors might set a [**status message**](#actor-status),
+To inform the users about the progress, the Actors might set a [**status message**](#actor-status),
 which is then displayed in the user interface and also available via API.
 
-Running actors can also launch a [**live-view web server**](#live-view-web-server),
+Running Actors can also launch a [**live-view web server**](#live-view-web-server),
 which is assigned a unique local or public URL to receive HTTP requests. For example,
-this is useful for messaging and interaction between actors, for running request-response REST APIs, or 
+this is useful for messaging and interaction between Actors, for running request-response REST APIs, or 
 providing a full-featured website.
 
-The actors can store their working data or results into specialized **storages**
+The Actors can store their working data or results into specialized **storages**
 called [Key-value store](#key-value-store) and [Dataset](#dataset) storages,
-from which they can be easily exported using API or integrated in other actors.
+from which they can be easily exported using API or integrated in other Actors.
 
 ### Output
 
-While the input object provides a standardized way to invoke actors,
-the actors can also generate an **output object**, which is a standardized way to display, consume and integrate
-actors' results.
+While the input object provides a standardized way to invoke Actors,
+the Actors can also generate an **output object**, which is a standardized way to display, consume and integrate
+Actors' results.
 
 The Actor results are typically fully available only once the Actor run finishes,
 but the consumers of the results might want to access partial results during the run.
-Therefore, the actors don't generate the output object directly, but rather
+Therefore, the Actors don't generate the output object directly, but rather
 define an [Output schema file](./pages/OUTPUT_SCHEMA.md), which contains
 instruction how to generate the output object. The output object is stored
 to the Actor run object under the `output` property, and returned via API immediately after
@@ -244,28 +244,28 @@ which can look as follows:
 TODO
 ```
 
-The output schema and output object can then be used by callers of actors to figure where to find
-Actor results, how to display them to users, or simplify plugging of actors in workflow automation pipelines.
+The output schema and output object can then be used by callers of Actors to figure where to find
+Actor results, how to display them to users, or simplify plugging of Actors in workflow automation pipelines.
 
 ### Storage
 
-The Actor system provides two specialized storages that can be used by actors for storing files and results:
+The Actor system provides two specialized storages that can be used by Actors for storing files and results:
 **Key-value store** and **Dataset**, respectively. For each Actor run,
 the system automatically creates both these storages 
 in empty state, and makes them readily available for the Actor.
 
-Besides these default storages, actors are free to create new or
+Besides these default storages, Actors are free to create new or
 access other existing key-value stores and datasets, either by ID or a name that can be set to them.
 The storages are accessible through an API and SDK also externally, for example,
 to download results when the Actor finishes.
 
-Note that the actors are free to access any other external storage through any third-party API.
+Note that the Actors are free to access any other external storage through any third-party API.
 
 #### Key-value store
 
 The key-value store is a simple data storage that is used for saving and reading
 files or data records. The records are represented by a unique text key and the data associated with a MIME content type.
-Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of actors.
+Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of Actors.
 
 Each Actor run is associated with a default empty key-value store, which is created exclusively for the run.
 The [Actor input](#input) is stored as JSON file into the default key-value store under the key defined by
@@ -290,7 +290,7 @@ it but you cannot modify or remove existing records. Typically it is used to sto
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an Actor starts, by default it is associated with a newly-created empty default dataset.
-The Actor can create additional datasets or access existing datasets created by other actors,
+The Actor can create additional datasets or access existing datasets created by other Actors,
 and use those as needed.
 
 ### Integrations
@@ -302,14 +302,14 @@ Describe chaining, webhooks, running another, metamorph etc.
 
 ....Charging money - basic info?
 
-### What actors are not
+### What Actors are not
 
 Actors are best suited for batch operations that take an input, perform an isolated job for a user,
 and potentially produce some output.
-However, actors are currently not best suited for continuous computing or storage workloads, such
+However, Actors are currently not best suited for continuous computing or storage workloads, such
 as running a live website, API backend, or database.
 
-As actors are based on Docker, it takes certain amount of time to spin up the container
+As Actors are based on Docker, it takes certain amount of time to spin up the container
 and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
 even for highly-optimized Docker images. For long-running jobs, Actor execution might be migrated
 to another machine, making it unsuitable for running databases.
@@ -339,7 +339,7 @@ but also in combination and in scripts
 in order to perform much more complex tasks than an individual program ever could,
 which in turn can be packaged as new programs.
 
-The idea of actors is to bring benefits of UNIX-style programs
+The idea of Actors is to bring benefits of UNIX-style programs
 from a local computer into an environment of cloud
 where programs run on multiple computers
 communicating over a network that is subject to latency and partitioning,
@@ -348,12 +348,12 @@ and where programs are invoked via API calls rather than system calls.
 
 Each Actor should do just one thing and do it well.
 Actors can be used stand-alone, as well as combined or scripted into more complex
-systems, which in turn can become new actors.
+systems, which in turn can become new Actors.
 Actors provide a simple user interface and documentation to help users interact with them.
 
-### UNIX programs vs. actors
+### UNIX programs vs. Actors
 
-The following table shows equivalents of key concepts of UNIX programs and actors.
+The following table shows equivalents of key concepts of UNIX programs and Actors.
 
 | UNIX programs            | Actors                                                                                                                             |
 |--------------------------|------------------------------------------------------------------------------------------------------------------------------------|
@@ -368,19 +368,19 @@ The following table shows equivalents of key concepts of UNIX programs and actor
 ### Design principles
 
 - Each Actor should do just one thing, and do it well.
-- Optimize for the users of the actors, help them understand what the Actor does, easily run it, and integrate.
-- Keep the system as simple as possible, so that actors can be built and used by the top 90% of developers.
+- Optimize for the users of the Actors, help them understand what the Actor does, easily run it, and integrate.
+- Keep the system as simple as possible, so that Actors can be built and used by the top 90% of developers.
 
 ### Relation to the Actor model
 
-Note that actors are only loosely related to
+Note that Actors are only loosely related to
 the **Actor model** known from computer science.
 According to [Wikipedia](https://en.wikipedia.org/wiki/Actor_model):
 
 > The Actor model in computer science is a mathematical model of concurrent computation
 > that treats Actor as the universal primitive of concurrent computation.
 > In response to a message it receives, an Actor can: make local decisions,
-> create more actors, send more messages, and determine how to respond to the
+> create more Actors, send more messages, and determine how to respond to the
 > next message received. Actors may modify their own private state,
 > but can only affect each other indirectly through messaging
 > (removing the need for lock-based synchronization).
@@ -390,12 +390,12 @@ this similarity is rather coincidental.
 Our primary focus was always on practical software engineering utility, not an
 implementation of a formal mathematical model.
 
-For example, our actors
-do not provide any standard message passing mechanism. The actors might communicate together
+For example, our Actors
+do not provide any standard message passing mechanism. The Actors might communicate together
 directly via HTTP requests (see [Live view](#live-view)),
 manipulate each other's operation using the Apify platform API (e.g. abort another Actor),
 or affect each other by sharing some internal state or storage.
-The actors simply do not have any formal restrictions,
+The Actors simply do not have any formal restrictions,
 and they can access whichever external systems they want.
 
 
@@ -403,33 +403,33 @@ and they can access whichever external systems they want.
 
 In movies and theater, an _actor_ is someone who gets a script
 and plays a role according to that script.
-Our actors also perform an act on someone's behalf, using a provided script,
+Our Actors also perform an act on someone's behalf, using a provided script,
 and thus we considered the name "Actor" as a good description.
 Also, an "Actor" evokes an idea of a person, which is a helpful way to think of and talk about
-actors as independent entities.
+Actors as independent entities.
 
 Coincidentally, in the web automation world it became common to call libraries
 using names related to theater, such as Puppeteer or Playwright,
 confirming "Actor" was a good choice.
-Last but no least, our model of actors is similar
+Last but no least, our model of Actors is similar
 to the Actor model known from the computer science.
 
 
 ## Installation and setup
 
-Below are steps to start building actors in various languages and environments.
+Below are steps to start building Actors in various languages and environments.
 
 ### Apify platform
 
-You can develop and run actors in [Apify Console](https://console.apify.com/actors) without
-installing any software locally. Just create a free account, and start building actors
+You can develop and run Actors in [Apify Console](https://console.apify.com/Actors) without
+installing any software locally. Just create a free account, and start building Actors
 in an online IDE.
 
 ### Node.js
 
 The most complete implementation of Actor system is provided by the Apify SDK for Node.js,
 via the [apify](https://www.npmjs.com/package/apify) NPM package. The package contains everything
-that you need to start building actors locally.
+that you need to start building Actors locally.
 You can install it to your Node.js project by running: 
 
 ```bash
@@ -438,7 +438,7 @@ $ npm install apify
 
 ### Python
 
-To build actors in Python, simply install the Apify SDK for Python,
+To build Actors in Python, simply install the Apify SDK for Python,
 via the [apify](https://pypi.org/project/apify/) PyPi package
 into your project:
 
@@ -448,7 +448,7 @@ $ pip3 install apify
 
 ### Command-line interface (CLI)
 
-For local development of actors and management of the Apify platform,
+For local development of Actors and management of the Apify platform,
 it is useful to install Apify CLI.
 You just need to install [Node.js](https://nodejs.org/en/download/)
 and then the [apify-cli](https://www.npmjs.com/package/apify-cli) NPM package globally as follows:
@@ -466,7 +466,7 @@ $ apify login
 
 The Apify CLI provides a number of commands, which can aid with Actor development in two ways:
 
-1. When developing actors using **Node.js or Python**, the CLI makes it easy to run the actors locally 
+1. When developing Actors using **Node.js or Python**, the CLI makes it easy to run the Actors locally 
    or deploy them to the Apify platform, using commands such as `run` and `push`.
    For details, see [Local development](#local-development).
 2. You can use the `actor` command to implement the Actor logic in a **shell script**.
@@ -474,7 +474,7 @@ The Apify CLI provides a number of commands, which can aid with Actor developmen
    arbitrary language as an Actor. You simply write a shell script that transforms 
    the Actor input to command-line options needed by the existing software, launch it,
    and then store results as Actor output.
-   For details, see [Repackaging existing software as actors](#repackaging-existing-software-as-actors).
+   For details, see [Repackaging existing software as Actors](#repackaging-existing-software-as-Actors).
    
 To get a help for a specific command, run:
 
@@ -632,7 +632,7 @@ $ cat file.txt
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an Actor starts, by default it is associated with a newly-created empty default dataset.
-The Actor can create additional datasets or access existing datasets created by other actors,
+The Actor can create additional datasets or access existing datasets created by other Actors,
 and use those as needed.
 
 Note that Datasets can optionally be equipped with schema that ensures only certain kinds
@@ -764,7 +764,7 @@ exit(1);
 ### Environment variables
 
 Actors have access to standard process environment variables. 
-The Apify platform uses environment variables prefixed with `ACTOR_` to pass the actors information
+The Apify platform uses environment variables prefixed with `ACTOR_` to pass the Actors information
 about the execution context.
 
 | Environment variable               | Description                                                                                                                                                                                                                |
@@ -778,7 +778,7 @@ about the execution context.
 | `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
 | `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
 | `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                                                             |
-| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by actors to optimize their memory usage.                                                                       |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                                                                       |
 | `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                                                                                                                          |
 | `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                                                                          |
 | `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
@@ -786,9 +786,9 @@ about the execution context.
 | `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the Actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for more details.  |
 | `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor. |
 
-**WARNING/TODO**: This is not implemented yet. Currently, the actors use environment variables
+**WARNING/TODO**: This is not implemented yet. Currently, the Actors use environment variables
 prefixed by `APIFY_`. See the full list of environment variables
-in [Apify documentation](https://docs.apify.com/actors/development/environment-variables).
+in [Apify documentation](https://docs.apify.com/Actors/development/environment-variables).
 
 <!--
   TODO: Implement these env vars, we need to keep the old ones for backwards compatibility
@@ -802,7 +802,7 @@ These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file usi
 or manually in the user interface in Apify Console.
 
 The environment variables can be set as secure in order to protect sensitive data such as API keys or passwords.
-The value of a secure environment variable is encrypted and can only be retrieved by the actors during their run,
+The value of a secure environment variable is encrypted and can only be retrieved by the Actors during their run,
 but not outside the runs. Furthermore, values of secure environment variables are omitted from the log.
 
 #### Node.js
@@ -894,9 +894,9 @@ Currently, the system sends the following events:
 | `persistState` | `{ isMigrating: Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the Actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
 
 In the future, the event mechanism might be extended to custom events and messages enabling communication between
-actors.
+Actors.
 
-Under the hood, actors receive the system events by connecting to a web socket address specified
+Under the hood, Actors receive the system events by connecting to a web socket address specified
 by the `ACTOR_EVENTS_WEBSOCKET_URL` environment variable.
 The system sends messages in JSON format in the following structure:
 
@@ -964,7 +964,7 @@ $ ps -a
 
 ### Start another Actor
 
-Actor can start other actors, if they have a permission.
+Actor can start other Actors, if they have a permission.
 
 It can override the default dataset or key-value store,
 and e.g. forwarding the data to another named dataset,
@@ -1013,7 +1013,7 @@ $ apify actor call file:../some-dir someInput='xxx'
 
 #### Slack
 
-It will also be possible to run actors from Slack app.
+It will also be possible to run Actors from Slack app.
 The following command starts the Actor, and then prints the messages to a Slack channel.
 
 ```
@@ -1047,11 +1047,11 @@ posix_spawn();
 
 This is the most magical Actor operation, which replaces running Actor’s Docker image with another Actor,
 similar to UNIX `exec` command.
-It is used for building new actors on top of existing ones.
+It is used for building new Actors on top of existing ones.
 You simply define input schema and write README for a specific use case,
 and then delegate the work to another Actor.
 
-An Actor can metamorph only to actors that have compatible output schema as the main Actor,
+An Actor can metamorph only to Actors that have compatible output schema as the main Actor,
 in order to ensure logical and consistent outcomes for users. 
 If the output schema of the target Actor is not compatible, the system should throw an error.
 
@@ -1161,7 +1161,7 @@ $ kill <pid>
 ### Live view web server
 
 An Actor can launch an HTTP web server that is exposed to the outer world.
-This enables actors to provide a custom HTTP API to integrate with other systems,
+This enables Actors to provide a custom HTTP API to integrate with other systems,
 to provide a web application for human users, to show Actor run details, diagnostics, charts,
 or to run an arbitrary web app.
 
@@ -1202,7 +1202,7 @@ The only required files are [Actor file](#actor-file) and [Dockerfile](#dockerfi
 all other files are optional.
 
 The Actor definition files are used by the CLI (e.g. by `apify push` and `apify run` commands),
-as well as when building actors on the Apify platform.
+as well as when building Actors on the Apify platform.
 The motivation to place the files into a separate directory
 is to keep the source code repository tidy and to prevent interactions with other source files,
 in particular when creating an Actor from pre-existing software repositories.
@@ -1242,7 +1242,7 @@ and it should contain great explanation what the Actor does and how to use it.
 The README file is referenced from the [Actor file](./pages/ACTOR.md) using the `readme`
 directive, and typically stored at `.actor/README.md`.
 
-Good documentation makes good actors!
+Good documentation makes good Actors!
 [Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
 
 
@@ -1274,7 +1274,7 @@ for specific storages:
 These storage schemas are used to ensure that stored objects or files 
 fulfil specific criteria, their fields have certain types, etc.
 On Apify platform, the schemas can be applied to the storages directly,
-without actors.
+without Actors.
 
 Note that all the storage schemas are weak, in a sense that if the schema doesn't define a property,
 such property can be added to the storage and have an arbitrary type.
@@ -1294,19 +1294,19 @@ This behavior might be deprecated in the future.
 
 ## Development
 
-TODO (@jancurn): Write a high-level overview how to build new actors. Provide links 
+TODO (@jancurn): Write a high-level overview how to build new Actors. Provide links 
 how to build directly on Apify+screenshots.
 
 ### Local development
 
 **Status: Not implemented yet.**
 
-TODO: Explain basic workflow with "apify" - create, run, push etc. Move the full local support for actors
+TODO: Explain basic workflow with "apify" - create, run, push etc. Move the full local support for Actors
  to ideas (see https://github.com/apify/actor-specs/pull/7/files#r794681016 )
 
-Actors can be developed and run locally. To support running other actors, we need to define mapping
+Actors can be developed and run locally. To support running other Actors, we need to define mapping
 of `username/actor` to local or remote git/https directories with `.actor` sub-directory,
-which is then used to launch actors specified e.g. by `Apify.call('bob/some-actor')'`.
+which is then used to launch Actors specified e.g. by `Apify.call('bob/some-actor')'`.
 TODO: Maybe using environment variable with the mapping?
 
 `apify run` - starts the Actor using Dockerfile
@@ -1323,7 +1323,7 @@ New flags:
 - 
 ....
 
-### Repackaging existing software as actors
+### Repackaging existing software as Actors
 
 Just add `.actor` directory to an existing source code repo.
 Use `apify actor` command in the Dockerfile's `RUN` instruction
@@ -1344,7 +1344,7 @@ TODO: Ground rules:
 - User of Actor should never need to look into log to understand what happened, e.g. why the Actor failed.
   This info must be in the status message
 
-### Shared actors
+### Shared Actors
 
 For example:
 
