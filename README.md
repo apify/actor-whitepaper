@@ -7,8 +7,8 @@ for programs running in the cloud.**
 
 Written by [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), and the Apify team
-in January 2023.
+[Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team
+in June 2024.
 
 
 ## Contents
@@ -193,16 +193,16 @@ The input schema is used by the system to:
 - Simplify integration of actors into automation workflows such as Zapier or Make, by providing smart connectors
   that smartly pre-populate and link Actor input properties
 
-**TODO: Show screenshots with web interface, API docs, and code examples**
+**TODO: Show screenshots with manual input in Console, generated API docs, and code examples for that Actor **
 
 ### Run environment
 
 The actors run within an isolated Docker container with access to local file system and network,
 and they can perform an arbitrary computing activity or call external APIs.
 The **standard output** of the Actor's program (stdout and stderr) is printed out and logged,
-which is useful for debugging.
+which is useful for development and debugging.
 
-In order to inform the users about the progress, the actors might set a [**status message**](#actor-status),
+To inform the users about the progress, the actors might set a [**status message**](#actor-status),
 which is then displayed in the user interface and also available via API.
 
 Running actors can also launch a [**live-view web server**](#live-view-web-server),
