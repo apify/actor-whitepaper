@@ -1100,18 +1100,18 @@ await Actor.addWebhook({
 #### CLI
 
 ```bash
-apify actor add-webhook --actor-run-id=RUN_ID \\
+$ apify actor add-webhook --actor-run-id=RUN_ID \\
   --event-types=ACTOR.RUN.SUCCEEDED,ACTOR.RUN.FAILED \\
   --request-url=https://api.example.com \\
   --payload-template='{ "test": 123" }'
 
-apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
+$ apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
   --request-actor=apify/send-mail \\
   --memory=4096 --build=beta \\
   --payload-template=@template.json
 
 # Or maybe have a simpler API for self-actor?
-apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
+$ apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
 ```
 
 #### UNIX equivalent
