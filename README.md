@@ -878,7 +878,7 @@ Currently, the system sends the following events:
 | Event name     | Payload | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | -------------- | ------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `cpuInfo`      | `{ isCpuOverloaded: Boolean }` | The event is emitted approximately every second and it indicates whether the Actor is using the maximum of available CPU resources. If that’s the case, the Actor should not add more workload. For example, this event is used by the AutoscaledPool class.                                                                                                                                                                                                                                                                             | 
-| `migrating`    | N/A | Emitted when the Actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the Actor and abort the run, to speed up migration. For example, this is used by the RequestList class. See [Migration to another server](#migration-to-another-server)                                                                                                                                                                                                               |
+| `migrating`    | N/A | Emitted when the Actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the Actor and abort the run, to speed up migration. See [Migration to another server](#migration-to-another-server)                                                                                                                                                                                                               |
 | `aborting`     | N/A | When a user aborts an Actor run on the Apify platform, they can choose to abort gracefully to allow the Actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.                                                                                                                                                                                                                                    |
 | `persistState` | `{ isMigrating: Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the Actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
 
@@ -1180,10 +1180,8 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
 ### Migration to another server
 
 The Actors can be migrated from another host server from time to time, especially the long-running ones.
-When the migration is imminent, the system sends the Actor the `migrating` [system event](#system-events) containing 
-the UTC time of the expected migration stored in `migratingAt` property (TODO: where exactly?).
-
-The Actor can use this information to persist its state to storages.
+When the migration is imminent, the system sends the Actor the `migrating` [system event](#system-events)
+to inform the Actor, so that it can persist its state to storages.
 All executed writes to the default Actor [storage](#storage) are guaranteed to be persisted before the migration.
 After the migration, Actor is restarted on a new host. It can restore its customer state from the storages again.
 
@@ -1210,6 +1208,10 @@ This is the main definition file of the Actor in JSON format,
 and it always must be present at `.actor/actor.json`.
 This file contains references to all other necessary files.
 
+```json
+// TODO: Show small example
+```
+
 For details, see the [Actor file](./pages/ACTOR.md) page.
 
 
@@ -1221,10 +1223,14 @@ Actors are started by running their Docker image,
 both locally using the `apify run` command,
 as well as on the Apify platform.
 
+```dockerfile
+// TODO: Show small example
+```
+
 The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
 directive, and typically stored at `.actor/Dockerfile`.
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
-Learn more in the official [Dockerfile reference](https://docs.docker.com/engine/reference/builder/).
+Learn more about Dockerfiles in the official [Docker reference](https://docs.docker.com/engine/reference/builder/).
 
 
 ### README
