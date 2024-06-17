@@ -5,7 +5,7 @@
 
 Key-value store schema has two main use cases described in the following examples:
 
-1. Some actors such as [Instagram scraper](https://apify.com/jaroslavhejlek/instagram-scraper)
+1. Some Actors such as [Instagram scraper](https://apify.com/jaroslavhejlek/instagram-scraper)
 store multiple types of files into the key-value store. Let's say the scraper stores images and user pictures.
 So for each of these, we would define a prefix group and allow the user to list images from a single group in both the
 UI and API.
@@ -89,7 +89,7 @@ https://api.apify.com/v2/key-value-stores/storeId/keys?prefix=post-images-
   but the developer defines a non-compatible record group for "INPUT" prefix?
   Maybe the default kv-stores should be created with a default record group to cover the "INPUT" prefixes
   and give them JSON types. Then, we'd never need to worry about existing records.
-  But it's a breaking change for some actors... maybe we can only do this for V2 actors with Actor file...
+  But it's a breaking change for some Actors... maybe we can only do this for V2 Actors with Actor file...
   ... it's getting quite complicated.
 - What if there's a conflict between record groups?
   Shall we consider the first one matching as if the file is valid for schema?

@@ -14,7 +14,7 @@ Dataset can be assigned a schema which describes:
 ## Basic properties
 
 - Storage is immutable. I.e., if you want to change the structure, then you need to create a new dataset.
-- Its schema is weak. I.e., you can always push their additional properties, but schema will ensure that all the listed once are there with a correct type. This is to make actors more compatible, i.e., some Actor expects dataset to contain certain fields but does not care about the additional ones.
+- Its schema is weak. I.e., you can always push their additional properties, but schema will ensure that all the listed once are there with a correct type. This is to make Actors more compatible, i.e., some Actor expects dataset to contain certain fields but does not care about the additional ones.
 
 There are two ways how to create a dataset with schema:
 1. User can start the Actor that has dataset schema linked from its

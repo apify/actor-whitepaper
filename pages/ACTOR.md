@@ -35,7 +35,7 @@ Here are the notes comparing the format to the previous version:
 
 - We removed the `template` property as it's not needed for anything, it only stored the original template
 - There's a new `title` field for a human-readable name of the Actor.
-  We're moving towards having human-readable names shown for actors everywhere,
+  We're moving towards having human-readable names shown for Actors everywhere,
   so it makes sense to define `title` directly in the source code.
 - Similarly, we added `description` for the short description of what the Actor does.
 - When calling `actor push` and the `title` or `description` are already set
@@ -44,7 +44,7 @@ Here are the notes comparing the format to the previous version:
   unless `apify push` is called with options `--force-title` or `--force-description`.
 - The `name` doesn't contain username, so that the Actor can be easily deployed
   to any user account. This is useful for tutorials and examples, as well as
-  pull requests done externally to create actors from existing source code files
+  pull requests done externally to create Actors from existing source code files
   owned by external developers
   (the developer might not have Apify account yet, and we might want to show them deployment
   to some testing account).
