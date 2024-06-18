@@ -487,20 +487,20 @@ $ actor help <command>
 
 The commands described in this section are expected to be called from within a context
 of a running Actor, both in local environment or on the Apify platform.
-By default, the identifier of the current Actor run is taken from `ACTOR_RUN_ID`
-environment variable, but it can be overridden.
-For example, in Node.js you can initialize the `Actor` class using another `actorRunId`,
-or in the `actor` CLI command you can pass the `--actor-run-id` flag.
+
+The Actor runtime system passes the context via [environment variables](#environment-variables),
+such as `APIFY_TOKEN` or `ACTOR_RUN_ID`, which is used by the SDK or CLI to interact with the runtime.
 
 ### Actor initialization
 
-First, the Actor should be initialized. During initialization, it prepares to receive events from Apify platform, determines machine and storage configuration and optionally purges previous state from local storage. It will also create a default instance of the Actor class.
-
-It is not required to perform the initialization explicitly, because the Actor will initialize on execution of any Actor method, but we strongly recommend it to prevent race conditions.
+The SDKs provide convenience methods to initialize the Actor and handle its result.  
+During initialization, it loads environment variables, checks configuration, prepares to receive system events,
+and optionally purges previous state from local storage.
 
 #### Node.js
  
-In Node.js the Actor is initialized by calling the `init()` method. It should be paired with an `exit()` method which terminates the Actor. Use of `exit()` is not required, but recommended. For more information go to [Exit Actor](#exit-actor).
+In Node.js the Actor is initialized by calling the `init()` method. It should be paired with an `exit()` method
+which terminates the Actor. Use of `exit()` is not required, but recommended. For more information go to [Exit Actor](#exit-actor).
 
 ```js
 import { Actor } from 'apify';
@@ -529,6 +529,16 @@ Actor.main(async () => {
 
 TODO: Add Python examples
 
+#### CLI
+
+No initialization needed, the process exit terminates the Actor, with the process status code
+determining if it succeeded or failed.
+
+```bash
+$ actor set-status-message "My work is done, friend"
+$ exit 0
+```
+
 #### UNIX equivalent
 
 ```c
@@ -541,7 +551,7 @@ int main (int argc, char *argv[]) {
 
 Get access to the Actor input object passed by the user.
 It is parsed from a JSON file, which is stored by the system in the Actor's default key-value store,
-Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_INPUT_KEY` environment variable.
+Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_INPUT_KEY` [environment variable](#environment-variables).
 
 The input is an object with properties.
 If the Actor defines the input schema, the input object is guaranteed to conform to it.
@@ -666,18 +676,18 @@ await dataset.push_data({ some_result=123 })
 ```bash
 # Push data to default dataset, in JSON format
 $ echo '{ "someResult": 123 }' | actor push-data --json
-$ apify actor push-data --json='{ "someResult": 123 }'
-$ apify actor push-data --json=@result.json
+$ actor push-data --json='{ "someResult": 123 }'
+$ actor push-data --json=@result.json
 
 # Push data to default dataset, in text format
-$ echo "someResult=123" | apify actor push-data
-$ apify actor push-data someResult=123
+$ echo "someResult=123" | actor push-data
+$ actor push-data someResult=123
 
 # Push to a specific dataset in the cloud
-$ apify actor push-data --dataset=bob/election-data someResult=123
+$ actor push-data --dataset=bob/election-data someResult=123
 
 # Push to dataset on local system
-$ apify actor push-data --dataset=./my_dataset someResult=123
+$ actor push-data --dataset=./my_dataset someResult=123
 ```
 
 #### UNIX equivalent
@@ -746,11 +756,11 @@ await Actor.fail('Could not finish the crawl, try increasing memory');
 
 ```bash
 # Actor will finish in 'SUCCEEDED' state
-$ apify actor exit
-$ apify actor exit --message "Email sent"
+$ actor exit
+$ actor exit --message "Email sent"
 
 # Actor will finish in 'FAILED' state
-$ apify actor exit --code=1 --message "Couldn't fetch the URL"
+$ actor exit --code=1 --message "Couldn't fetch the URL"
 ```
 
 #### UNIX equivalent
@@ -863,8 +873,8 @@ await actor.set_status_message('Crawled 45 of 100 pages')
 #### CLI
 
 ```bash
-$ apify actor set-status-message "Crawled 45 of 100 pages"
-$ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
+$ actor set-status-message "Crawled 45 of 100 pages"
+$ actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 ```
 
 
@@ -987,18 +997,18 @@ const run2 = await Actor.call(
 ```bash
 # On stdout, the commands emit Actor run object (in text or JSON format),
 # we shouldn't wait for finish, for that it should be e.g. "execute"
-$ apify actor call apify/google-search-scraper queries='test\ntest2' \
+$ apify call apify/google-search-scraper queries='test\ntest2' \
   countryCode='US'
-$ apify actor call --json apify/google-search-scraper '{ "queries": }'
-$ apify actor call --input=@data.json --json apify/google-search-scraper
-$ apify actor call --memory=1024 --build=beta apify/google-search-scraper
-$ apify actor call --output-record-key=SCREENSHOT apify/google-search-scraper
+$ apify call --json apify/google-search-scraper '{ "queries": }'
+$ apify call --input=@data.json --json apify/google-search-scraper
+$ apify call --memory=1024 --build=beta apify/google-search-scraper
+$ apify call --output-record-key=SCREENSHOT apify/google-search-scraper
 
 # Pass input from stdin
-$ cat input.json | apify actor call apify/google-search-scraper --json
+$ cat input.json | actor call apify/google-search-scraper --json
 
 # Call local actor during development
-$ apify actor call file:../some-dir someInput='xxx'
+$ apify call file:../some-dir someInput='xxx'
 ```
 
 #### Slack
@@ -1065,8 +1075,8 @@ await Actor.metamorph(
 #### CLI
 
 ```bash
-$ apify actor metamorph bob/web-scraper startUrls=http://example.com
-$ apify actor metamorph --input=@input.json --json --memory=4096 \
+$ actor metamorph bob/web-scraper startUrls=http://example.com
+$ actor metamorph --input=@input.json --json --memory=4096 \
   bob/web-scraper
 ```
 
@@ -1100,18 +1110,18 @@ await Actor.addWebhook({
 #### CLI
 
 ```bash
-$ apify actor add-webhook --actor-run-id=RUN_ID \\
+$ actor add-webhook \\
   --event-types=ACTOR.RUN.SUCCEEDED,ACTOR.RUN.FAILED \\
   --request-url=https://api.example.com \\
   --payload-template='{ "test": 123" }'
 
-$ apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
+$ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
   --request-actor=apify/send-mail \\
   --memory=4096 --build=beta \\
   --payload-template=@template.json
 
 # Or maybe have a simpler API for self-actor?
-$ apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
+$ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
 ```
 
 #### UNIX equivalent
@@ -1138,7 +1148,7 @@ await Actor.abort({ statusMessage: 'Job was done,', actorRunId: 'RUN_ID' });
 #### CLI
 
 ```bash
-$ apify actor abort --actor-run-id=[RUN_ID] --token=123 
+$ actor abort --token=123 
 ```
 
 
