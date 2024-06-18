@@ -493,8 +493,8 @@ such as `APIFY_TOKEN` or `ACTOR_RUN_ID`, which is used by the SDK or CLI to inte
 
 ### Initialization
 
-The SDKs provide convenience methods to initialize the Actor and handle its result.  
-During initialization, it loads environment variables, checks configuration, prepares to receive system events,
+The SDKs provide convenience methods to initialize the Actor and handle its result.
+During initialization, the SDK loads environment variables, checks configuration, prepares to receive system events,
 and optionally purges previous state from local storage.
 
 #### Node.js
