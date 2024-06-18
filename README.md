@@ -1136,28 +1136,29 @@ $ command1 || command2  # ("orf" symbol)
 
 ### Abort another Actor
 
-Abort itself or another running Actor on the Apify platform,
-changing its [status](#actor-status) to `ABORTED`.
+Abort itself or another Actor running on the Apify platform.
+Aborting an Actor changes its [status](#actor-status) to `ABORTED`.
 
 #### Node.js
 
 ```js
-await Actor.abort({ statusMessage: 'Job was done,', actorRunId: 'RUN_ID' });
+await Actor.abort({ statusMessage: 'Your job is done,', actorRunId: 'RUN_ID' });
 ```
 
 #### CLI
 
 ```bash
-$ actor abort --token=123 
+$ actor abort --run-id RUN_ID 
 ```
-
 
 #### UNIX equivalent
 
 ```bash
 # Terminate a program
-$ kill <pid>
+$ kill <PID>
 ```
+
+<!-- TODO: Include Actor.boot() or not? -->
 
 ### Live view web server
 
@@ -1185,6 +1186,10 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
   console.log(`Example live view web server running at ${process.env.ACTOR_WEB_SERVER_URL}`)
 })
 ```
+
+### Standby Mode
+
+# TODO: Write this
 
 
 ### Migration to another server
