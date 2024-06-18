@@ -483,7 +483,7 @@ $ apify help <command>
 $ actor help <command>
 ```
 
-## Programming interface
+## Actor programming interface
 
 The commands described in this section are expected to be called from within a context
 of a running Actor, both in local environment or on the Apify platform.
@@ -491,7 +491,7 @@ of a running Actor, both in local environment or on the Apify platform.
 The Actor runtime system passes the context via [environment variables](#environment-variables),
 such as `APIFY_TOKEN` or `ACTOR_RUN_ID`, which is used by the SDK or CLI to interact with the runtime.
 
-### Actor initialization
+### Initialization
 
 The SDKs provide convenience methods to initialize the Actor and handle its result.  
 During initialization, it loads environment variables, checks configuration, prepares to receive system events,
