@@ -1,6 +1,6 @@
-# The Actor Programming Model Whitepaper [DRAFT]
+# The Web Actor Programming Model Whitepaper [DRAFT]
 
-**The whitepaper describes new concept for building serverless microapps called _actors_,
+**The whitepaper describes a new concept for building serverless microapps called _Actors_,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
@@ -71,7 +71,7 @@ in June 2024.
 ## Introduction
 
 This document explains how to develop _actors_,
-a new kind of serverless microapps (or agents, programs, ...) for general-purpose language-agnostic computing and automation jobs.
+a new kind of serverless microapps (agents, programs, ...) for general-purpose language-agnostic computing and automation jobs.
 The main design goal for Actors is to make it easy for developers build and ship reusable
 cloud software tools, which are also easy to run
 and integrate by potentially not-too-technical users.
@@ -94,8 +94,9 @@ Currently, the most complete implementation of Actor model is provided
 by the Apify platform, with SDKs for 
 [Node.js](https://sdk.apify.com/) and
 [Python](https://pypi.org/project/apify/),
-and a [command-line interface](https://docs.apify.com/cli).
-Beware that these implementations do not support all features yet. This is work in progress. 
+and a [command-line interface (CLI)](https://docs.apify.com/cli).
+Beware that the frameworks might not yet implement all the features of Actor programming model.
+This is work in progress. 
 
 
 ### Overview
