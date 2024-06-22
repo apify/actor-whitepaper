@@ -1383,7 +1383,10 @@ To create a SaaS product, one usually needs to:
 
 Packaging software as an Actor and deploying it to a cloud platform such as Apify can take away steps 3 to 8,
 making it easier and faster to lunch new SaaS products and earn income on them.
-You can 
+
+The platforms can offer various payment models, such as regular fixed rental fee, payment per result,
+or variable payment per arbitrary item. The software can be closed-source or open-source. 
+This is the choice of the developer.
 
 Actors provide a new way for software developers to monetize their skills,
 brining creator economy model to SaaS products.
