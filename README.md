@@ -16,56 +16,57 @@ in June 2024.
 
 <!-- toc -->
 
-- [Introduction](#introduction)
-  * [Overview](#overview)
-- [Basic concepts](#basic-concepts)
-  * [Input](#input)
-  * [Run environment](#run-environment)
-  * [Output](#output)
-  * [Storage](#storage)
-  * [Integrations](#integrations)
-  * [Publishing & Monetization](#publishing--monetization)
-  * [What Actors are not](#what-Actors-are-not)
-- [Philosophy](#philosophy)
-  * [UNIX programs vs. Actors](#unix-programs-vs-Actors)
-  * [Design principles](#design-principles)
-  * [Relation to the Actor model](#relation-to-the-actor-model)
-  * [Why the name "Actor" ?](#why-the-name-actor-)
-- [Installation and setup](#installation-and-setup)
-  * [Apify platform](#apify-platform)
-  * [Node.js](#nodejs)
-  * [Python](#python)
-  * [Command-line interface (CLI)](#command-line-interface-cli)
-- [Programming interface](#programming-interface)
-  * [Actor initialization](#actor-initialization)
-  * [Get input](#get-input)
-  * [Key-value store access](#key-value-store-access)
-  * [Push results to dataset](#push-results-to-dataset)
-  * [Exit Actor](#exit-actor)
-  * [Environment variables](#environment-variables)
-  * [Actor status](#actor-status)
-  * [System events](#system-events)
-  * [Get memory information](#get-memory-information)
-  * [Start another Actor](#start-another-actor)
-  * [Metamorph 🪄](#metamorph-%F0%9F%AA%84)
-  * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
-  * [Abort another Actor](#abort-another-actor)
-  * [Live view web server](#live-view-web-server)
-  * [Migration to another server](#migration-to-another-server)
-- [Actor definition files](#actor-definition-files)
-  * [Actor file](#actor-file)
-  * [Dockerfile](#dockerfile)
-  * [README](#readme)
-  * [Schema files](#schema-files)
-  * [Backward compatibility](#backward-compatibility)
-- [Development](#development)
-  * [Local development](#local-development)
-  * [Deployment to Apify platform](#deployment-to-apify-platform)
-  * [Repackaging existing software as Actors](#repackaging-existing-software-as-Actors)
-  * [Continuous integration and delivery](#continuous-integration-and-delivery)
-- [Sharing & Community](#sharing--community)
-  * [Shared Actors](#shared-Actors)
-- [TODOs (@jancurn)](#todos-jancurn)
+  * [Introduction](#introduction)
+    + [Overview](#overview)
+  * [Basic concepts](#basic-concepts)
+    + [Input](#input)
+    + [Run environment](#run-environment)
+    + [Output](#output)
+    + [Storage](#storage)
+    + [Integrations](#integrations)
+    + [Publishing and monetization](#publishing-and-monetization)
+    + [What Actors are not](#what-actors-are-not)
+  * [Philosophy](#philosophy)
+    + [UNIX programs vs. Actors](#unix-programs-vs-actors)
+    + [Design principles](#design-principles)
+    + [Relation to the Actor model](#relation-to-the-actor-model)
+    + [Why the name "Actor"](#why-the-name-actor)
+  * [Installation and setup](#installation-and-setup)
+    + [Apify platform](#apify-platform)
+    + [Node.js](#nodejs)
+    + [Python](#python)
+    + [Command-line interface (CLI)](#command-line-interface-cli)
+  * [Actor programming interface](#actor-programming-interface)
+    + [Initialization](#initialization)
+    + [Get input](#get-input)
+    + [Key-value store access](#key-value-store-access)
+    + [Push results to dataset](#push-results-to-dataset)
+    + [Exit Actor](#exit-actor)
+    + [Environment variables](#environment-variables)
+    + [Actor status](#actor-status)
+    + [System events](#system-events)
+    + [Get memory information](#get-memory-information)
+    + [Start another Actor](#start-another-actor)
+    + [Metamorph 🪄](#metamorph-%F0%9F%AA%84)
+    + [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
+    + [Abort another Actor](#abort-another-actor)
+    + [Live view web server](#live-view-web-server)
+    + [Standby Mode](#standby-mode)
+- [TODO: Write this](#todo-write-this)
+    + [Migration to another server](#migration-to-another-server)
+  * [Actor definition files](#actor-definition-files)
+    + [Actor file](#actor-file)
+    + [Dockerfile](#dockerfile)
+    + [README](#readme)
+    + [Schema files](#schema-files)
+    + [Backward compatibility](#backward-compatibility)
+  * [Development](#development)
+    + [Local development](#local-development)
+    + [Deployment to Apify platform](#deployment-to-apify-platform)
+    + [Continuous integration and delivery](#continuous-integration-and-delivery)
+  * ["Actorizing" existing code](#actorizing-existing-code)
+  * [Sharing and publishing](#sharing-and-publishing)
+  * [Monetization](#monetization)
 
 <!-- tocstop -->
 
@@ -300,7 +301,7 @@ and use those as needed.
 Describe chaining, webhooks, running another, metamorph etc.
 
 
-### Publishing & Monetization
+### Publishing and monetization
 
 ....Charging money - basic info?
 
@@ -394,28 +395,22 @@ implementation of a formal mathematical model.
 
 For example, our Actors
 do not provide any standard message passing mechanism. The Actors might communicate together
-directly via HTTP requests (see [Live view](#live-view)),
+directly via HTTP requests (see [**live-view web server**](#live-view-web-server)),
 manipulate each other's operation using the Apify platform API (e.g. abort another Actor),
 or affect each other by sharing some internal state or storage.
 The Actors simply do not have any formal restrictions,
 and they can access whichever external systems they want.
 
 
-### Why the name "Actor" ?
+### Why the name "Actor"
 
 In movies and theater, an _actor_ is someone who gets a script
 and plays a role according to that script.
-Our Actors also perform an act on someone's behalf, using a provided script,
-and thus we considered the name "Actor" as a good description.
-Also, an "Actor" evokes an idea of a person, which is a helpful way to think of and talk about
-Actors as independent entities.
+Our Actors also perform an act on someone's behalf, using a provided script.
+They work well with Puppeteers and Playwrights.
+And they are related to the Actor model known from the computer science.
 
-Coincidentally, in the web automation world it became common to call libraries
-using names related to theater, such as Puppeteer or Playwright,
-confirming "Actor" was a good choice.
-Last but no least, our model of Actors is similar
-to the Actor model known from the computer science.
-
+To make it clear Actors are not people, the letter "A" is capitalized.
 
 ## Installation and setup
 
@@ -476,7 +471,7 @@ The Apify CLI provides two commands: `apify` and `actor`.
 push deployment of an Actor to cloud, or access storages. For details, see [Local development](#local-development).
 
 `actor` command is to be used from within an Actor in the runtime, to implement the Actors functionality in a shell script.
-   For details, see [Actor-izing existing software](#actorizing-existing-software).
+   For details, see [Actorizing existing software](#actorizing-existing-software).
    
 To get a help for a specific command, run:
 
