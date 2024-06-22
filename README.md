@@ -10,6 +10,7 @@ Written by [Jan Čurn](https://apify.com/jancurn),
 [Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team
 in June 2024.
 
+**Version 0.9**
 
 ## Contents
 
@@ -1341,29 +1342,51 @@ TODO: Show code example
 TODO: Mention CI/CD, e.g. how to integrate with GiHub etc.
 
 
-## Actor-izing existing software
+## "Actorizing" existing code
 
-You can repackage an existing software repository
-as an Actor by creating the `.actor/` directory with the [Actor definition files](#actor-definition-files)
-to describe how to run the software and what is its input and output.
+You can repackage many existing software repositories
+as an Actor by creating the `.actor/` directory with the [Actor definition files](#actor-definition-files),
+and providing a Dockerfile with instruction how to run the software.
 
-With the `actor` CLI command, it's easy to "Actorize" software tools written in any programming language.
-Only provide a shell script that transforms the Actor input to command-line options needed by the software, launch it,
-and then transform and store results as Actor output.
-
-**PROPOSAL:**
-
-You can automatically generate the `.actor/` definition files using the CLI:
+The `actor` CLI command can be used from the Dockerfile's `RUN` script transform the Actor JSON input
+into the configuration of the software, usually passed via command-line arguments,
+and then store the Actor output results. For example:
 
 ```bash
-$ actor ize
+TODO: Code examples of Dockerfile with "actor" command
+````
+
+The `actor init` CLI command can automatically
+generate the `.actor` directory and configuration files:
+
+```bash
+$ actor init TODO: or `apify actorize`?
 ```
 
-The command works on the best-effort basis to wrap the code as an Actor,
-depending on its programming language, libraries, and setup.
+The command works on the best-effort basis, 
+creating necessary configuration files for the specific programming language and libraries.
 
+## Sharing and publishing
 
-## Sharing & Community
+...
+
+## Monetization
+
+To create a SaaS product, one usually needs to:
+
+1. Develop the core service or product
+2. Write down what it does and how to use it
+3. Setup infrastructure where it runs and scales
+4. Setup billing and payments
+5. Pick and buy a domain name
+6. Create a website
+7. Marketing (content, ads, SEO, ...)
+8. Sales
+9. Customer support
+
+Packaging software as an Actor and deploying it to a cloud platform such as Apify can take away 3 to 8,
+making it easier and faster to lunch new SaaS products and earn income on them.
+You can 
 
 TODO: Motivation - why building on Apify is easier than building your own SaaS
 
