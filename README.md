@@ -1381,7 +1381,7 @@ To create a SaaS product, one usually needs to:
 8. Sale the product (demos, procurement, )
 9. Customer support
 
-Packaging software as an Actor and deploying it to a cloud platform such as Apify can take away 3 to 8,
+Packaging software as an Actor and deploying it to a cloud platform such as Apify can take away steps 3 to 8,
 making it easier and faster to lunch new SaaS products and earn income on them.
 You can 
 
