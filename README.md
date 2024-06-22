@@ -879,6 +879,8 @@ $ actor set-status-message "Crawled 45 of 100 pages"
 $ actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 ```
 
+Convention: The end user of an Actor should never need to look into log to understand what happened,
+e.g. why the Actor failed. All necessary information must be set by the Actor in the status message.
 
 ### System events
 
@@ -1374,24 +1376,20 @@ creating necessary configuration files for the specific programming language and
 
 To create a SaaS product, one usually needs to:
 
-1. Develop the core service or product
-2. Write down what it does and how to use it
+1. Develop the product
+2. Write what it does and how to use it
 3. Setup infrastructure where it runs and scales
-4. Setup billing and payments
-5. Pick and buy a domain name
+4. Handle billing, taxes, and payments
+5. Find and buy a domain name
 6. Create a website
-7. Marketing (content, ads, SEO, ...)
-8. Sales
+7. Market the product (content, ads, SEO, ...)
+8. Sale the product (demos, procurement, )
 9. Customer support
 
 Packaging software as an Actor and deploying it to a cloud platform such as Apify can take away 3 to 8,
 making it easier and faster to lunch new SaaS products and earn income on them.
 You can 
 
-TODO: Motivation - why building on Apify is easier than building your own SaaS
+Actors provide a new way for software developers to monetize their skills,
+brining creator economy model to SaaS products.
 
-TODO: Ground rules:
-- User of Actor should never need to look into log to understand what happened, e.g. why the Actor failed.
-  This info must be in the status message
-
-Fees
