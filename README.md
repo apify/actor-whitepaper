@@ -1,77 +1,79 @@
-# The Actor Programming Model Whitepaper [DRAFT]
+# The Web Actor Programming Model Whitepaper [DRAFT]
 
-**The whitepaper describes new concept for building serverless microapps called _actors_,
+**The whitepaper describes a new concept for building serverless microapps called _Actors_,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
 Written by [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), and the Apify team
-in January 2023.
+[Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team
+in June 2024.
 
+**Version 0.9**
 
 ## Contents
 
 <!-- toc -->
 
-- [Introduction](#introduction)
-  * [Overview](#overview)
-- [Basic concepts](#basic-concepts)
-  * [Input](#input)
-  * [Run environment](#run-environment)
-  * [Output](#output)
-  * [Storage](#storage)
-  * [Integrations](#integrations)
-  * [Publishing & Monetization](#publishing--monetization)
-  * [What Actors are not](#what-Actors-are-not)
-- [Philosophy](#philosophy)
-  * [UNIX programs vs. Actors](#unix-programs-vs-Actors)
-  * [Design principles](#design-principles)
-  * [Relation to the Actor model](#relation-to-the-actor-model)
-  * [Why the name "Actor" ?](#why-the-name-actor-)
-- [Installation and setup](#installation-and-setup)
-  * [Apify platform](#apify-platform)
-  * [Node.js](#nodejs)
-  * [Python](#python)
-  * [Command-line interface (CLI)](#command-line-interface-cli)
-- [Programming interface](#programming-interface)
-  * [Actor initialization](#actor-initialization)
-  * [Get input](#get-input)
-  * [Key-value store access](#key-value-store-access)
-  * [Push results to dataset](#push-results-to-dataset)
-  * [Exit Actor](#exit-actor)
-  * [Environment variables](#environment-variables)
-  * [Actor status](#actor-status)
-  * [System events](#system-events)
-  * [Get memory information](#get-memory-information)
-  * [Start another Actor](#start-another-actor)
-  * [Metamorph 🪄](#metamorph-%F0%9F%AA%84)
-  * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
-  * [Abort another Actor](#abort-another-actor)
-  * [Live view web server](#live-view-web-server)
-  * [Migration to another server](#migration-to-another-server)
-- [Actor definition files](#actor-definition-files)
-  * [Actor file](#actor-file)
-  * [Dockerfile](#dockerfile)
-  * [README](#readme)
-  * [Schema files](#schema-files)
-  * [Backward compatibility](#backward-compatibility)
-- [Development](#development)
-  * [Local development](#local-development)
-  * [Deployment to Apify platform](#deployment-to-apify-platform)
-  * [Repackaging existing software as Actors](#repackaging-existing-software-as-Actors)
-  * [Continuous integration and delivery](#continuous-integration-and-delivery)
-- [Sharing & Community](#sharing--community)
-  * [Shared Actors](#shared-Actors)
-- [TODOs (@jancurn)](#todos-jancurn)
+  * [Introduction](#introduction)
+    + [Overview](#overview)
+  * [Basic concepts](#basic-concepts)
+    + [Input](#input)
+    + [Run environment](#run-environment)
+    + [Output](#output)
+    + [Storage](#storage)
+    + [Integrations](#integrations)
+    + [Publishing and monetization](#publishing-and-monetization)
+    + [What Actors are not](#what-actors-are-not)
+  * [Philosophy](#philosophy)
+    + [UNIX programs vs. Actors](#unix-programs-vs-actors)
+    + [Design principles](#design-principles)
+    + [Relation to the Actor model](#relation-to-the-actor-model)
+    + [Why the name "Actor"](#why-the-name-actor)
+  * [Installation and setup](#installation-and-setup)
+    + [Apify platform](#apify-platform)
+    + [Node.js](#nodejs)
+    + [Python](#python)
+    + [Command-line interface (CLI)](#command-line-interface-cli)
+  * [Actor programming interface](#actor-programming-interface)
+    + [Initialization](#initialization)
+    + [Get input](#get-input)
+    + [Key-value store access](#key-value-store-access)
+    + [Push results to dataset](#push-results-to-dataset)
+    + [Exit Actor](#exit-actor)
+    + [Environment variables](#environment-variables)
+    + [Actor status](#actor-status)
+    + [System events](#system-events)
+    + [Get memory information](#get-memory-information)
+    + [Start another Actor](#start-another-actor)
+    + [Metamorph 🪄](#metamorph-%F0%9F%AA%84)
+    + [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
+    + [Abort another Actor](#abort-another-actor)
+    + [Live view web server](#live-view-web-server)
+    + [Standby Mode](#standby-mode)
+- [TODO: Write this](#todo-write-this)
+    + [Migration to another server](#migration-to-another-server)
+  * [Actor definition files](#actor-definition-files)
+    + [Actor file](#actor-file)
+    + [Dockerfile](#dockerfile)
+    + [README](#readme)
+    + [Schema files](#schema-files)
+    + [Backward compatibility](#backward-compatibility)
+  * [Development](#development)
+    + [Local development](#local-development)
+    + [Deployment to Apify platform](#deployment-to-apify-platform)
+    + [Continuous integration and delivery](#continuous-integration-and-delivery)
+  * ["Actorizing" existing code](#actorizing-existing-code)
+  * [Sharing and publishing](#sharing-and-publishing)
+  * [Monetization](#monetization)
 
 <!-- tocstop -->
 
 ## Introduction
 
 This document explains how to develop _actors_,
-a new kind of serverless microapps (or agents, programs, ...) for general-purpose language-agnostic computing and automation jobs.
+a new kind of serverless microapps (agents, programs, ...) for general-purpose language-agnostic computing and automation jobs.
 The main design goal for Actors is to make it easy for developers build and ship reusable
 cloud software tools, which are also easy to run
 and integrate by potentially not-too-technical users.
@@ -94,8 +96,9 @@ Currently, the most complete implementation of Actor model is provided
 by the Apify platform, with SDKs for 
 [Node.js](https://sdk.apify.com/) and
 [Python](https://pypi.org/project/apify/),
-and a [command-line interface](https://docs.apify.com/cli).
-Beware that these implementations do not support all features yet. This is work in progress. 
+and a [command-line interface (CLI)](https://docs.apify.com/cli).
+Beware that the frameworks might not yet implement all the features of Actor programming model.
+This is work in progress. 
 
 
 ### Overview
@@ -180,7 +183,7 @@ the Actor developer can define an [Input schema file](./pages/INPUT_SCHEMA.md).
 For example, the input schema for Actor `bob/screenshot-taker` will look like this:
 
 ```json
-TODO
+TODO: Actor example
 ```
 
 The input schema is used by the system to:
@@ -193,16 +196,16 @@ The input schema is used by the system to:
 - Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
   that smartly pre-populate and link Actor input properties
 
-**TODO: Show screenshots with web interface, API docs, and code examples**
+**TODO: Actor example - Show screenshots with manual input in Console, generated API docs, and code examples for that Actor **
 
 ### Run environment
 
 The Actors run within an isolated Docker container with access to local file system and network,
 and they can perform an arbitrary computing activity or call external APIs.
 The **standard output** of the Actor's program (stdout and stderr) is printed out and logged,
-which is useful for debugging.
+which is useful for development and debugging.
 
-In order to inform the users about the progress, the Actors might set a [**status message**](#actor-status),
+To inform the users about the progress, the Actors might set a [**status message**](#actor-status),
 which is then displayed in the user interface and also available via API.
 
 Running Actors can also launch a [**live-view web server**](#live-view-web-server),
@@ -217,10 +220,10 @@ from which they can be easily exported using API or integrated in other Actors.
 ### Output
 
 While the input object provides a standardized way to invoke Actors,
-the Actors can also generate an **output object**, which is a standardized way to display, consume and integrate
+the Actors can also generate an **output object**, which is a standardized way to display, consume, and integrate
 Actors' results.
 
-The Actor results are typically fully available only once the Actor run finishes,
+The Actor results are typically fully available only after the Actor run finishes,
 but the consumers of the results might want to access partial results during the run.
 Therefore, the Actors don't generate the output object directly, but rather
 define an [Output schema file](./pages/OUTPUT_SCHEMA.md), which contains
@@ -228,20 +231,20 @@ instruction how to generate the output object. The output object is stored
 to the Actor run object under the `output` property, and returned via API immediately after
 the Actor is started, without the need to wait for it to finish or generate the actual results.
 
-TODO: Consider storing the object also to key-value store...
-
 The output object is similar to input object, as it contains properties and values.
 For example, for the `bob/screenshot-taker` Actor the output object can look like this:
 
 ```json
-TODO
+{
+  "fileUrl": ""
+}
 ```
 
 The output object is generated automatically by the system based on the output schema file,
-which can look as follows:
+which looks as follows:
 
 ```json
-TODO
+TODO: Actor example
 ```
 
 The output schema and output object can then be used by callers of Actors to figure where to find
@@ -298,7 +301,7 @@ and use those as needed.
 Describe chaining, webhooks, running another, metamorph etc.
 
 
-### Publishing & Monetization
+### Publishing and monetization
 
 ....Charging money - basic info?
 
@@ -392,28 +395,22 @@ implementation of a formal mathematical model.
 
 For example, our Actors
 do not provide any standard message passing mechanism. The Actors might communicate together
-directly via HTTP requests (see [Live view](#live-view)),
+directly via HTTP requests (see [**live-view web server**](#live-view-web-server)),
 manipulate each other's operation using the Apify platform API (e.g. abort another Actor),
 or affect each other by sharing some internal state or storage.
 The Actors simply do not have any formal restrictions,
 and they can access whichever external systems they want.
 
 
-### Why the name "Actor" ?
+### Why the name "Actor"
 
 In movies and theater, an _actor_ is someone who gets a script
 and plays a role according to that script.
-Our Actors also perform an act on someone's behalf, using a provided script,
-and thus we considered the name "Actor" as a good description.
-Also, an "Actor" evokes an idea of a person, which is a helpful way to think of and talk about
-Actors as independent entities.
+Our Actors also perform an act on someone's behalf, using a provided script.
+They work well with Puppeteers and Playwrights.
+And they are related to the Actor model known from the computer science.
 
-Coincidentally, in the web automation world it became common to call libraries
-using names related to theater, such as Puppeteer or Playwright,
-confirming "Actor" was a good choice.
-Last but no least, our model of Actors is similar
-to the Actor model known from the computer science.
-
+To make it clear Actors are not people, the letter "A" is capitalized.
 
 ## Installation and setup
 
@@ -449,57 +446,58 @@ $ pip3 install apify
 ### Command-line interface (CLI)
 
 For local development of Actors and management of the Apify platform,
-it is useful to install Apify CLI.
-You just need to install [Node.js](https://nodejs.org/en/download/)
-and then the [apify-cli](https://www.npmjs.com/package/apify-cli) NPM package globally as follows:
+it is handy to install Apify CLI.
+You can install it:
+
+```bash
+$ brew install apify-cli
+```
+
+or via the [apify-cli](https://www.npmjs.com/package/apify-cli) Node.js package:
 
 ```bash
 $ npm install -g apify-cli
 ```
 
-To confirm the installation succeeded and to login to the Apify platform
-with your username and API token, run the `login` command as follows:
+You can confirm the installation succeeded and login to the Apify platform by running:
 
 ```bash
 $ apify login
 ```
 
-The Apify CLI provides a number of commands, which can aid with Actor development in two ways:
+The Apify CLI provides two commands: `apify` and `actor`.
 
-1. When developing Actors using **Node.js or Python**, the CLI makes it easy to run the Actors locally 
-   or deploy them to the Apify platform, using commands such as `run` and `push`.
-   For details, see [Local development](#local-development).
-2. You can use the `actor` command to implement the Actor logic in a **shell script**.
-   This is useful for repackaging existing software tools written in an
-   arbitrary language as an Actor. You simply write a shell script that transforms 
-   the Actor input to command-line options needed by the existing software, launch it,
-   and then store results as Actor output.
-   For details, see [Repackaging existing software as Actors](#repackaging-existing-software-as-Actors).
+`apify` command lets you interact with the Apify platform, for example run an Actor,
+push deployment of an Actor to cloud, or access storages. For details, see [Local development](#local-development).
+
+`actor` command is to be used from within an Actor in the runtime, to implement the Actors functionality in a shell script.
+   For details, see [Actorizing existing software](#actorizing-existing-software).
    
 To get a help for a specific command, run:
 
  ```bash
 $ apify help <command>
- ```
+$ actor help <command>
+```
 
-## Programming interface
+## Actor programming interface
 
 The commands described in this section are expected to be called from within a context
 of a running Actor, both in local environment or on the Apify platform.
-By default, the identifier of the current Actor run is taken from `ACTOR_RUN_ID`
-environment variable, but it can be overridden.
-For example, in Node.js you can initialize the `Actor` class using another `actorRunId`,
-or in the `apify actor` CLI command you can pass the `--actor-run-id` flag.
 
-### Actor initialization
+The Actor runtime system passes the context via [environment variables](#environment-variables),
+such as `APIFY_TOKEN` or `ACTOR_RUN_ID`, which is used by the SDK or CLI to interact with the runtime.
 
-First, the Actor should be initialized. During initialization, it prepares to receive events from Apify platform, determines machine and storage configuration and optionally purges previous state from local storage. It will also create a default instance of the Actor class.
+### Initialization
 
-It is not required to perform the initialization explicitly, because the Actor will initialize on execution of any Actor method, but we strongly recommend it to prevent race conditions.
+The SDKs provide convenience methods to initialize the Actor and handle its result.
+During initialization, the SDK loads environment variables, checks configuration, prepares to receive system events,
+and optionally purges previous state from local storage.
 
 #### Node.js
  
-In Node.js the Actor is initialized by calling the `init()` method. It should be paired with an `exit()` method which terminates the Actor. Use of `exit()` is not required, but recommended. For more information go to [Exit Actor](#exit-actor).
+In Node.js the Actor is initialized by calling the `init()` method. It should be paired with an `exit()` method
+which terminates the Actor. Use of `exit()` is not required, but recommended. For more information go to [Exit Actor](#exit-actor).
 
 ```js
 import { Actor } from 'apify';
@@ -526,7 +524,17 @@ Actor.main(async () => {
 
 #### Python
 
-TODO: @fnesveda please add Python examples.
+TODO: Add Python examples
+
+#### CLI
+
+No initialization needed, the process exit terminates the Actor, with the process status code
+determining if it succeeded or failed.
+
+```bash
+$ actor set-status-message "My work is done, friend"
+$ exit 0
+```
 
 #### UNIX equivalent
 
@@ -540,7 +548,7 @@ int main (int argc, char *argv[]) {
 
 Get access to the Actor input object passed by the user.
 It is parsed from a JSON file, which is stored by the system in the Actor's default key-value store,
-Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_INPUT_KEY` environment variable.
+Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_INPUT_KEY` [environment variable](#environment-variables).
 
 The input is an object with properties.
 If the Actor defines the input schema, the input object is guaranteed to conform to it.
@@ -566,7 +574,7 @@ print(input)
 
 ```bash
 # Emits a JSON object, which can be parsed e.g. using the "jq" tool
-$ apify actor get-input | jq
+$ actor get-input | jq
 
 > { "option1": "aaa", "option2": 456 }
 ```
@@ -594,18 +602,16 @@ when running the Actor.
 #### Node.js
 
 ```js
-// Save object to store (stringified to JSON)
-await Actor.setValue('my_state', { something: 123 });
-
-// Save binary file to store with content type
+// Save objects to the default key-value store
+await Actor.setValue('my_state', { something: 123 }); //  (stringified to JSON)
 await Actor.setValue('screenshot.png', buffer, { contentType: 'image/png' });
 
-// Get record from store (automatically parsed from JSON)
+// Get record from the default key-value store, automatically parsed from JSON
 const value = await Actor.getValue('my_state');
 
 // Access another key-value store by its name
 const store = await Actor.openKeyValueStore('screenshots-store');
-await store.setValue('screenshot.png', buffer, { contentType: 'image/png' });
+const imageBuffer = await store.getValue('screenshot.png');
 ```
 
 #### Python
@@ -667,18 +673,18 @@ await dataset.push_data({ some_result=123 })
 ```bash
 # Push data to default dataset, in JSON format
 $ echo '{ "someResult": 123 }' | actor push-data --json
-$ apify actor push-data --json='{ "someResult": 123 }'
-$ apify actor push-data --json=@result.json
+$ actor push-data --json='{ "someResult": 123 }'
+$ actor push-data --json=@result.json
 
 # Push data to default dataset, in text format
-$ echo "someResult=123" | apify actor push-data
-$ apify actor push-data someResult=123
+$ echo "someResult=123" | actor push-data
+$ actor push-data someResult=123
 
 # Push to a specific dataset in the cloud
-$ apify actor push-data --dataset=bob/election-data someResult=123
+$ actor push-data --dataset=bob/election-data someResult=123
 
 # Push to dataset on local system
-$ apify actor push-data --dataset=./my_dataset someResult=123
+$ actor push-data --dataset=./my_dataset someResult=123
 ```
 
 #### UNIX equivalent
@@ -747,11 +753,11 @@ await Actor.fail('Could not finish the crawl, try increasing memory');
 
 ```bash
 # Actor will finish in 'SUCCEEDED' state
-$ apify actor exit
-$ apify actor exit --message "Email sent"
+$ actor exit
+$ actor exit --message "Email sent"
 
 # Actor will finish in 'FAILED' state
-$ apify actor exit --code=1 --message "Couldn't fetch the URL"
+$ actor exit --code=1 --message "Couldn't fetch the URL"
 ```
 
 #### UNIX equivalent
@@ -785,16 +791,6 @@ about the execution context.
 | `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for more details. |
 | `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the Actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for more details.  |
 | `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor. |
-
-**WARNING/TODO**: This is not implemented yet. Currently, the Actors use environment variables
-prefixed by `APIFY_`. See the full list of environment variables
-in [Apify documentation](https://docs.apify.com/Actors/development/environment-variables).
-
-<!--
-  TODO: Implement these env vars, we need to keep the old ones for backwards compatibility
-  Only Apify-specific env vars should have prefix APIFY_, e.g. APIFY_PROXY_PASSWORD, APIFY_TOKEN or APIFY_USER_ID.
-  Mention these additional env vars in the text
--->
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in local development environment or on the Apify platform.
@@ -874,10 +870,12 @@ await actor.set_status_message('Crawled 45 of 100 pages')
 #### CLI
 
 ```bash
-$ apify actor set-status-message "Crawled 45 of 100 pages"
-$ apify actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
+$ actor set-status-message "Crawled 45 of 100 pages"
+$ actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 ```
 
+Convention: The end user of an Actor should never need to look into log to understand what happened,
+e.g. why the Actor failed. All necessary information must be set by the Actor in the status message.
 
 ### System events
 
@@ -886,11 +884,11 @@ Actors are notified by the system about various events such as a migration to an
 
 Currently, the system sends the following events:
 
-| Event name     | Payload | Description |
-| -------------- | ------- | ----------- |
-| `cpuInfo`      | `{ isCpuOverloaded: Boolean }` | The event is emitted approximately every second and it indicates whether the Actor is using the maximum of available CPU resources. If that’s the case, the Actor should not add more workload. For example, this event is used by the AutoscaledPool class. | 
-| `migrating`    | N/A | Emitted when the Actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the Actor and abort the run, to speed up migration. For example, this is used by the RequestList class. |
-| `aborting`     | N/A | When a user aborts an Actor run on the Apify platform, they can choose to abort gracefully to allow the Actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.|
+| Event name     | Payload | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------- | ------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `cpuInfo`      | `{ isCpuOverloaded: Boolean }` | The event is emitted approximately every second and it indicates whether the Actor is using the maximum of available CPU resources. If that’s the case, the Actor should not add more workload. For example, this event is used by the AutoscaledPool class.                                                                                                                                                                                                                                                                             | 
+| `migrating`    | N/A | Emitted when the Actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the Actor and abort the run, to speed up migration. See [Migration to another server](#migration-to-another-server).                                                                                                                                                                                                                                                                  |
+| `aborting`     | N/A | When a user aborts an Actor run on the Apify platform, they can choose to abort gracefully to allow the Actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.                                                                                                                                                                                                                                    |
 | `persistState` | `{ isMigrating: Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the Actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
 
 In the future, the event mechanism might be extended to custom events and messages enabling communication between
@@ -920,9 +918,10 @@ but generated virtually on the Actor SDK level.
 
 ```js
 // Add event handler
-Actor.on('cpuInfo', (data) => {
-    if (data.isCpuOverloaded) console.log('Oh no, we need to slow down!');
-});
+const handler = (data) => {
+  if (data.isCpuOverloaded) console.log('Oh no, we need to slow down!');
+}
+Actor.on('cpuInfo', handler);
 
 // Remove all handlers for a specific event
 Actor.off('systemInfo');
@@ -933,7 +932,7 @@ Actor.off('systemInfo', handler);
 
 #### Python
 
-TODO: @fnesveda Add Python example, here and elsewhere too
+TODO: Add Python example, here and elsewhere too
 
 
 #### UNIX equivalent
@@ -997,18 +996,18 @@ const run2 = await Actor.call(
 ```bash
 # On stdout, the commands emit Actor run object (in text or JSON format),
 # we shouldn't wait for finish, for that it should be e.g. "execute"
-$ apify actor call apify/google-search-scraper queries='test\ntest2' \
+$ apify call apify/google-search-scraper queries='test\ntest2' \
   countryCode='US'
-$ apify actor call --json apify/google-search-scraper '{ "queries": }'
-$ apify actor call --input=@data.json --json apify/google-search-scraper
-$ apify actor call --memory=1024 --build=beta apify/google-search-scraper
-$ apify actor call --output-record-key=SCREENSHOT apify/google-search-scraper
+$ apify call --json apify/google-search-scraper '{ "queries": }'
+$ apify call --input=@data.json --json apify/google-search-scraper
+$ apify call --memory=1024 --build=beta apify/google-search-scraper
+$ apify call --output-record-key=SCREENSHOT apify/google-search-scraper
 
 # Pass input from stdin
-$ cat input.json | apify actor call apify/google-search-scraper --json
+$ cat input.json | actor call apify/google-search-scraper --json
 
 # Call local actor during development
-$ apify actor call file:../some-dir someInput='xxx'
+$ apify call file:../some-dir someInput='xxx'
 ```
 
 #### Slack
@@ -1043,30 +1042,31 @@ $ command <arg1>, <arg2>, … &
 posix_spawn();
 ```
 
-### Metamorph 🪄
+### Metamorph
 
-This is the most magical Actor operation, which replaces running Actor’s Docker image with another Actor,
-similar to UNIX `exec` command.
+🪄This is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor,
+similarly to UNIX `exec` command.
 It is used for building new Actors on top of existing ones.
 You simply define input schema and write README for a specific use case,
 and then delegate the work to another Actor.
 
+The target Actor inherits the default storages used by the calling Actor.
+The target Actor input is stored to the default key-value store,
+under a key such as `INPUT-2` (the actual key is passed via the `ACTOR_INPUT_KEY` [environment variable](#environment-variables)).
+Internally, the target Actor can recursively metamorph into another Actor.
+
+**PROPOSAL:**
+
 An Actor can metamorph only to Actors that have compatible output schema as the main Actor,
 in order to ensure logical and consistent outcomes for users. 
 If the output schema of the target Actor is not compatible, the system should throw an error.
-
-<!-- TODO: This is not implemented yet -->
-
-Note that the target Actor inherits the default storages used by the calling Actor.
-The target Actor input is stored to the default key-value store, often under a key such as `INPUT-2`. 
-Internally, the target Actor can recursively metamorph into another Actor.
 
 #### Node.js
 
 ```js
 await Actor.metamorph(
     'bob/web-scraper',
-    { startUrls: [ "http://example.com" ] },
+    { startUrls: [ "https://www.example.com" ] },
     { memoryMbytes: 4096 },
 );
 ```
@@ -1074,8 +1074,8 @@ await Actor.metamorph(
 #### CLI
 
 ```bash
-$ apify actor metamorph bob/web-scraper startUrls=http://example.com
-$ apify actor metamorph --input=@input.json --json --memory=4096 \
+$ actor metamorph bob/web-scraper startUrls=http://example.com
+$ actor metamorph --input=@input.json --json --memory=4096 \
   bob/web-scraper
 ```
 
@@ -1109,18 +1109,18 @@ await Actor.addWebhook({
 #### CLI
 
 ```bash
-apify actor add-webhook --actor-run-id=RUN_ID \\
+$ actor add-webhook \\
   --event-types=ACTOR.RUN.SUCCEEDED,ACTOR.RUN.FAILED \\
   --request-url=https://api.example.com \\
   --payload-template='{ "test": 123" }'
 
-apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
+$ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
   --request-actor=apify/send-mail \\
   --memory=4096 --build=beta \\
   --payload-template=@template.json
 
 # Or maybe have a simpler API for self-actor?
-apify actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
+$ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
 ```
 
 #### UNIX equivalent
@@ -1135,28 +1135,29 @@ $ command1 || command2  # ("orf" symbol)
 
 ### Abort another Actor
 
-Abort itself or another running Actor on the Apify platform,
-changing its [status](#actor-status) to `ABORTED`.
+Abort itself or another Actor running on the Apify platform.
+Aborting an Actor changes its [status](#actor-status) to `ABORTED`.
 
 #### Node.js
 
 ```js
-await Actor.abort({ statusMessage: 'Job was done,', actorRunId: 'RUN_ID' });
+await Actor.abort({ statusMessage: 'Your job is done, friend.', actorRunId: 'RUN_ID' });
 ```
 
 #### CLI
 
 ```bash
-$ apify actor abort --actor-run-id=[RUN_ID] --token=123 
+$ actor abort --run-id RUN_ID 
 ```
-
 
 #### UNIX equivalent
 
 ```bash
 # Terminate a program
-$ kill <pid>
+$ kill <PID>
 ```
+
+<!-- TODO: Include Actor.boot() or not? -->
 
 ### Live view web server
 
@@ -1185,11 +1186,18 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
 })
 ```
 
+### Standby Mode
+
+# TODO: Write this
+
 
 ### Migration to another server
 
-TODO...
-
+The Actors can be migrated from another host server from time to time, especially the long-running ones.
+When the migration is imminent, the system sends the Actor the `migrating` [system event](#system-events)
+to inform the Actor, so that it can persist its state to storages.
+All executed writes to the default Actor [storage](#storage) are guaranteed to be persisted before the migration.
+After the migration, Actor is restarted on a new host. It can restore its customer state from the storages again.
 
 ## Actor definition files
 
@@ -1214,6 +1222,10 @@ This is the main definition file of the Actor in JSON format,
 and it always must be present at `.actor/actor.json`.
 This file contains references to all other necessary files.
 
+```json
+// TODO: Show small example
+```
+
 For details, see the [Actor file](./pages/ACTOR.md) page.
 
 
@@ -1225,10 +1237,14 @@ Actors are started by running their Docker image,
 both locally using the `apify run` command,
 as well as on the Apify platform.
 
+```dockerfile
+// TODO: Show small example
+```
+
 The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
 directive, and typically stored at `.actor/Dockerfile`.
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
-Learn more in the official [Dockerfile reference](https://docs.docker.com/engine/reference/builder/).
+Learn more about Dockerfiles in the official [Docker reference](https://docs.docker.com/engine/reference/builder/).
 
 
 ### README
@@ -1292,22 +1308,16 @@ and looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
 files in the Actor's top-level directory instead.
 This behavior might be deprecated in the future.
 
+
 ## Development
 
-TODO (@jancurn): Write a high-level overview how to build new Actors. Provide links 
-how to build directly on Apify+screenshots.
+Actors can be developed locally, using a git integration, or in a web IDE.
+The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
-**Status: Not implemented yet.**
-
-TODO: Explain basic workflow with "apify" - create, run, push etc. Move the full local support for Actors
+TODO: Explain basic workflow with `apify` - create, run, push etc. Move the full local support for Actors
  to ideas (see https://github.com/apify/actor-specs/pull/7/files#r794681016 )
-
-Actors can be developed and run locally. To support running other Actors, we need to define mapping
-of `username/actor` to local or remote git/https directories with `.actor` sub-directory,
-which is then used to launch Actors specified e.g. by `Apify.call('bob/some-actor')'`.
-TODO: Maybe using environment variable with the mapping?
 
 `apify run` - starts the Actor using Dockerfile
 referenced from `.actor/actor.json` or Dockerfile in the Actor top-level directory
@@ -1316,48 +1326,68 @@ referenced from `.actor/actor.json` or Dockerfile in the Actor top-level directo
 
 ### Deployment to Apify platform
 
-`apify push` - uses info from `.actor/actor.json`
-New flags:
-- `--force-title` and `--force-description`
-- `--target` to specify where to deploy. See `.actor/actor.json` for details.
-- 
-....
+The `apify push` CLI command takes information from the `.actor` directory and builds an Actor on the Apify platform,
+so that you can run it remotely.
 
-### Repackaging existing software as Actors
-
-Just add `.actor` directory to an existing source code repo.
-Use `apify actor` command in the Dockerfile's `RUN` instruction
-to set up and run the Actor.
-
-TODO: Explain more, show example
+```bash
+TODO: Show code example
+````
 
 
 ### Continuous integration and delivery
 
 TODO: Mention CI/CD, e.g. how to integrate with GiHub etc.
 
-## Sharing & Community
 
-TODO: Motivation - why building on Apify is easier than building your own SaaS
+## "Actorizing" existing code
 
-TODO: Ground rules:
-- User of Actor should never need to look into log to understand what happened, e.g. why the Actor failed.
-  This info must be in the status message
+You can repackage many existing software repositories
+as an Actor by creating the `.actor/` directory with the [Actor definition files](#actor-definition-files),
+and providing a Dockerfile with instruction how to run the software.
 
-### Shared Actors
+The `actor` CLI command can be used from the Dockerfile's `RUN` script transform the Actor JSON input
+into the configuration of the software, usually passed via command-line arguments,
+and then store the Actor output results. For example:
 
-For example:
+```bash
+TODO: Code examples of Dockerfile with "actor" command
+````
 
+The `actor init` CLI command can automatically
+generate the `.actor` directory and configuration files:
+
+```bash
+$ actor init TODO: or `apify actorize`?
 ```
-https://apify.com/jancurn/some-scraper
-```
 
+The command works on the best-effort basis, 
+creating necessary configuration files for the specific programming language and libraries.
 
+## Sharing and publishing
 
-## TODOs (@jancurn)
+...
 
-- Add more pictures, e.g. screenshots from Apify Store, Input UI, etc.
-- Maybe add comparison with other systems, like Lambda, Modal, Replit, ECS etc. in terms of developer experience 
-  - Maybe mention these in specific points,
-- Review external links and consider replacing them with local links
+## Monetization
+
+To create a SaaS product, one usually needs to:
+
+1. Develop the product
+2. Write what it does and how to use it
+3. Setup infrastructure where it runs and scales
+4. Handle billing, taxes, and payments
+5. Find and buy a domain name
+6. Create a website
+7. Market the product (content, ads, SEO, ...)
+8. Sale the product (demos, procurement, )
+9. Customer support
+
+Packaging software as an Actor and deploying it to a cloud platform such as Apify can take away steps 3 to 8,
+making it easier and faster to lunch new SaaS products and earn income on them.
+
+The platforms can offer various payment models, such as regular fixed rental fee, payment per result,
+or variable payment per arbitrary item. The software can be closed-source or open-source. 
+This is the choice of the developer.
+
+Actors provide a new way for software developers to monetize their skills,
+brining creator economy model to SaaS products.
 
