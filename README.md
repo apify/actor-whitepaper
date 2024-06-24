@@ -1042,9 +1042,9 @@ $ command <arg1>, <arg2>, … &
 posix_spawn();
 ```
 
-### Metamorph 🪄
+### Metamorph
 
-This is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor,
+🪄This is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor,
 similarly to UNIX `exec` command.
 It is used for building new Actors on top of existing ones.
 You simply define input schema and write README for a specific use case,
