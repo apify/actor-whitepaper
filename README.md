@@ -524,7 +524,17 @@ Actor.main(async () => {
 
 #### Python
 
-TODO: Add Python examples
+```python
+import asyncio
+from apify import Actor
+
+async def main():
+  async with Actor:
+    input = await Actor.get_input()
+    print(input)
+
+asyncio.run(main())
+```
 
 #### CLI
 
@@ -566,7 +576,7 @@ console.log(input);
 #### Python
 
 ```python
-input = actor.get_input()
+input = Actor.get_input()
 print(input)
 ```
 
@@ -618,13 +628,13 @@ const imageBuffer = await store.getValue('screenshot.png');
 
 ```python
 # Save object to store (stringified to JSON)
-await actor.set_value('my-state', { something=123 })
+await Actor.set_value('my-state', { 'something': 123 })
 
 # Save binary file to store with content type
-await actor.set_value('screenshot', buffer, { contentType='image/png' })
+await Actor.set_value('screenshot', buffer, content_type='image/png')
 
 # Get object from store (automatically parsed from JSON)
-dataset = await actor.get_value('my-state')
+state = await Actor.get_value('my-state')
 ```
 
 #### UNIX
@@ -661,11 +671,11 @@ await dataset.pushData({ someResult: 123 });
 
 ```python
 # Append result object to the default dataset associated with the run
-await actor.push_data({ some_result=123 })
+await Actor.push_data({ 'some_result': 123 })
 
 # Append result object to a specific named dataset
-dataset = await actor.open_dataset('bob/poll-results-2019')
-await dataset.push_data({ some_result=123 })
+dataset = await Actor.open_dataset('bob/poll-results-2019')
+await dataset.push_data({ 'some_result': 123 })
 ```
 
 #### CLI
@@ -741,10 +751,10 @@ Actor.on('exit', ({ statusMessage, exitCode, timeoutSecs }) => {
 
 ```python
 # Actor will finish in 'SUCCEEDED' state
-await actor.exit('Generated 14 screenshots')
+await Actor.exit('Generated 14 screenshots')
 
 # Actor will finish in 'FAILED' state
-await actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 })
+await Actor.exit('Could not finish the crawl, try increasing memory', exit_code=1)
 # ... or nicer way using this syntactic sugar:
 await Actor.fail('Could not finish the crawl, try increasing memory');
 ```
@@ -864,7 +874,7 @@ await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
 #### Python
 
 ```python
-await actor.set_status_message('Crawled 45 of 100 pages')
+await Actor.set_status_message('Crawled 45 of 100 pages')
 ```
 
 #### CLI
@@ -921,7 +931,7 @@ but generated virtually on the Actor SDK level.
 const handler = (data) => {
   if (data.isCpuOverloaded) console.log('Oh no, we need to slow down!');
 }
-Actor.on('cpuInfo', handler);
+Actor.on('systemInfo', handler);
 
 // Remove all handlers for a specific event
 Actor.off('systemInfo');
@@ -932,7 +942,22 @@ Actor.off('systemInfo', handler);
 
 #### Python
 
-TODO: Add Python example, here and elsewhere too
+```python
+from apify import Actor, Event
+
+# Add event handler
+async def handler(data):
+  if data.cpu_info.is_overloaded:
+    print('Oh no, we need to slow down!')
+
+Actor.on(Event.SYSTEM_INFO, handler);
+
+# Remove all handlers for a specific event
+Actor.off(Event.SYSTEM_INFO);
+
+# Remove a specific event handler
+Actor.off(Event.SYSTEM_INFO, handler);
+```
 
 
 #### UNIX equivalent
