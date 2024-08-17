@@ -218,7 +218,7 @@ The input schema is used by the system to:
 - Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
   that smartly pre-populate and link Actor input properties
 
-**Example of auto-generated Actor input UI**
+#### Example of auto-generated Actor input UI
 
 ![Screenshot Taker Input UI](./img/screenshot-taker-input.png)
 
@@ -261,16 +261,24 @@ For example, for the `bob/screenshot-taker` Actor the output object can look lik
 
 ```json
 {
-  "screenshotUrl": ""
+  "screenshotUrl": "https://api.apify.com/key-value-stores/FkspwWd8dFknjkxx/screenshot.png"
 }
 ```
 
-The output object is generated automatically by the system based on the output schema file,
+The output object is generated automatically by the system based on the [output schema file](./pages/OUTPUT_SCHEMA.md),
 which looks as follows:
 
 ```json
-TODO: Actor example
-
+{
+  "title": "Output schema for Screenshot Taker Actor",
+  "description": "The URL to the resulting screenshot",
+  "properties": {
+    "screenshotUrl": {
+      "type": "key-value-store.file",
+      "title": "Webpage screenshot"
+    }
+  }
+}
 ```
 
 The output schema and output object can then be used by callers of Actors to figure where to find
@@ -304,10 +312,6 @@ The Actor can read this object using the [Get input](#get-input) function.
 The Actor can read and write records to key-value stores using the API. For details,
 see [Key-value store access](#key-value-store-access).
 
-
-Output + schema...
-
-
 #### Dataset
 
 Dataset storage allows you to store a series of data objects such as results from web scraping, crawling or data processing jobs. You can export your datasets in JSON, CSV, XML, RSS, Excel or HTML formats.
@@ -324,24 +328,22 @@ and use those as needed.
 
 ### Integrations
 
-Describe chaining, webhooks, running another, metamorph etc.
+TODO: Describe chaining, webhooks, running another, metamorph etc.
 
-
-### Publishing and monetization
-
-....Charging money - basic info?
 
 ### What Actors are not
 
-Actors are best suited for batch operations that take an input, perform an isolated job for a user,
+Actors are best suited for compute operations that take an input, perform an isolated job for a user,
 and potentially produce some output.
-However, Actors are currently not best suited for continuous computing or storage workloads, such
-as running a live website, API backend, or database.
+
+For long-running jobs, Actor execution might be migrated
+from server to another server, making it unsuitable for running dependable storage workloads
+such as SQL databases.
 
 As Actors are based on Docker, it takes certain amount of time to spin up the container
 and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
-even for highly-optimized Docker images. For long-running jobs, Actor execution might be migrated
-to another machine, making it unsuitable for running databases.
+even for highly-optimized Docker images. The [Standby mode](#standby-mode) enables running
+an Actor as a web server, to more effectively process small API requests.
 
 ## Philosophy
 
@@ -1108,8 +1110,6 @@ The target Actor input is stored to the default key-value store,
 under a key such as `INPUT-2` (the actual key is passed via the `ACTOR_INPUT_KEY` [environment variable](#environment-variables)).
 Internally, the target Actor can recursively metamorph into another Actor.
 
-**PROPOSAL:**
-
 An Actor can metamorph only to Actors that have compatible output schema as the main Actor,
 in order to ensure logical and consistent outcomes for users. 
 If the output schema of the target Actor is not compatible, the system should throw an error.
@@ -1210,7 +1210,7 @@ $ actor abort --run-id RUN_ID
 $ kill <PID>
 ```
 
-<!-- TODO: Include Actor.boot() or not? -->
+<!-- TODO: Include Actor.boot() or not? I'd say yes -->
 
 ### Live view web server
 
@@ -1294,7 +1294,15 @@ and it always must be present at `.actor/actor.json`.
 This file contains references to all other necessary files.
 
 ```json
-// TODO: Show small example
+{
+  "actorSpecification": 1,
+  "name": "screenshot-taker",
+  "title": "Screenshot Taker",
+  "description": "Take a screenshot of any URL",
+  "version": "0.0",
+  "input": "./input_schema.json",
+  "dockerfile": "./Dockerfile"
+}
 ```
 
 For details, see the [Actor file](./pages/ACTOR.md) page.
@@ -1308,14 +1316,69 @@ Actors are started by running their Docker image,
 both locally using the `apify run` command,
 as well as on the Apify platform.
 
-```dockerfile
-// TODO: Show small example
-```
-
 The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
 directive, and typically stored at `.actor/Dockerfile`.
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
 Learn more about Dockerfiles in the official [Docker reference](https://docs.docker.com/engine/reference/builder/).
+
+#### Example Actor Dockerfile
+
+```dockerfile
+# Specify the base Docker image. You can read more about
+# the available images at https://crawlee.dev/docs/guides/docker-images
+# You can also use any other image from Docker Hub.
+FROM apify/actor-node-playwright-chrome:22-1.46.0 AS builder
+
+# Copy just package.json and package-lock.json
+# to speed up the build using Docker layer cache.
+COPY --chown=myuser package*.json ./
+
+# Install all dependencies. Don't audit to speed up the installation.
+RUN npm install --include=dev --audit=false
+
+# Next, copy the source files using the user set
+# in the base image.
+COPY --chown=myuser . ./
+
+# Install all dependencies and build the project.
+# Don't audit to speed up the installation.
+RUN npm run build
+
+# Create final image
+FROM apify/actor-node-playwright-firefox:22-1.46.0
+
+# Copy just package.json and package-lock.json
+# to speed up the build using Docker layer cache.
+COPY --chown=myuser package*.json ./
+
+# Install NPM packages, skip optional and development dependencies to
+# keep the image small. Avoid logging too much and print the dependency
+# tree for debugging
+RUN npm --quiet set progress=false \
+    && npm install --omit=dev --omit=optional \
+    && echo "Installed NPM packages:" \
+    && (npm list --omit=dev --all || true) \
+    && echo "Node.js version:" \
+    && node --version \
+    && echo "NPM version:" \
+    && npm --version \
+    && rm -r ~/.npm
+
+# Install all required Playwright dependencies for Firefox
+RUN npx playwright install firefox
+
+# Copy built JS files from builder image
+COPY --from=builder --chown=myuser /home/myuser/dist ./dist
+
+# Next, copy the remaining files and directories with the source code.
+# Since we do this after NPM install, quick build will be really fast
+# for most source file changes.
+COPY --chown=myuser . ./
+
+# Run the image. If you know you won't need headful browsers,
+# you can remove the XVFB start script for a micro perf gain.
+CMD ./start_xvfb_and_run_cmd.sh && ./run_protected.sh npm run start:prod --silent
+```
 
 
 ### README
@@ -1329,8 +1392,8 @@ and it should contain great explanation what the Actor does and how to use it.
 The README file is referenced from the [Actor file](./pages/ACTOR.md) using the `readme`
 directive, and typically stored at `.actor/README.md`.
 
-Good documentation makes good Actors!
-[Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
+Good documentation makes good Actors.
+[Learn more](https://docs.apify.com/academy/get-most-of-actors/seo-and-promotion) how to write great READMEs for SEO.
 
 
 ### Schema files
@@ -1387,7 +1450,7 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
-TODO: Explain basic workflow with `apify` - create, run, push etc. Move the full local support for Actors
+TODO (Adam): Explain basic workflow with `apify` - create, run, push etc. Move the full local support for Actors
  to ideas (see https://github.com/apify/actor-specs/pull/7/files#r794681016 )
 
 `apify run` - starts the Actor using Dockerfile
@@ -1401,14 +1464,14 @@ The `apify push` CLI command takes information from the `.actor` directory and b
 so that you can run it remotely.
 
 ```bash
-TODO: Show code example
+TODO (Adam): Show code example
 ````
 
 
 ### Continuous integration and delivery
 
-TODO: Mention CI/CD, e.g. how to integrate with GiHub etc.
-
+The source code of the Actors can be hosted on external source control systems like GitHub or GitLab,
+and integrated to CI/CD pipelines. The implementation details are not part of this Actor specification.
 
 ## "Actorizing" existing code
 
@@ -1421,14 +1484,14 @@ into the configuration of the software, usually passed via command-line argument
 and then store the Actor output results. For example:
 
 ```bash
-TODO: Code examples of Dockerfile with "actor" command
+TODO (Adam): Code examples of Dockerfile with "actor" command
 ````
 
 The `actor init` CLI command can automatically
 generate the `.actor` directory and configuration files:
 
 ```bash
-$ actor init TODO: or `apify actorize`?
+$ actor init
 ```
 
 The command works on the best-effort basis, 
@@ -1442,7 +1505,7 @@ and decide whether you want to make its source code open or closed.
 You can also publish the Actor for anyone to use on a marketplace like [Apify Store](https://apify.com/store).
 The Actor will get its public landing page like `https://apify.com/bob/screenshot-taker`,
 showing its README, description of inputs, outputs, API examples, etc.
-Once published, your Actor is automatically exposed to a growing audience of users and potential customers.
+Once published, your Actor is automatically exposed to organic traffic of users and potential customers.
 
 ### Monetization
 

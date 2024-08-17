@@ -26,9 +26,15 @@ It looks as follows:
     "keyValueStore": "./key_value_store_schema.json",
     "dataset": "../shared-schemas/dataset_schema.json",
     "requestQueue": "./request_queue_schema.json"
+  },
+  "scripts": {
+    "post-create": "npm install",
+    "run": "npm start"
   }
 }
 ```
+
+## Random notes
 
 The `.actor/actor.json` replaces the legacy `apify.json` file.
 Here are the notes comparing the format to the previous version:
@@ -68,9 +74,4 @@ Here are the notes comparing the format to the previous version:
   could have an option `--apply-env-vars-to-build` like we have it on platform.
 - The `dockerfile` and `readme` directives are optional, the system falls back to reasonable
   defaults, first in `.actor` directory and then in the top-level directory.
-
-TODOs (@jancurn):
-- The above text needs reformatting, make it more like a reference
-
-
-- Add "scripts" section, see https://apifier.slack.com/archives/C04HB9V90DT/p1672826248186569 
+"scripts" section added, see https://apifier.slack.com/archives/C04HB9V90DT/p1672826248186569
