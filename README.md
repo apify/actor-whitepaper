@@ -1410,29 +1410,36 @@ creating necessary configuration files for the specific programming language and
 
 ## Sharing and publishing
 
-...
+Once an Actor is developed, the Actor platform lets you share it with other specific users,
+and decide whether you want to make its source code open or closed.
 
-## Monetization
+You can also publish the Actor for anyone to use on a marketplace like [Apify Store](https://apify.com/store).
+The Actor will get its public landing page like `https://apify.com/bob/screenshot-taker`,
+showing its README, description of inputs, outputs, API examples, etc.
+Once published, your Actor is automatically exposed to a growing audience of users and potential customers.
 
-To create a SaaS product, one usually needs to:
+### Monetization
+
+To build a SaaS product, one usually needs to:
 
 1. Develop the product
-2. Write what it does and how to use it
-3. Setup infrastructure where it runs and scales
-4. Handle billing, taxes, and payments
-5. Find and buy a domain name
-6. Create a website
-7. Market the product (content, ads, SEO, ...)
-8. Sale the product (demos, procurement, )
-9. Customer support
+2. Write documentation
+3. Find and buy a domain name
+4. Set up a website
+5. Setup cloud infrastructure where it runs and scales
+6. Handle payments, billing, and taxes
+7. Marketing (content, ads, SEO, ...)
+8. Sales (demos, procurement, )
 
-Packaging software as an Actor and deploying it to a cloud platform such as Apify can take away steps 3 to 8,
-making it easier and faster to lunch new SaaS products and earn income on them.
+Building software as an Actor and deploying it to the Apify platform changes this to:
 
-The platforms can offer various payment models, such as regular fixed rental fee, payment per result,
-or variable payment per arbitrary item. The software can be closed-source or open-source. 
-This is the choice of the developer.
+1. Develop the Actor
+2. Write README
+3. Publish Actor on Apify Store
+4. Earn income
 
-Actors provide a new way for software developers to monetize their skills,
-brining creator economy model to SaaS products.
+Packaging your software as Actors makes it faster to lunch new small SaaS products and then earn income on them,
+using various monetization options, e.g. fixed rental fee or payment per result.
 
+Actors provide a new way for software developers like you to monetize their skills,
+bringing the creator economy model to SaaS.
