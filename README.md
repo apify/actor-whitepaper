@@ -783,7 +783,7 @@ about the execution context.
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in local development environment or on the Apify platform.
-These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive,
+These variables are defined in the [.actor/actor.json](/pages/ACTOR_FILE.md) file using the `environmentVariables` directive,
 or manually in the user interface in Apify Console.
 
 The environment variables can be set as secure in order to protect sensitive data such as API keys or passwords.
@@ -1254,7 +1254,7 @@ This file contains references to all other necessary files.
 }
 ```
 
-For details, see the [Actor file](./pages/ACTOR.md) page.
+For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
 
 
 ### Dockerfile
@@ -1265,12 +1265,13 @@ Actors are started by running their Docker image,
 both locally using the `apify run` command,
 as well as on the Apify platform.
 
-The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
-directive, and typically stored at `.actor/Dockerfile`.
+The Dockerfile is referenced from the [Actor file](#actor-file) using the `dockerfile`
+directive, and is typically stored at `.actor/Dockerfile`.
+
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
 Learn more about Dockerfiles in the official [Docker reference](https://docs.docker.com/engine/reference/builder/).
 
-#### Example Actor Dockerfile
+#### Example Dockerfile of an Actor
 
 ```dockerfile
 # Specify the base Docker image. You can read more about
@@ -1339,27 +1340,18 @@ It is used to generate Actor's public web page on Apify,
 and it should contain great explanation what the Actor does and how to use it.
 
 The README file is referenced from the [Actor file](#actor-file) using the `readme`
-directive, and typically stored at `.actor/README.md`.
+property, and typically stored at `.actor/README.md`.
 
 Good documentation makes good Actors.
 [Learn more](https://docs.apify.com/academy/get-most-of-actors/seo-and-promotion) how to write great READMEs for SEO.
 
 ### Input schema file
 
-The structure of Actor's [input and output](#input-and-output) can be optionally
-dictated by the input and output schema files.
-These files list properties accepted by Actor on input, and properties that the Actor produces on output,
-respectively.
-The input and output schema files are used to render a user interface
-to make it easy to run the Actor manually,
-to generate API documentation, render the view of Actor's output,
-validate the input,
-and to enable connecting Actor outputs to input of another Actor for rich workflows. 
+The structure of Actor's [input](#input) can be optionally
+dictated by the input schema file, which is linked in `.actor/actor.json` file
+as the `input` property, and typically stored at `.actor/input_schema.json`.
 
-The input and output schema is defined by two JSON files that are linked 
-from the [Actor file](#actor-file), 
-
-The input schema is used by the system to:
+The input schema file list properties accepted by Actor on input. It is used by the system to:
 
 - Validate the passed input JSON object on Actor run,
   so that Actors don't need to perform input validation and error handling in their code.
@@ -1368,9 +1360,6 @@ The input schema is used by the system to:
   making Actors easy for users to integrate the Actors.
 - Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
   that smartly pre-populate and link Actor input properties
-
-
-- [Input schema file](./pages/INPUT_SCHEMA.md)
 
 For example, the input schema for Actor `bob/screenshot-taker` will look like this:
 
@@ -1402,10 +1391,22 @@ For example, the input schema for Actor `bob/screenshot-taker` will look like th
 }
 ```
 
+For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
+
 ### Output schema file
 
-The output object is generated automatically by the system based on the output schema file
-which is often stored at `output_schema.json` and can look as follows:
+Similar to the Actor input, the output object is generated automatically by the
+system based on the output schema file,
+which is linked in `.actor/actor.json` file
+as the `output` property, and typically stored at `.actor/output_schema.json`.
+
+The output schema defines the Actor stores its results and it is used by the system to:
+
+- Generate API documentation for users of Actors to figure where to find results.
+- Publish OpenAPI specification to make it easy for callers of Actors to figure where to find results
+- Simplifies integrating Actors with other systems and workflow automation
+
+For example, the output schema file for Actor `bob/screenshot-taker` will look as follows:
 
 ```json
 {
@@ -1420,10 +1421,7 @@ which is often stored at `output_schema.json` and can look as follows:
 }
 ```
 
-The output schema and output object can then be used by callers of Actors to figure where to find
-Actor results, how to display them to users, or simplify plugging of Actors in workflow automation pipelines.
-
-See [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
+For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
 
 #### Storages
 

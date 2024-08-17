@@ -1,4 +1,4 @@
-# Actor File
+# Actor file specification
 
 This JSON file must be present at `.actor/actor.json` and contains the main definition of the Actor.
 
@@ -74,4 +74,4 @@ Here are the notes comparing the format to the previous version:
   could have an option `--apply-env-vars-to-build` like we have it on platform.
 - The `dockerfile` and `readme` directives are optional, the system falls back to reasonable
   defaults, first in `.actor` directory and then in the top-level directory.
-"scripts" section added, see https://apifier.slack.com/archives/C04HB9V90DT/p1672826248186569
+- "scripts" section added, see https://apify.slack.com/archives/C04HB9V90DT/p1672826248186569
