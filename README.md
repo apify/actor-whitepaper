@@ -783,24 +783,26 @@ Actors have access to standard process environment variables.
 The Apify platform uses environment variables prefixed with `ACTOR_` to pass the Actors information
 about the execution context.
 
-| Environment variable               | Description                                                                                                                                                                                                                |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ACTOR_ID`                         | ID of the Actor. |
-| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                                                                       |
-| `ACTOR_BUILD_ID`                   | ID of the Actor build. |
-| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build. |
-| `ACTOR_TASK_ID`                    | ID of the saved Actor task. |
-| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                                                                    |
-| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
-| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
-| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                                                             |
-| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                                                                       |
-| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                                                                                                                          |
-| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                                                                          |
-| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
+| Environment variable               | Description                                                                                                                                                                 |
+|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ACTOR_ID`                         | ID of the Actor.                                                                                                                                                            |
+| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                        |
+| `ACTOR_BUILD_ID`                   | ID of the Actor build.                                                                                                                                                      |
+| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build.                                                                                                               |
+| `ACTOR_TASK_ID`                    | ID of the saved Actor task.                                                                                                                                                 |
+| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                               |
+| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                              |
+| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                  |
+| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                                    |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                          |
+| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                |
+| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                      |
+| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for details.                                                       |
 | `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for more details. |
 | `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the Actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for more details.  |
-| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor. |
+| `ACTOR_STANDBY_PORT`               | A TCP port on which the Actor Standby can start a HTTP server to receive messages from the outside world. See [Standby mode](#standby-mode) for more details.               |                                                                      |                                                                                                                                                                          |                                                                                                                                                                           |
+| `ACTOR_STANDBY_URL`                | A unique public URL under which the Actor run Standny web server is accessible from the outside world. See [Standby mode](#standby-mode) for more details.                  |                                                                      |                                                                                                                                                                          |
+| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                  |
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in local development environment or on the Apify platform.
@@ -1211,9 +1213,27 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
 })
 ```
 
-### Standby Mode
+### Standby mode
 
-# TODO: Write this
+The Standby mode lets Actors run in the background and respond to incoming HTTP requests, like any web or API server.
+
+Starting an Actor run requires launching a Docker container, and so it comes with a performance penalty, sometimes in order of seconds for large images.
+For batch jobs this penalty is negligible, but for quick request-response interactions it becomes inefficient.
+The Standby mode lets developers run Actors as web servers to run jobs requiring quick response times.
+
+To use the Standby mode, start an HTTP web server at the `ACTOR_STANDBY_PORT` TCP port,
+and process arbitrary HTTP requests.
+
+The Actor system publishes the web server at URL reported in the `ACTOR_STANDBY_EXTERNAL_URL` environment variable,
+and will automatically start or abort the Actor as needed by the amount of HTTP requests.
+The external public URL can look like this: 
+
+```
+https://bob--web-screenshot-api.apify.actor
+```
+
+Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this specification,
+but they might be in the future introduced as new settings in the `actor.json` file.
 
 
 ### Migration to another server
