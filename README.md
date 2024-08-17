@@ -63,7 +63,7 @@ in June 2024.
   * [Local development](#local-development)
   * [Deployment to Apify platform](#deployment-to-apify-platform)
   * [Continuous integration and delivery](#continuous-integration-and-delivery)
-- ["Actorizing" existing code](#actorizing-existing-code)
+- [Actorizing existing code](#actorizing-existing-code)
 - [Sharing and publishing](#sharing-and-publishing)
   * [Monetization](#monetization)
 
@@ -448,7 +448,7 @@ The Apify CLI provides two commands: `apify` and `actor`.
 push deployment of an Actor to cloud, or access storages. For details, see [Local development](#local-development).
 
 `actor` command is to be used from within an Actor in the runtime, to implement the Actors functionality in a shell script.
-   For details, see [Actorizing existing software](#actorizing-existing-software).
+   For details, see [Actorizing existing code](#actorizing-existing-code).
    
 To get a help for a specific command, run:
 
@@ -539,7 +539,7 @@ Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_I
 
 The input is an object with properties.
 If the Actor defines the input schema, the input object is guaranteed to conform to it.
-For details, see [Input and output](#input-and-output).
+For details, see [Input](#input).
 
 #### Node.js
 
@@ -783,7 +783,7 @@ about the execution context.
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in local development environment or on the Apify platform.
-These variables are defined in the [.actor/actor.json](/pages/ACTOR_FILE.md) file using the `environmentVariables` directive,
+These variables are defined in the [Actor file](#actor-file) at `.actor/actor.json` using the `environmentVariables` directive,
 or manually in the user interface in Apify Console.
 
 The environment variables can be set as secure in order to protect sensitive data such as API keys or passwords.
@@ -1423,7 +1423,7 @@ For example, the output schema file for Actor `bob/screenshot-taker` will look a
 
 For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
 
-#### Storages
+#### Storage schema files
 
 Both input and output schema files can additionally reference schema files 
 for specific storages:
@@ -1484,7 +1484,7 @@ TODO (Adam): Show code example
 The source code of the Actors can be hosted on external source control systems like GitHub or GitLab,
 and integrated to CI/CD pipelines. The implementation details are not part of this Actor specification.
 
-## "Actorizing" existing code
+## Actorizing existing code
 
 You can repackage many existing software repositories
 as an Actor by creating the `.actor/` directory with the [Actor definition files](#actor-definition-files),
