@@ -16,56 +16,55 @@ in June 2024.
 
 <!-- toc -->
 
-  * [Introduction](#introduction)
-    + [Overview](#overview)
-  * [Basic concepts](#basic-concepts)
-    + [Input](#input)
-    + [Run environment](#run-environment)
-    + [Output](#output)
-    + [Storage](#storage)
-    + [Integrations](#integrations)
-    + [Publishing and monetization](#publishing-and-monetization)
-    + [What Actors are not](#what-actors-are-not)
-  * [Philosophy](#philosophy)
-    + [UNIX programs vs. Actors](#unix-programs-vs-actors)
-    + [Design principles](#design-principles)
-    + [Relation to the Actor model](#relation-to-the-actor-model)
-    + [Why the name "Actor"](#why-the-name-actor)
-  * [Installation and setup](#installation-and-setup)
-    + [Apify platform](#apify-platform)
-    + [Node.js](#nodejs)
-    + [Python](#python)
-    + [Command-line interface (CLI)](#command-line-interface-cli)
-  * [Actor programming interface](#actor-programming-interface)
-    + [Initialization](#initialization)
-    + [Get input](#get-input)
-    + [Key-value store access](#key-value-store-access)
-    + [Push results to dataset](#push-results-to-dataset)
-    + [Exit Actor](#exit-actor)
-    + [Environment variables](#environment-variables)
-    + [Actor status](#actor-status)
-    + [System events](#system-events)
-    + [Get memory information](#get-memory-information)
-    + [Start another Actor](#start-another-actor)
-    + [Metamorph 🪄](#metamorph-%F0%9F%AA%84)
-    + [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
-    + [Abort another Actor](#abort-another-actor)
-    + [Live view web server](#live-view-web-server)
-    + [Standby Mode](#standby-mode)
-- [TODO: Write this](#todo-write-this)
-    + [Migration to another server](#migration-to-another-server)
-  * [Actor definition files](#actor-definition-files)
-    + [Actor file](#actor-file)
-    + [Dockerfile](#dockerfile)
-    + [README](#readme)
-    + [Schema files](#schema-files)
-    + [Backward compatibility](#backward-compatibility)
-  * [Development](#development)
-    + [Local development](#local-development)
-    + [Deployment to Apify platform](#deployment-to-apify-platform)
-    + [Continuous integration and delivery](#continuous-integration-and-delivery)
-  * ["Actorizing" existing code](#actorizing-existing-code)
-  * [Sharing and publishing](#sharing-and-publishing)
+- [Introduction](#introduction)
+  * [Overview](#overview)
+- [Basic concepts](#basic-concepts)
+  * [Input](#input)
+  * [Run environment](#run-environment)
+  * [Output](#output)
+  * [Storage](#storage)
+  * [Integrations](#integrations)
+  * [Publishing and monetization](#publishing-and-monetization)
+  * [What Actors are not](#what-actors-are-not)
+- [Philosophy](#philosophy)
+  * [UNIX programs vs. Actors](#unix-programs-vs-actors)
+  * [Design principles](#design-principles)
+  * [Relation to the Actor model](#relation-to-the-actor-model)
+  * [Why the name "Actor"](#why-the-name-actor)
+- [Installation and setup](#installation-and-setup)
+  * [Apify platform](#apify-platform)
+  * [Node.js](#nodejs)
+  * [Python](#python)
+  * [Command-line interface (CLI)](#command-line-interface-cli)
+- [Actor programming interface](#actor-programming-interface)
+  * [Initialization](#initialization)
+  * [Get input](#get-input)
+  * [Key-value store access](#key-value-store-access)
+  * [Push results to dataset](#push-results-to-dataset)
+  * [Exit Actor](#exit-actor)
+  * [Environment variables](#environment-variables)
+  * [Actor status](#actor-status)
+  * [System events](#system-events)
+  * [Get memory information](#get-memory-information)
+  * [Start another Actor](#start-another-actor)
+  * [Metamorph](#metamorph)
+  * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
+  * [Abort another Actor](#abort-another-actor)
+  * [Live view web server](#live-view-web-server)
+  * [Standby mode](#standby-mode)
+  * [Migration to another server](#migration-to-another-server)
+- [Actor definition files](#actor-definition-files)
+  * [Actor file](#actor-file)
+  * [Dockerfile](#dockerfile)
+  * [README](#readme)
+  * [Schema files](#schema-files)
+  * [Backward compatibility](#backward-compatibility)
+- [Development](#development)
+  * [Local development](#local-development)
+  * [Deployment to Apify platform](#deployment-to-apify-platform)
+  * [Continuous integration and delivery](#continuous-integration-and-delivery)
+- ["Actorizing" existing code](#actorizing-existing-code)
+- [Sharing and publishing](#sharing-and-publishing)
   * [Monetization](#monetization)
 
 <!-- tocstop -->
@@ -168,9 +167,8 @@ For example, an input object for an Actor `bob/screenshot-taker` can look like t
 
 ```json
 {
-  "url": "http://www.example.com",
-  "width": 800,
-  "height": 600
+  "url": "https://www.example.com",
+  "width": 800
 }
 ```
 
@@ -183,7 +181,31 @@ the Actor developer can define an [Input schema file](./pages/INPUT_SCHEMA.md).
 For example, the input schema for Actor `bob/screenshot-taker` will look like this:
 
 ```json
-TODO: Actor example
+{
+  "title": "Input schema for Screenshot Taker Actor",
+  "description": "Enter a web page URL and it will take its screenshot with a specific width",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "url": {
+      "title": "URL",
+      "type": "string",
+      "editor": "textfield",
+      "description": "URL of the webpage"
+    },
+    "width": {
+      "title": "Viewport width",
+      "type": "integer",
+      "description": "Width of the browser window.",
+      "default": 1200,
+      "minimum": 1,
+      "unit": "pixels"
+    }
+  },
+  "required": [
+    "url"
+  ]
+}
 ```
 
 The input schema is used by the system to:
@@ -196,7 +218,10 @@ The input schema is used by the system to:
 - Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
   that smartly pre-populate and link Actor input properties
 
-**TODO: Actor example - Show screenshots with manual input in Console, generated API docs, and code examples for that Actor **
+**Example of auto-generated Actor input UI**
+
+![Screenshot Taker Input UI](./img/screenshot-taker-input.png)
+
 
 ### Run environment
 
@@ -236,7 +261,7 @@ For example, for the `bob/screenshot-taker` Actor the output object can look lik
 
 ```json
 {
-  "fileUrl": ""
+  "screenshotUrl": ""
 }
 ```
 
@@ -245,6 +270,7 @@ which looks as follows:
 
 ```json
 TODO: Actor example
+
 ```
 
 The output schema and output object can then be used by callers of Actors to figure where to find
