@@ -1229,10 +1229,10 @@ and will automatically start or abort the Actor as needed by the amount of HTTP 
 The external public URL can look like this: 
 
 ```
-https://bob--web-screenshot-api.apify.actor
+https://bob--screenshot-taker.apify.actor
 ```
 
-Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this specification,
+Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
 but they might be in the future introduced as new settings in the `actor.json` file.
 
 
