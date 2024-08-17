@@ -1,4 +1,4 @@
-# Request queue schema file specification
+# Request queue schema file specification [work in progress]
 
 TODO: This will be added later
 

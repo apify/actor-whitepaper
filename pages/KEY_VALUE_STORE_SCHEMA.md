@@ -1,4 +1,4 @@
-# Key-value store schema file specification
+# Key-value store schema file specification [work in progress]
 
 
 ## Basic properties
