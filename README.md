@@ -177,46 +177,9 @@ whether starting it using API, in user interface, CLI, or scheduler.
 The Actor can access the value of the input object using the [Get input](#get-input) function.
 
 In order to specify what kind of input object an Actor expects,
-the Actor developer can define an [Input schema file](./pages/INPUT_SCHEMA.md).
-For example, the input schema for Actor `bob/screenshot-taker` will look like this:
-
-```json
-{
-  "title": "Input schema for Screenshot Taker Actor",
-  "description": "Enter a web page URL and it will take its screenshot with a specific width",
-  "type": "object",
-  "schemaVersion": 1,
-  "properties": {
-    "url": {
-      "title": "URL",
-      "type": "string",
-      "editor": "textfield",
-      "description": "URL of the webpage"
-    },
-    "width": {
-      "title": "Viewport width",
-      "type": "integer",
-      "description": "Width of the browser window.",
-      "default": 1200,
-      "minimum": 1,
-      "unit": "pixels"
-    }
-  },
-  "required": [
-    "url"
-  ]
-}
-```
+the Actor developer can define an [Input schema file](#input-schema-file).
 
 The input schema is used by the system to:
-
-- Validate the passed input JSON object on Actor run,
-  so that Actors don't need to perform input validation and error handling in their code.
-- Render user interface for Actors to make it easy for users to run and test them manually
-- Generate Actor API documentation and integration code examples on the web or in CLI, 
-  making Actors easy for users to integrate the Actors.
-- Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
-  that smartly pre-populate and link Actor input properties
 
 #### Example of auto-generated Actor input UI
 
@@ -251,7 +214,7 @@ Actors' results.
 The Actor results are typically fully available only after the Actor run finishes,
 but the consumers of the results might want to access partial results during the run.
 Therefore, the Actors don't generate the output object directly, but rather
-define an [Output schema file](./pages/OUTPUT_SCHEMA.md), which contains
+define an [Output schema file](#output-schema-file), which contains
 instruction how to generate the output object. The output object is stored
 to the Actor run object under the `output` property, and returned via API immediately after
 the Actor is started, without the need to wait for it to finish or generate the actual results.
@@ -265,21 +228,7 @@ For example, for the `bob/screenshot-taker` Actor the output object can look lik
 }
 ```
 
-The output object is generated automatically by the system based on the [output schema file](./pages/OUTPUT_SCHEMA.md),
-which looks as follows:
-
-```json
-{
-  "title": "Output schema for Screenshot Taker Actor",
-  "description": "The URL to the resulting screenshot",
-  "properties": {
-    "screenshotUrl": {
-      "type": "key-value-store.file",
-      "title": "Webpage screenshot"
-    }
-  }
-}
-```
+The output object is generated automatically by the system based on the [output schema file](#output-schema-file).
 
 The output schema and output object can then be used by callers of Actors to figure where to find
 Actor results, how to display them to users, or simplify plugging of Actors in workflow automation pipelines.
@@ -1389,14 +1338,13 @@ format.
 It is used to generate Actor's public web page on Apify,
 and it should contain great explanation what the Actor does and how to use it.
 
-The README file is referenced from the [Actor file](./pages/ACTOR.md) using the `readme`
+The README file is referenced from the [Actor file](#actor-file) using the `readme`
 directive, and typically stored at `.actor/README.md`.
 
 Good documentation makes good Actors.
 [Learn more](https://docs.apify.com/academy/get-most-of-actors/seo-and-promotion) how to write great READMEs for SEO.
 
-
-### Schema files
+### Input schema file
 
 The structure of Actor's [input and output](#input-and-output) can be optionally
 dictated by the input and output schema files.
@@ -1409,10 +1357,75 @@ validate the input,
 and to enable connecting Actor outputs to input of another Actor for rich workflows. 
 
 The input and output schema is defined by two JSON files that are linked 
-from the [Actor file](#actor-file):
+from the [Actor file](#actor-file), 
+
+The input schema is used by the system to:
+
+- Validate the passed input JSON object on Actor run,
+  so that Actors don't need to perform input validation and error handling in their code.
+- Render user interface for Actors to make it easy for users to run and test them manually
+- Generate Actor API documentation and integration code examples on the web or in CLI,
+  making Actors easy for users to integrate the Actors.
+- Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
+  that smartly pre-populate and link Actor input properties
+
 
 - [Input schema file](./pages/INPUT_SCHEMA.md)
-- [Output schema file](./pages/OUTPUT_SCHEMA.md)
+
+For example, the input schema for Actor `bob/screenshot-taker` will look like this:
+
+```json
+{
+  "title": "Input schema for Screenshot Taker Actor",
+  "description": "Enter a web page URL and it will take its screenshot with a specific width",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "url": {
+      "title": "URL",
+      "type": "string",
+      "editor": "textfield",
+      "description": "URL of the webpage"
+    },
+    "width": {
+      "title": "Viewport width",
+      "type": "integer",
+      "description": "Width of the browser window.",
+      "default": 1200,
+      "minimum": 1,
+      "unit": "pixels"
+    }
+  },
+  "required": [
+    "url"
+  ]
+}
+```
+
+### Output schema file
+
+The output object is generated automatically by the system based on the output schema file
+which is often stored at `output_schema.json` and can look as follows:
+
+```json
+{
+  "title": "Output schema for Screenshot Taker Actor",
+  "description": "The URL to the resulting screenshot",
+  "properties": {
+    "screenshotUrl": {
+      "type": "key-value-store.file",
+      "title": "Webpage screenshot"
+    }
+  }
+}
+```
+
+The output schema and output object can then be used by callers of Actors to figure where to find
+Actor results, how to display them to users, or simplify plugging of Actors in workflow automation pipelines.
+
+See [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
+
+#### Storages
 
 Both input and output schema files can additionally reference schema files 
 for specific storages:
