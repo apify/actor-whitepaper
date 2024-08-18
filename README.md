@@ -86,8 +86,10 @@ it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
 Drawing on this experience,
-we're releasing this Actor programming model whitepaper to the public,
-in a hope to eventually make it a new open standard, and thus help community to more effectively
+we're releasing this whitepaper to introduce the philosophy of Actors
+to the public and receive feedback on it.
+Our hope is that Actor programming model will eventually become an open standard,
+which will help community to more effectively
 build and ship reusable software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
@@ -112,7 +114,7 @@ or removing duplicates from a large dataset.
 Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
 
 Basically, Actors are programs packaged as Docker images,
-which accept a well-defined JSON input, perform
+which accept a well-defined input JSON object, perform
 an action, and optionally produce a well-defined JSON output.
 
 Actors have the following elements:
@@ -147,8 +149,8 @@ can set a price tag for the usage of their Actors, and thus make
 [passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-Actors-b0392278d085/)
 to have an incentive to keep developing and improving the Actor for the users.
 
-Currently, Actors can run locally or on the Apify platform. However, one of the goals of this open 
-specification is to motivate creation of new runtime environments outside of Apify.
+Currently, Actors can run locally or on the Apify platform. One of the goals of this whitepaper
+is to motivate the community to create new runtime environments outside of Apify.
 
 The ultimate goal of the Actor programming model is to make it as simple as possible
 for people to develop, run, and integrate software automation tools.
@@ -157,7 +159,7 @@ for people to develop, run, and integrate software automation tools.
 ## Basic concepts
 
 This section describes core features of Actors, what they are good for,
-and how Actors differ from other serverless computing platforms. 
+and how Actors differ from other serverless computing systems. 
 
 ### Input
 
@@ -196,10 +198,10 @@ and they can perform an arbitrary computing activity or call external APIs.
 The **standard output** of the Actor's program (stdout and stderr) is printed out and logged,
 which is useful for development and debugging.
 
-To inform the users about the progress, the Actors might set a [**status message**](#actor-status),
+To inform the users about the progress, the Actors might set a [status message](#actor-status),
 which is then displayed in the user interface and also available via API.
 
-Running Actors can also launch a [**live-view web server**](#live-view-web-server),
+Running Actors can also launch a [live-view web server](#live-view-web-server),
 which is assigned a unique local or public URL to receive HTTP requests. For example,
 this is useful for messaging and interaction between Actors, for running request-response REST APIs, or 
 providing a full-featured website.
@@ -384,7 +386,7 @@ implementation of a formal mathematical model.
 
 For example, our Actors
 do not provide any standard message passing mechanism. The Actors might communicate together
-directly via HTTP requests (see [**live-view web server**](#live-view-web-server)),
+directly via HTTP requests (see [live-view web server](#live-view-web-server)),
 manipulate each other's operation using the Apify platform API (e.g. abort another Actor),
 or affect each other by sharing some internal state or storage.
 The Actors simply do not have any formal restrictions,
@@ -772,26 +774,27 @@ Actors have access to standard process environment variables.
 The Apify platform uses environment variables prefixed with `ACTOR_` to pass the Actors information
 about the execution context.
 
-| Environment variable               | Description                                                                                                                                                                 |
-|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ACTOR_ID`                         | ID of the Actor.                                                                                                                                                            |
-| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                        |
-| `ACTOR_BUILD_ID`                   | ID of the Actor build.                                                                                                                                                      |
-| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build.                                                                                                               |
-| `ACTOR_TASK_ID`                    | ID of the saved Actor task.                                                                                                                                                 |
-| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                               |
-| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                              |
-| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                  |
-| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                                    |
-| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                          |
-| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                |
-| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                      |
-| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for details.                                                       |
-| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for more details. |
-| `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the Actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for more details.  |
-| `ACTOR_STANDBY_PORT`               | A TCP port on which the Actor Standby can start a HTTP server to receive messages from the outside world. See [Standby mode](#standby-mode) for more details.               |                                                                      |                                                                                                                                                                          |                                                                                                                                                                           |
-| `ACTOR_STANDBY_URL`                | A unique public URL under which the Actor run Standny web server is accessible from the outside world. See [Standby mode](#standby-mode) for more details.                  |                                                                      |                                                                                                                                                                          |
-| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                  |
+| Environment variable               | Description                                                                                                                                                            |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ACTOR_ID`                         | ID of the Actor.                                                                                                                                                       |
+| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                   |
+| `ACTOR_BUILD_ID`                   | ID of the Actor build.                                                                                                                                                 |
+| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build.                                                                                                          |
+| `ACTOR_TASK_ID`                    | ID of the saved Actor task.                                                                                                                                            |
+| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                          |
+| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                         |
+| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                             |
+| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                               |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                     |
+| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                           |
+| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                 |
+| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for details.                                                  |
+| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for details. |
+| `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the Actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for details.  |
+| `ACTOR_STANDBY_PORT`               | A TCP port on which the Actor Standby can start a HTTP server to receive messages from the outside world. See [Standby mode](#standby-mode) for details.               |                                                                      |                                                                                                                                                                          |                                                                                                                                                                           |
+| `ACTOR_STANDBY_URL`                | A unique public URL under which the Actor run Standny web server is accessible from the outside world. See [Standby mode](#standby-mode) for details.                  |                                                                      |                                                                                                                                                                          |
+| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                             |
+| `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                    |
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in local development environment or on the Apify platform.
@@ -1233,85 +1236,74 @@ After the migration, Actor is restarted on a new host. It can restore its custom
 
 ### Charging money
 
-To run an Actor on the Apify platform or other clouds,
+To run an Actor on the Apify platform or another cloud platform,
 a user typically needs to pay to cover the computing costs.
-Additionally, the platforms are free to introduce other monetization
+Additionally, the platforms are free to introduce other [monetization](#monetization)
 mechanisms, such as charging the users a fixed monthly fee for "renting" the Actor,
-or charging a variable fee for the number of results produced by the Actor.
+or a variable fee for the number of results produced by the Actor.
 These charging mechanisms are beyond the scope of this whitepaper.
-For details, see [Monetization](#monetization).
 
-On top of these "static" payment options, Actors will eventually support
+On top of these external monetization systems, Actors provide
 a built-in monetization system that enables developers to charge users variable
-amounts, e.g. based on returned number of results,
-complexity of the input, or cost of external APIs used by the Actor.
+amounts per event, e.g. based on the number of returned results,
+complexity of the input, or the cost of external APIs used internally by the Actor.
 
 The Actor can dynamically charge the current user a specific amount of money
 by calling the `charge` function.
-Users of Actors can ensure they will not be charged too much by specifying
-the maximum amount when starting an Actor using the `maxChargeCreditsUsd` run option.
+Users of Actors can limit the maximum amount to be charged by the Actor
+using the `maxTotalChargeUsd` run option, which is then passed to the Actor using
+the `ACTOR_MAX_TOTAL_CHARGE_USD` environment variable.
 The Actor can call the `charge` function as many times as necessary,
-but once the total sum of charged credits would exceed the maximum limit,
+but once the total sum of charged credits would exceed this maximum limit,
 the invocation of the function throws an error.
 
 When a paid Actor subsequently starts another paid Actor, the charges performed
-by the subsequent Actors are taken from the calling Actor's credits.
+by the subsequent Actors are taken from the calling Actor's allowance.
 This enables Actor economy, where Actors hierarchically pay other Actors or external APIs
 to perform parts of the job.
 
-**Rules for building Actors with variable charging:**
-
-<!-- TODO: Should be called ACTOR_MAX_CHARGE_CREDITS_USD? -->
-
-- If your Actor is charging users, make sure at the earliest time possible  
-  that the Actor is being run with sufficient credits, by checking the input
-  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO (@jancurn)).
-  If the maximum credits are not sufficient for Actor's operation with respect
-  to the input (e.g. user is requesting too many results for too little money),
-  fail the Actor immediately with a reasonable error status message for the user,
-  and don't charge the user anything.
-- Charge the users right **after** you have incurred the costs,
-  not in advance. If the Actor fails in the middle or is aborted, the users
-  only need to be charged for results they actually received.
-  Nothing will make users of your Actors angrier than charging them for something they didn't receive.
-
-**Integration with input schema**
-
-The Actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
-`maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
-per unit of usage specified in the input schema.
-This field can be used by the Apify platform to automatically inform the user about
-maximum possible charge, and automatically set `maxChargeCreditsUsd` for the Actor run.
-For example,
-for Google Search Scraper paid by number of pages scraped, this setting would be
-added to `maxPageCount` field which limits the maximum number of pages to scrape.
-Note that the Actor doesn't know in advance how many pages it will be able to fetch,
-hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
-
-<!-- TODO: Shall we create another Actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
-That could provide for better UX. Probably not, it would be an overkill... -->
-
 #### Node.js
 
-Charge the current user of the Actor a specific amount:
+Charge the current user of the Actor a specific amount of USD:
 
 ```js
-const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
+const chargeInfo = await Actor.charge({
+  eventName: 'gpt-4o-token',
+  count: 1000,
+  chargePerEventUsd: 0.0001,
+});
 ```
 
-Set the maximum amount to charge when starting an actor.
+Specify the maximum amount you're willing to pay when starting an Actor.
 
 ```js
 const run = await Actor.call(
   'bob/analyse-images',
-  { imageUrls: ['...'] },
+  { imageUrls: ['https://www.example.com/image.png'] },
   {
-      // By default, it's 0, hence actors cannot charge users unless they explicitely allow that.
-      maxChargeCreditsUsd: 5,
+      // By default this is 0, hence Actors cannot charge users unless they explicitly allow that.
+      maxTotalChargeUsd: 5,
   },
 );
 ```
 
+<!-- TODO: Add Python and CLI examples -->
+
+
+#### Rules for building Actors with variable charging
+
+If your Actor is charging users, you need to make sure at the earliest time possible 
+that the Actor is being run with sufficient credits with respect to its input.
+If the maximum credits specified by the `ACTOR_MAX_TOTAL_CHARGE_USD` environment variable is
+not sufficient for Actor's operation with respect
+to the input (e.g. user is requesting too many results for too little money),
+the Actor must fail immediately with an explanatory error status message for the user,
+and don't charge the user anything.
+
+You also must charge the users only **after** you have incurred the costs, 
+not before. If the Actor fails in the middle or is aborted, the users
+only need to be charged for results they actually received.
+Nothing will make users of your Actors angrier than charging them for something they didn't receive.
 
 
 ## Actor definition files
