@@ -179,7 +179,8 @@ The Actor can access the value of the input object using the [Get input](#get-in
 In order to specify what kind of input object an Actor expects,
 the Actor developer can define an [Input schema file](#input-schema-file).
 
-The input schema is used by the system to:
+The input schema is used by the system to generate user interface, API examples,
+and simplify integrations with external systems.
 
 #### Example of auto-generated Actor input UI
 
@@ -277,8 +278,16 @@ and use those as needed.
 
 ### Integrations
 
-TODO: Describe chaining, webhooks, running another, metamorph etc.
+**Actors are designed for interoperability.** Thanks to the input and output
+schemas, it easy to connect Actors with external systems,
+be it directly via REST API, Node.js or Python clients, CLI, or no-code automations.
+From the schema files, the system can automatically generate API documentation, OpenAPI specification,
+and validate inputs and outputs, simplifying their integrations to any other systems.
 
+Furthermore, Actors can interact with themselves,
+for example [start another Actors](#start-another-actor),
+attach [Webhooks](#attach-webhook-to-an-actor-run) to process the results,
+or [Metamorph](#metamorph) into another Actor to have it finish the work.
 
 ### What Actors are not
 
@@ -349,7 +358,8 @@ The following table shows equivalents of key concepts of UNIX programs and Actor
 
 - Each Actor should do just one thing, and do it well.
 - Optimize for the users of the Actors, help them understand what the Actor does, easily run it, and integrate.
-- Keep the system as simple as possible, so that Actors can be built and used by the top 90% of developers.
+- Optimize for interoperability, to make it ever easier to connect Actors with other systems
+- Keep the API as simple as possible, so that Actors can be built and used by >90% of software developers.
 
 ### Relation to the Actor model
 
