@@ -27,6 +27,7 @@ The file looks as follows:
   // Links to other Actor defintion files
   "dockerfile": "./Dockerfile", // If omitted, the system looks for "./Dockerfile" and "../Dockerfile"
   "readme": "./README.md", // If omitted, the system looks for "./ACTOR.md" and "../README.md"
+  "changelog": "../../../shared/CHANGELOG.md",
   
   // Links to input/output schema files, or inlined schema objects.
   "input": "./input_schema.json",
