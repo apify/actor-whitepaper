@@ -4,7 +4,7 @@ Dataset storage enables you to sequentially store and retrieve data records, in 
 Each Actor run is assigned its own dataset, which is created when the first item is stored to it.
 Datasets usually contain results from web scraping, crawling or data processing jobs.
 The data can be visualized as a table where each object is a row and its attributes are the columns.
-The data can be exported in JSON, CSV, XML, RSS, Excel or HTML formats.
+The data can be exported in JSON, CSV, XML, RSS, Excel, or HTML formats.
 
 Dataset can be assigned a schema which describes:
 
@@ -45,7 +45,8 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
     "title": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
 
-    // Define a JSON schema for the dataset fields, including their type, description, etc.
+    // A JSON schema describing the dataset fields, with our extensions including description.
+    // TODO: maybe call this field "jsonSchema" or "schema" ?
     "fields": {
         "type": "object",
         "properties": {
@@ -133,9 +134,8 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 
 ### JSON schema
 
-Items of a dataset can be described by a JSON schema definition. Apify platform then ensures that each object complies with the provided schema.
-In the first version only the standard JSON schema will be supported, i.e.:
-
+Items of a dataset can be described by a JSON schema definition, passed into the `fields` property.
+The Actor system then ensures that each records added to the dataset complies with the provided schema.
 
 ```jsonc
 {
@@ -170,20 +170,6 @@ In the first version only the standard JSON schema will be supported, i.e.:
       }
     }
   }
-}
-```
-
-And potentially with simplified version coming in the future:
-
-```jsonc
-{
-  "id": "string",
-  "*name": "string",
-  "*email": "string",
-  "arr": [{
-    "site": "string",
-    "url": "string"
-  }]
 }
 ```
 
