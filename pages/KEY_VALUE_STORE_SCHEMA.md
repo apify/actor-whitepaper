@@ -84,7 +84,6 @@ https://api.apify.com/v2/key-value-stores/storeId/keys?prefix=post-images-
 
 ## TODO(@jancurn)
 - Finalize this text, keep `collections` for now
-- xx
 - What is kv-store schema is used by Actor to define structure of key-value store it operates on,
   but the developer defines a non-compatible record group for "INPUT" prefix?
   Maybe the default kv-stores should be created with a default record group to cover the "INPUT" prefixes

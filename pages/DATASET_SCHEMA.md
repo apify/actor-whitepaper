@@ -1,6 +1,10 @@
 # Dataset schema file specification
 
-Dataset storage enables you to sequentially save and retrieve data. Each Actor run is assigned its own dataset, which is created when the first item is stored to it. Datasets usually contain results from web scraping, crawling or data processing jobs. The data can be visualized as a table where each object is a row and its attributes are the columns. The data can be exported in JSON, CSV, XML, RSS, Excel or HTML formats.
+Dataset storage enables you to sequentially store and retrieve data records, in various formats.
+Each Actor run is assigned its own dataset, which is created when the first item is stored to it.
+Datasets usually contain results from web scraping, crawling or data processing jobs.
+The data can be visualized as a table where each object is a row and its attributes are the columns.
+The data can be exported in JSON, CSV, XML, RSS, Excel or HTML formats.
 
 Dataset can be assigned a schema which describes:
 
@@ -41,22 +45,35 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
     "title": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
 
-    // Not supported yet
+    // Define a JSON schema for the dataset fields, including their type, description, etc.
     "fields": {
-        "title": "string",  
-        "imageUrl": "string",  
-        "priceUsd": "number", 
-        "manufacturer": {
-            "title": "string", 
-            "url": "number",
+        "type": "object",
+        "properties": {
+            "title": {
+                "type": "string",
+                "description": "The name of the results",
+            },
+            "imageUrl": {
+                "type": "string",
+                "description": "Function executed for each request",
+            },
+            "priceUsd": {
+                "type": "integer",
+                "description": "Price of the item",
+            },
+            "manufacturer": {
+                "type": "object",
+                "properties": {
+                    "title": { ... }, 
+                    "url": { ... },
+                }
+            },
+            ...
         },
-        "productVariants": [{
-            "color": "?string"
-        }],
-        
-        ...
+        "required": ["title"],
     },
   
+    // Define the ways how to present the Dataset to users
     "views": {
         "overview": {
             "title": "Products overview",
@@ -116,7 +133,8 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 
 ### JSON schema
 
-Items of a dataset can be described by a JSON schema definition. Apify platform then ensures that each object accomplies with the provided schema. In the first version only the standard JSON schema will be supported, i.e.:
+Items of a dataset can be described by a JSON schema definition. Apify platform then ensures that each object complies with the provided schema.
+In the first version only the standard JSON schema will be supported, i.e.:
 
 
 ```jsonc
@@ -155,7 +173,7 @@ Items of a dataset can be described by a JSON schema definition. Apify platform 
 }
 ```
 
-with simplifed version comming in the near future:
+And potentially with simplified version coming in the future:
 
 ```jsonc
 {
