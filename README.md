@@ -3,7 +3,7 @@
 **The whitepaper describes a new concept for building serverless microapps called _Actors_,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
-for programs running in the cloud.**
+for programs or agents running in the cloud.**
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
@@ -16,7 +16,9 @@ By [Jan Čurn](https://apify.com/jancurn),
 <!-- toc -->
 
 - [Introduction](#introduction)
+  * [Background](#background)
   * [Overview](#overview)
+  * [Apify platform](#apify-platform)
 - [Basic concepts](#basic-concepts)
   * [Input](#input)
   * [Run environment](#run-environment)
@@ -30,7 +32,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Relation to the Actor model](#relation-to-the-actor-model)
   * [Why the name "Actor"](#why-the-name-actor)
 - [Installation and setup](#installation-and-setup)
-  * [Apify platform](#apify-platform)
+  * [Running on the Apify platform](#running-on-the-apify-platform)
   * [Node.js](#nodejs)
   * [Python](#python)
   * [Command-line interface (CLI)](#command-line-interface-cli)
@@ -72,12 +74,15 @@ By [Jan Čurn](https://apify.com/jancurn),
 
 ## Introduction
 
-This document introduces _Actors_,
-a new kind of serverless microapps (or agents, cloud programs, ...) for general-purpose
+This whitepaper introduces _Actors_,
+a new kind of serverless microapps (or agents, cloud programs, functions) for general-purpose
 language-agnostic computing and automation jobs.
-The main design goal for Actors is to make it easy for developers build and ship reusable
-cloud software tools, which are also easy to run
+The main goal for Actors is to make it easy for developers build and ship reusable
+software automation tools, which are also easy to run
 and integrate by other users.
+
+
+### Background
 
 The Actors were first introduced by [Apify](https://apify.com/) in late 2017,
 as a way to easily build, package, and ship web scraping and web automation tools to customers.
@@ -85,10 +90,10 @@ Over the years, Apify keeps developing the concept and has applied
 it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
-Drawing on this experience,
+Building on this experience,
 we're releasing this whitepaper to introduce the philosophy of Actors
-to the public and receive feedback on it.
-Our hope is that Actor programming model will eventually become an open standard,
+to the public and receive your feedback on it.
+Our hope is to make the Actor programming model an open standard,
 which will help community to more effectively
 build and ship reusable software automation tools,
 as well as encourage new implementations of the model in other programming languages.
@@ -114,23 +119,26 @@ or removing duplicates from a large dataset.
 Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
 
 Basically, Actors are programs packaged as Docker images,
-which accept a well-defined input JSON object, perform
+which accept a well-defined JSON input, perform
 an action, and optionally produce a well-defined JSON output.
 
 Actors have the following elements:
 - **Dockerfile** which specifies where is the Actor's source code,
-  how to build it, and run it
-- **Documentation** in a form of README.md file
+  how to build it, and run it.
+- **Documentation** in a form of README.md file.
 - **Input and output schemas** that describe what input the Actor requires,
-  and what results it produces
-- Access to an out-of-box **storage system** for Actor data, results, and files
-- **Metadata** such as the Actor name, description, author, and version
+  and what results it produces.
+- Access to an out-of-box **storage system** for Actor data, results, and files.
+- **Metadata** such as the Actor name, description, author, and version.
 
 The documentation and the input/output schemas make it possible for people to easily understand what the Actor does,
 enter the required inputs both in user interface or API,
 and integrate the results of the Actor into their other workflows.
 Actors can easily call and interact with each other, enabling building more complex
 systems on top of simple ones.
+
+
+### Apify platform
 
 The Actors can be published
 on the [Apify platform](https://apify.com/store),
@@ -145,15 +153,10 @@ The Apify platform provides an open API, cron-style scheduler, webhooks
 and [integrations](https://apify.com/integrations)
 to services such as Zapier or Make, which make it easy for users
 to integrate Actors into their existing workflows. Additionally, the Actor developers
-can set a price tag for the usage of their Actors, and thus make
-[passive income](https://blog.apify.com/make-regular-passive-income-developing-web-automation-Actors-b0392278d085/)
-to have an incentive to keep developing and improving the Actor for the users.
+can set a price tag for the usage of their Actors, and thus earn income
+and have an incentive to keep developing and improving the Actor for the users.
+For details, see [Monetization](#monetization).
 
-Currently, Actors can run locally or on the Apify platform. One of the goals of this whitepaper
-is to motivate the community to create new runtime environments outside of Apify.
-
-The ultimate goal of the Actor programming model is to make it as simple as possible
-for people to develop, run, and integrate software automation tools.
 
 
 ## Basic concepts
@@ -404,11 +407,12 @@ And they are related to the Actor model known from the computer science.
 
 To make it clear Actors are not people, the letter "A" is capitalized.
 
+
 ## Installation and setup
 
 Below are steps to start building Actors in various languages and environments.
 
-### Apify platform
+### Running on the Apify platform
 
 You can develop and run Actors in [Apify Console](https://console.apify.com/actors) without
 installing any software locally. Just create a free account, and start building Actors
@@ -1641,6 +1645,7 @@ The monetization gives developers an incentive to further develop and maintain t
 Actors provide a new way for software developers like you to monetize their skills,
 bringing the creator economy model to SaaS.
 
+For more details, read our essay [Make passive income developing web automation Actors](https://blog.apify.com/make-regular-passive-income-developing-web-automation-Actors-b0392278d085/).
 
 ## Future work
 
