@@ -71,25 +71,26 @@ in June 2024.
 
 ## Introduction
 
-This document explains how to develop _actors_,
-a new kind of serverless microapps (agents, programs, ...) for general-purpose language-agnostic computing and automation jobs.
+This document introduces _Actors_,
+a new kind of serverless microapps (agents, programs, ...) for general-purpose
+language-agnostic computing and automation jobs.
 The main design goal for Actors is to make it easy for developers build and ship reusable
 cloud software tools, which are also easy to run
-and integrate by potentially not-too-technical users.
+and integrate by other users.
 
 The Actors were first introduced by [Apify](https://apify.com/) in late 2017,
 as a way to easily build, package, and ship web scraping and web automation tools to customers.
-Over the next years, Apify kept developing the concept and applied
+Over the years, Apify kept developing the concept and applied
 it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
 Drawing on this experience,
-we're releasing this specification of the Actor programming model to the public,
-in a hope to make it a new open standard, and to help community to more effectively
-build and ship software automation tools,
+we're releasing this whitepaper for the Actor programming model to the public,
+in a hope to eventually make it a new open standard, and thus help community to more effectively
+build and ship reusable software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
-The goal of this document is to be the north star showing what the
+The goal of this whitepaper is to be the north star showing what the
 Actor programming model is and what its implementations should support.
 Currently, the most complete implementation of Actor model is provided
 by the Apify platform, with SDKs for 
@@ -1494,7 +1495,7 @@ TODO (Adam): Show code example
 The source code of the Actors can be hosted on external source control systems like GitHub or GitLab,
 and integrated to CI/CD pipelines. The implementation details are not part of this Actor specification.
 
-## Actorizing existing code
+### Actorizing existing code
 
 You can repackage many existing software repositories
 as an Actor by creating the `.actor/` directory with the [Actor definition files](#actor-definition-files),
