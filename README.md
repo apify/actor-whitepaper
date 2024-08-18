@@ -5,12 +5,11 @@ which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
 
-Written by [Jan Čurn](https://apify.com/jancurn),
+By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team
-in June 2024.
+[Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team.
 
-**Version 0.9**
+**Version 0.9 (August 2024)**
 
 ## Contents
 
@@ -52,6 +51,7 @@ in June 2024.
   * [Live view web server](#live-view-web-server)
   * [Standby mode](#standby-mode)
   * [Migration to another server](#migration-to-another-server)
+  * [Charging money](#charging-money)
 - [Actor definition files](#actor-definition-files)
   * [Actor file](#actor-file)
   * [Dockerfile](#dockerfile)
@@ -63,16 +63,17 @@ in June 2024.
   * [Local development](#local-development)
   * [Deployment to Apify platform](#deployment-to-apify-platform)
   * [Continuous integration and delivery](#continuous-integration-and-delivery)
-- [Actorizing existing code](#actorizing-existing-code)
+  * [Actorizing existing code](#actorizing-existing-code)
 - [Sharing and publishing](#sharing-and-publishing)
   * [Monetization](#monetization)
+- [Future work](#future-work)
 
 <!-- tocstop -->
 
 ## Introduction
 
 This document introduces _Actors_,
-a new kind of serverless microapps (agents, programs, ...) for general-purpose
+a new kind of serverless microapps (or agents, cloud programs, ...) for general-purpose
 language-agnostic computing and automation jobs.
 The main design goal for Actors is to make it easy for developers build and ship reusable
 cloud software tools, which are also easy to run
@@ -80,12 +81,12 @@ and integrate by other users.
 
 The Actors were first introduced by [Apify](https://apify.com/) in late 2017,
 as a way to easily build, package, and ship web scraping and web automation tools to customers.
-Over the years, Apify kept developing the concept and applied
+Over the years, Apify keeps developing the concept and has applied
 it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
 Drawing on this experience,
-we're releasing this whitepaper for the Actor programming model to the public,
+we're releasing this Actor programming model whitepaper to the public,
 in a hope to eventually make it a new open standard, and thus help community to more effectively
 build and ship reusable software automation tools,
 as well as encourage new implementations of the model in other programming languages.
@@ -270,7 +271,7 @@ Dataset storage allows you to store a series of data objects such as results fro
 The Dataset represents a store for structured data where each object stored has the same attributes,
 such as online store products or real estate offers. You can imagine it as a table, where each object is
 a row and its attributes are columns. Dataset is an append-only storage - you can only add new records to
-it but you cannot modify or remove existing records. Typically it is used to store crawling results.
+it, but you cannot modify or remove existing records. Typically, it is used to store crawling results.
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an Actor starts, by default it is associated with a newly-created empty default dataset.
@@ -345,21 +346,21 @@ Actors provide a simple user interface and documentation to help users interact 
 
 The following table shows equivalents of key concepts of UNIX programs and Actors.
 
-| UNIX programs            | Actors                                                                                                                             |
-|--------------------------|------------------------------------------------------------------------------------------------------------------------------------|
-| Command-line options     | [Input object](#get-input)                                                                                                         |
-| Read stdin               | No direct equivalent, you can [read from a dataset](#dataset) specified in the input.                                              |
-| Write to stdout	       | [Push results to dataset](#push-results-to-dataset), set [Actor status](#actor-status)                                             |
-| Write to stderr	       | No direct equivalent, you can write errors to log, set error status message, or push failed dataset items into an "error" dataset. |
-| File system	           | [Key-value store](#key-value-store-access)                                                                                         |
-| Process identifier (PID) | Actor run ID                                                                                                                       |
-| Process exit code        | [Actor exit code](#exit-actor)                                                                                                     |
+| UNIX programs              | Actors                                                                                                                             |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------------------|
+| Command-line options       | [Input object](#get-input)                                                                                                         |
+| Read stdin                 | No direct equivalent, you can [read from a dataset](#dataset) specified in the input.                                              |
+| Write to stdout	           | [Push results to dataset](#push-results-to-dataset), set [Actor status](#actor-status)                                             |
+| Write to stderr	           | No direct equivalent, you can write errors to log, set error status message, or push failed dataset items into an "error" dataset. |
+| File system	               | [Key-value store](#key-value-store-access)                                                                                         |
+| Process identifier (PID)   | Actor run ID                                                                                                                       |
+| Process exit code          | [Actor exit code](#exit-actor)                                                                                                     |
 
 ### Design principles
 
 - Each Actor should do just one thing, and do it well.
 - Optimize for the users of the Actors, help them understand what the Actor does, easily run it, and integrate.
-- Optimize for interoperability, to make it ever easier to connect Actors with other systems
+- Optimize for interoperability, to make it ever easier to connect Actors with other systems.
 - Keep the API as simple as possible, so that Actors can be built and used by >90% of software developers.
 
 ### Relation to the Actor model
@@ -1230,6 +1231,89 @@ to inform the Actor, so that it can persist its state to storages.
 All executed writes to the default Actor [storage](#storage) are guaranteed to be persisted before the migration.
 After the migration, Actor is restarted on a new host. It can restore its customer state from the storages again.
 
+### Charging money
+
+To run an Actor on the Apify platform or other clouds,
+a user typically needs to pay to cover the computing costs.
+Additionally, the platforms are free to introduce other monetization
+mechanisms, such as charging the users a fixed monthly fee for "renting" the Actor,
+or charging a variable fee for the number of results produced by the Actor.
+These charging mechanisms are beyond the scope of this whitepaper.
+For details, see [Monetization](#monetization).
+
+On top of these "static" payment options, Actors will eventually support
+a built-in monetization system that enables developers to charge users variable
+amounts, e.g. based on returned number of results,
+complexity of the input, or cost of external APIs used by the Actor.
+
+The Actor can dynamically charge the current user a specific amount of money
+by calling the `charge` function.
+Users of Actors can ensure they will not be charged too much by specifying
+the maximum amount when starting an Actor using the `maxChargeCreditsUsd` run option.
+The Actor can call the `charge` function as many times as necessary,
+but once the total sum of charged credits would exceed the maximum limit,
+the invocation of the function throws an error.
+
+When a paid Actor subsequently starts another paid Actor, the charges performed
+by the subsequent Actors are taken from the calling Actor's credits.
+This enables Actor economy, where Actors hierarchically pay other Actors or external APIs
+to perform parts of the job.
+
+**Rules for building Actors with variable charging:**
+
+<!-- TODO: Should be called ACTOR_MAX_CHARGE_CREDITS_USD? -->
+
+- If your Actor is charging users, make sure at the earliest time possible  
+  that the Actor is being run with sufficient credits, by checking the input
+  and `APIFY_MAX_CHARGE_CREDITS_USD` environment variable (see Environment variables TODO (@jancurn)).
+  If the maximum credits are not sufficient for Actor's operation with respect
+  to the input (e.g. user is requesting too many results for too little money),
+  fail the Actor immediately with a reasonable error status message for the user,
+  and don't charge the user anything.
+- Charge the users right **after** you have incurred the costs,
+  not in advance. If the Actor fails in the middle or is aborted, the users
+  only need to be charged for results they actually received.
+  Nothing will make users of your Actors angrier than charging them for something they didn't receive.
+
+**Integration with input schema**
+
+The Actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
+`maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
+per unit of usage specified in the input schema.
+This field can be used by the Apify platform to automatically inform the user about
+maximum possible charge, and automatically set `maxChargeCreditsUsd` for the Actor run.
+For example,
+for Google Search Scraper paid by number of pages scraped, this setting would be
+added to `maxPageCount` field which limits the maximum number of pages to scrape.
+Note that the Actor doesn't know in advance how many pages it will be able to fetch,
+hence the pricing needs to be set on the maximum, and the cost charged dynamically on the fly.
+
+<!-- TODO: Shall we create another Actor status `CREDITS_EXCEEDED` instead of `FAILED` ?
+That could provide for better UX. Probably not, it would be an overkill... -->
+
+#### Node.js
+
+Charge the current user of the Actor a specific amount:
+
+```js
+const chargeInfo = await Actor.charge({ creditsUsd: 1.23 });
+```
+
+Set the maximum amount to charge when starting an actor.
+
+```js
+const run = await Actor.call(
+  'bob/analyse-images',
+  { imageUrls: ['...'] },
+  {
+      // By default, it's 0, hence actors cannot charge users unless they explicitely allow that.
+      maxChargeCreditsUsd: 5,
+  },
+);
+```
+
+
+
 ## Actor definition files
 
 The Actor system uses several special files that define Actor metadata, documentation,
@@ -1249,9 +1333,10 @@ in particular when creating an Actor from pre-existing software repositories.
 
 ### Actor file
 
-This is the main definition file of the Actor in JSON format,
+This is the main definition file of the Actor,
 and it always must be present at `.actor/actor.json`.
-This file contains references to all other necessary files.
+This file has JSON format and contains a single object, whose properties 
+define the basics of the Actor and link to all other necessary files.
 
 ```json
 {
@@ -1411,11 +1496,11 @@ system based on the output schema file,
 which is linked in `.actor/actor.json` file
 as the `output` property, and typically stored at `.actor/output_schema.json`.
 
-The output schema defines the Actor stores its results and it is used by the system to:
+The output schema defines the Actor stores its results, and it is used by the system to:
 
 - Generate API documentation for users of Actors to figure where to find results.
-- Publish OpenAPI specification to make it easy for callers of Actors to figure where to find results
-- Simplifies integrating Actors with other systems and workflow automation
+- Publish OpenAPI specification to make it easy for callers of Actors to figure where to find results.
+- Simplifies integrating Actors with other systems and workflow automation.
 
 For example, the output schema file for Actor `bob/screenshot-taker` will look as follows:
 
@@ -1493,7 +1578,9 @@ TODO (Adam): Show code example
 ### Continuous integration and delivery
 
 The source code of the Actors can be hosted on external source control systems like GitHub or GitLab,
-and integrated to CI/CD pipelines. The implementation details are not part of this Actor specification.
+and integrated to CI/CD pipelines.
+The implementation details, as well as details of the Actor build and version management process,
+are beyond the scope of this whitepaper.
 
 ### Actorizing existing code
 
@@ -1547,10 +1634,19 @@ Building software as an Actor and deploying it to the Apify platform changes thi
 1. Develop the Actor
 2. Write README
 3. Publish Actor on Apify Store
-4. Earn income
 
 Packaging your software as Actors makes it faster to lunch new small SaaS products and then earn income on them,
-using various monetization options, e.g. fixed rental fee or payment per result.
+using various monetization options, e.g. fixed rental fee, payment per result,
+or payment per event (see [Charging money](#charging-money)).
 
 Actors provide a new way for software developers like you to monetize their skills,
 bringing the creator economy model to SaaS.
+
+
+## Future work
+
+TODO: Write this
+
+- Clearer definition of what is part of the standard and what is beyond the scope
+
+Tobik idea of HTTP layer to ease implementation
