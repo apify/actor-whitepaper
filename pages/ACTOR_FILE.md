@@ -22,6 +22,8 @@ The file looks as follows:
   
   // If true, it indicates the Actor uses the Standby mode.
   "usesStandbyMode": true,
+  // Link to OpenAPI schema for the Standby web server API
+  "standbySchemaOpenAPI": "./standby-openapi.json",
   
   // Optional min and max memory for running this Actor
   "minMemoryMbytes": 128,
