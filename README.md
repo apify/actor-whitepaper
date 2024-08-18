@@ -1175,7 +1175,7 @@ $ actor abort --run-id RUN_ID
 $ kill <PID>
 ```
 
-<!-- TODO: Include Actor.boot() or not? I'd say yes -->
+<!-- TODO: Include Actor.boot() or not? I'd say yes. See https://github.com/apify/actor-specs/issues/23 -->
 
 ### Live view web server
 
@@ -1226,6 +1226,7 @@ https://bob--screenshot-taker.apify.actor
 Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
 but they might be in the future introduced as new settings in the `actor.json` file.
 
+<!-- TODO: Consider unifying Standby mode with Live view web server, they are really two sides of the same thing -->
 
 ### Migration to another server
 

@@ -25,19 +25,21 @@ The file looks as follows:
   "maxMemoryMbytes": 4096,
   
   // Links to other Actor defintion files
-  "dockerfile": "./Dockerfile", // If omitted, it checks "./Dockerfile" and "../Dockerfile"
-  "readme": "./ACTOR.md", // If omitted, it checks "./ACTOR.md" and "../README.md"
+  "dockerfile": "./Dockerfile", // If omitted, the system looks for "./Dockerfile" and "../Dockerfile"
+  "readme": "./README.md", // If omitted, the system looks for "./ACTOR.md" and "../README.md"
+  
+  // Links to input/output schema files, or inlined schema objects.
   "input": "./input_schema.json",
   "output": "./output_schema.json",
   
-  // Link to storage schema files
+  // Links to storage schema files, or inlined schema objects.
   "storages": {
     "keyValueStore": "./key_value_store_schema.json",
-    "dataset": "../shared-schemas/dataset_schema.json",
+    "dataset": "../shared_schemas/generic_dataset_schema.json",
     "requestQueue": "./request_queue_schema.json"
   },
 
-  // Scripts that might be used by the CLI for local Actor development 
+  // Scripts that might be used by the CLI to ease the local Actor development.
   "scripts": {
     "post-create": "npm install",
     "run": "npm start"
