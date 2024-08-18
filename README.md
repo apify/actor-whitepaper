@@ -385,12 +385,13 @@ Our primary focus was always on practical software engineering utility, not an
 implementation of a formal mathematical model.
 
 For example, our Actors
-do not provide any standard message passing mechanism. The Actors might communicate together
+do not provide any standard message passing mechanism, but they can communicate together
 directly via HTTP requests (see [live-view web server](#live-view-web-server)),
-manipulate each other's operation using the Apify platform API (e.g. abort another Actor),
+manipulate each other's operation via the Apify platform API (e.g. abort another Actor),
 or affect each other by sharing some internal state or storage.
-The Actors simply do not have any formal restrictions,
-and they can access whichever external systems they want.
+The Actors do not have any formal restrictions,
+and they can access whichever external systems they want,
+and thus going beyond the formal mathematical Actor model.
 
 
 ### Why the name "Actor"
