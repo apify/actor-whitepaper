@@ -100,8 +100,8 @@ by the Apify platform, with SDKs for
 [Node.js](https://sdk.apify.com/) and
 [Python](https://pypi.org/project/apify/),
 and a [command-line interface (CLI)](https://docs.apify.com/cli).
-Beware that the frameworks might not yet implement all the features of Actor programming model.
-This is work in progress. 
+Beware that the frameworks might not yet implement all the features of Actor programming model
+described in this whitepaper. This is work in progress. 
 
 
 ### Overview
