@@ -405,7 +405,7 @@ Below are steps to start building Actors in various languages and environments.
 
 ### Apify platform
 
-You can develop and run Actors in [Apify Console](https://console.apify.com/Actors) without
+You can develop and run Actors in [Apify Console](https://console.apify.com/actors) without
 installing any software locally. Just create a free account, and start building Actors
 in an online IDE.
 
