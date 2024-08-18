@@ -130,7 +130,7 @@ to perform parts of the job.
 
 **Integration with input schema**
 
-The Actor [Input schema](./pages/INPUT_SCHEMA.md) file can contain a special field called
+The Actor [Input schema](INPUT_SCHEMA.md) file can contain a special field called
 `maxChargeCreditsPerUnitUsd`, which contains an information what is the maximum cost
 per unit of usage specified in the input schema.
 This field can be used by the Apify platform to automatically inform the user about
