@@ -9,7 +9,7 @@ The file looks as follows:
   // Required, indicates that this is an Actor definition file
   "actorSpecification": 1,
   
-  // Metadata
+  // Properties
   "name": "google-search-scraper",
   "title": "Google Search Scraper",
   "description": "The 200-char description",
@@ -24,6 +24,11 @@ The file looks as follows:
   "usesStandbyMode": true,
   // Link to OpenAPI schema for the Standby web server API
   "standbySchemaOpenAPI": "./standby-openapi.json",
+  
+  // A meta object enabling impelemtations to pass arbitrary additional properties
+  "meta": {
+    "something": "bla bla"
+  },
   
   // Optional min and max memory for running this Actor
   "minMemoryMbytes": 128,
