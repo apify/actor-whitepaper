@@ -20,6 +20,9 @@ The file looks as follows:
     "MYSQL_PASSWORD": "@mySecretPassword"
   },
   
+  // If true, it indicates the Actor uses the Standby mode.
+  "usesStandbyMode": true,
+  
   // Optional min and max memory for running this Actor
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
