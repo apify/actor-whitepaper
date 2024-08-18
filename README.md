@@ -1606,6 +1606,10 @@ $ actor init
 The command works on the best-effort basis, 
 creating necessary configuration files for the specific programming language and libraries.
 
+Actorization of existing code gives the developers an easy way to give their code
+presence in the cloud in a form of an Actor, so that the users can easily try it without
+having to install and manage it locally.
+
 ## Sharing and publishing
 
 Once an Actor is developed, the Actor platform lets you share it with other specific users,
@@ -1638,6 +1642,7 @@ Building software as an Actor and deploying it to the Apify platform changes thi
 Packaging your software as Actors makes it faster to lunch new small SaaS products and then earn income on them,
 using various monetization options, e.g. fixed rental fee, payment per result,
 or payment per event (see [Charging money](#charging-money)).
+The monetization gives developers an incentive to further develop and maintain their Actors.
 
 Actors provide a new way for software developers like you to monetize their skills,
 bringing the creator economy model to SaaS.
