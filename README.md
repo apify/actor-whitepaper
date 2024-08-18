@@ -16,56 +16,55 @@ in June 2024.
 
 <!-- toc -->
 
-  * [Introduction](#introduction)
-    + [Overview](#overview)
-  * [Basic concepts](#basic-concepts)
-    + [Input](#input)
-    + [Run environment](#run-environment)
-    + [Output](#output)
-    + [Storage](#storage)
-    + [Integrations](#integrations)
-    + [Publishing and monetization](#publishing-and-monetization)
-    + [What Actors are not](#what-actors-are-not)
-  * [Philosophy](#philosophy)
-    + [UNIX programs vs. Actors](#unix-programs-vs-actors)
-    + [Design principles](#design-principles)
-    + [Relation to the Actor model](#relation-to-the-actor-model)
-    + [Why the name "Actor"](#why-the-name-actor)
-  * [Installation and setup](#installation-and-setup)
-    + [Apify platform](#apify-platform)
-    + [Node.js](#nodejs)
-    + [Python](#python)
-    + [Command-line interface (CLI)](#command-line-interface-cli)
-  * [Actor programming interface](#actor-programming-interface)
-    + [Initialization](#initialization)
-    + [Get input](#get-input)
-    + [Key-value store access](#key-value-store-access)
-    + [Push results to dataset](#push-results-to-dataset)
-    + [Exit Actor](#exit-actor)
-    + [Environment variables](#environment-variables)
-    + [Actor status](#actor-status)
-    + [System events](#system-events)
-    + [Get memory information](#get-memory-information)
-    + [Start another Actor](#start-another-actor)
-    + [Metamorph 🪄](#metamorph-%F0%9F%AA%84)
-    + [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
-    + [Abort another Actor](#abort-another-actor)
-    + [Live view web server](#live-view-web-server)
-    + [Standby Mode](#standby-mode)
-- [TODO: Write this](#todo-write-this)
-    + [Migration to another server](#migration-to-another-server)
-  * [Actor definition files](#actor-definition-files)
-    + [Actor file](#actor-file)
-    + [Dockerfile](#dockerfile)
-    + [README](#readme)
-    + [Schema files](#schema-files)
-    + [Backward compatibility](#backward-compatibility)
-  * [Development](#development)
-    + [Local development](#local-development)
-    + [Deployment to Apify platform](#deployment-to-apify-platform)
-    + [Continuous integration and delivery](#continuous-integration-and-delivery)
-  * ["Actorizing" existing code](#actorizing-existing-code)
-  * [Sharing and publishing](#sharing-and-publishing)
+- [Introduction](#introduction)
+  * [Overview](#overview)
+- [Basic concepts](#basic-concepts)
+  * [Input](#input)
+  * [Run environment](#run-environment)
+  * [Output](#output)
+  * [Storage](#storage)
+  * [Integrations](#integrations)
+  * [What Actors are not](#what-actors-are-not)
+- [Philosophy](#philosophy)
+  * [UNIX programs vs. Actors](#unix-programs-vs-actors)
+  * [Design principles](#design-principles)
+  * [Relation to the Actor model](#relation-to-the-actor-model)
+  * [Why the name "Actor"](#why-the-name-actor)
+- [Installation and setup](#installation-and-setup)
+  * [Apify platform](#apify-platform)
+  * [Node.js](#nodejs)
+  * [Python](#python)
+  * [Command-line interface (CLI)](#command-line-interface-cli)
+- [Actor programming interface](#actor-programming-interface)
+  * [Initialization](#initialization)
+  * [Get input](#get-input)
+  * [Key-value store access](#key-value-store-access)
+  * [Push results to dataset](#push-results-to-dataset)
+  * [Exit Actor](#exit-actor)
+  * [Environment variables](#environment-variables)
+  * [Actor status](#actor-status)
+  * [System events](#system-events)
+  * [Get memory information](#get-memory-information)
+  * [Start another Actor](#start-another-actor)
+  * [Metamorph](#metamorph)
+  * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
+  * [Abort another Actor](#abort-another-actor)
+  * [Live view web server](#live-view-web-server)
+  * [Standby mode](#standby-mode)
+  * [Migration to another server](#migration-to-another-server)
+- [Actor definition files](#actor-definition-files)
+  * [Actor file](#actor-file)
+  * [Dockerfile](#dockerfile)
+  * [README](#readme)
+  * [Input schema file](#input-schema-file)
+  * [Output schema file](#output-schema-file)
+  * [Backward compatibility](#backward-compatibility)
+- [Development](#development)
+  * [Local development](#local-development)
+  * [Deployment to Apify platform](#deployment-to-apify-platform)
+  * [Continuous integration and delivery](#continuous-integration-and-delivery)
+- [Actorizing existing code](#actorizing-existing-code)
+- [Sharing and publishing](#sharing-and-publishing)
   * [Monetization](#monetization)
 
 <!-- tocstop -->
@@ -168,9 +167,8 @@ For example, an input object for an Actor `bob/screenshot-taker` can look like t
 
 ```json
 {
-  "url": "http://www.example.com",
-  "width": 800,
-  "height": 600
+  "url": "https://www.example.com",
+  "width": 800
 }
 ```
 
@@ -179,24 +177,15 @@ whether starting it using API, in user interface, CLI, or scheduler.
 The Actor can access the value of the input object using the [Get input](#get-input) function.
 
 In order to specify what kind of input object an Actor expects,
-the Actor developer can define an [Input schema file](./pages/INPUT_SCHEMA.md).
-For example, the input schema for Actor `bob/screenshot-taker` will look like this:
+the Actor developer can define an [Input schema file](#input-schema-file).
 
-```json
-TODO: Actor example
-```
+The input schema is used by the system to generate user interface, API examples,
+and simplify integrations with external systems.
 
-The input schema is used by the system to:
+#### Example of auto-generated Actor input UI
 
-- Validate the passed input JSON object on Actor run,
-  so that Actors don't need to perform input validation and error handling in their code.
-- Render user interface for Actors to make it easy for users to run and test them manually
-- Generate Actor API documentation and integration code examples on the web or in CLI, 
-  making Actors easy for users to integrate the Actors.
-- Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
-  that smartly pre-populate and link Actor input properties
+![Screenshot Taker Input UI](./img/screenshot-taker-input.png)
 
-**TODO: Actor example - Show screenshots with manual input in Console, generated API docs, and code examples for that Actor **
 
 ### Run environment
 
@@ -226,7 +215,7 @@ Actors' results.
 The Actor results are typically fully available only after the Actor run finishes,
 but the consumers of the results might want to access partial results during the run.
 Therefore, the Actors don't generate the output object directly, but rather
-define an [Output schema file](./pages/OUTPUT_SCHEMA.md), which contains
+define an [Output schema file](#output-schema-file), which contains
 instruction how to generate the output object. The output object is stored
 to the Actor run object under the `output` property, and returned via API immediately after
 the Actor is started, without the need to wait for it to finish or generate the actual results.
@@ -236,16 +225,11 @@ For example, for the `bob/screenshot-taker` Actor the output object can look lik
 
 ```json
 {
-  "fileUrl": ""
+  "screenshotUrl": "https://api.apify.com/key-value-stores/FkspwWd8dFknjkxx/screenshot.png"
 }
 ```
 
-The output object is generated automatically by the system based on the output schema file,
-which looks as follows:
-
-```json
-TODO: Actor example
-```
+The output object is generated automatically by the system based on the [output schema file](#output-schema-file).
 
 The output schema and output object can then be used by callers of Actors to figure where to find
 Actor results, how to display them to users, or simplify plugging of Actors in workflow automation pipelines.
@@ -278,10 +262,6 @@ The Actor can read this object using the [Get input](#get-input) function.
 The Actor can read and write records to key-value stores using the API. For details,
 see [Key-value store access](#key-value-store-access).
 
-
-Output + schema...
-
-
 #### Dataset
 
 Dataset storage allows you to store a series of data objects such as results from web scraping, crawling or data processing jobs. You can export your datasets in JSON, CSV, XML, RSS, Excel or HTML formats.
@@ -298,24 +278,30 @@ and use those as needed.
 
 ### Integrations
 
-Describe chaining, webhooks, running another, metamorph etc.
+**Actors are designed for interoperability.** Thanks to the input and output
+schemas, it easy to connect Actors with external systems,
+be it directly via REST API, Node.js or Python clients, CLI, or no-code automations.
+From the schema files, the system can automatically generate API documentation, OpenAPI specification,
+and validate inputs and outputs, simplifying their integrations to any other systems.
 
-
-### Publishing and monetization
-
-....Charging money - basic info?
+Furthermore, Actors can interact with themselves,
+for example [start another Actors](#start-another-actor),
+attach [Webhooks](#attach-webhook-to-an-actor-run) to process the results,
+or [Metamorph](#metamorph) into another Actor to have it finish the work.
 
 ### What Actors are not
 
-Actors are best suited for batch operations that take an input, perform an isolated job for a user,
+Actors are best suited for compute operations that take an input, perform an isolated job for a user,
 and potentially produce some output.
-However, Actors are currently not best suited for continuous computing or storage workloads, such
-as running a live website, API backend, or database.
+
+For long-running jobs, Actor execution might be migrated
+from server to another server, making it unsuitable for running dependable storage workloads
+such as SQL databases.
 
 As Actors are based on Docker, it takes certain amount of time to spin up the container
 and launch its main process. Doing this for every small HTTP transaction (e.g. API call) is not efficient,
-even for highly-optimized Docker images. For long-running jobs, Actor execution might be migrated
-to another machine, making it unsuitable for running databases.
+even for highly-optimized Docker images. The [Standby mode](#standby-mode) enables running
+an Actor as a web server, to more effectively process small API requests.
 
 ## Philosophy
 
@@ -372,7 +358,8 @@ The following table shows equivalents of key concepts of UNIX programs and Actor
 
 - Each Actor should do just one thing, and do it well.
 - Optimize for the users of the Actors, help them understand what the Actor does, easily run it, and integrate.
-- Keep the system as simple as possible, so that Actors can be built and used by the top 90% of developers.
+- Optimize for interoperability, to make it ever easier to connect Actors with other systems
+- Keep the API as simple as possible, so that Actors can be built and used by >90% of software developers.
 
 ### Relation to the Actor model
 
@@ -418,7 +405,7 @@ Below are steps to start building Actors in various languages and environments.
 
 ### Apify platform
 
-You can develop and run Actors in [Apify Console](https://console.apify.com/Actors) without
+You can develop and run Actors in [Apify Console](https://console.apify.com/actors) without
 installing any software locally. Just create a free account, and start building Actors
 in an online IDE.
 
@@ -471,7 +458,7 @@ The Apify CLI provides two commands: `apify` and `actor`.
 push deployment of an Actor to cloud, or access storages. For details, see [Local development](#local-development).
 
 `actor` command is to be used from within an Actor in the runtime, to implement the Actors functionality in a shell script.
-   For details, see [Actorizing existing software](#actorizing-existing-software).
+   For details, see [Actorizing existing code](#actorizing-existing-code).
    
 To get a help for a specific command, run:
 
@@ -562,7 +549,7 @@ Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_I
 
 The input is an object with properties.
 If the Actor defines the input schema, the input object is guaranteed to conform to it.
-For details, see [Input and output](#input-and-output).
+For details, see [Input](#input).
 
 #### Node.js
 
@@ -783,28 +770,30 @@ Actors have access to standard process environment variables.
 The Apify platform uses environment variables prefixed with `ACTOR_` to pass the Actors information
 about the execution context.
 
-| Environment variable               | Description                                                                                                                                                                                                                |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ACTOR_ID`                         | ID of the Actor. |
-| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                                                                       |
-| `ACTOR_BUILD_ID`                   | ID of the Actor build. |
-| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build. |
-| `ACTOR_TASK_ID`                    | ID of the saved Actor task. |
-| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                                                                    |
-| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                        |
-| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                            |
-| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                                                             |
-| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                                                                       |
-| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                                                                                                                          |
-| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                                                                          |
-| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for more details.                                       |
+| Environment variable               | Description                                                                                                                                                                 |
+|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ACTOR_ID`                         | ID of the Actor.                                                                                                                                                            |
+| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                        |
+| `ACTOR_BUILD_ID`                   | ID of the Actor build.                                                                                                                                                      |
+| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build.                                                                                                               |
+| `ACTOR_TASK_ID`                    | ID of the saved Actor task.                                                                                                                                                 |
+| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                               |
+| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                              |
+| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                  |
+| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                                    |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                          |
+| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                |
+| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                      |
+| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for details.                                                       |
 | `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for more details. |
 | `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the Actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for more details.  |
-| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor. |
+| `ACTOR_STANDBY_PORT`               | A TCP port on which the Actor Standby can start a HTTP server to receive messages from the outside world. See [Standby mode](#standby-mode) for more details.               |                                                                      |                                                                                                                                                                          |                                                                                                                                                                           |
+| `ACTOR_STANDBY_URL`                | A unique public URL under which the Actor run Standny web server is accessible from the outside world. See [Standby mode](#standby-mode) for more details.                  |                                                                      |                                                                                                                                                                          |
+| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                  |
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in local development environment or on the Apify platform.
-These variables are defined in the [.actor/actor.json](/pages/ACTOR.md) file using the `environmentVariables` directive,
+These variables are defined in the [Actor file](#actor-file) at `.actor/actor.json` using the `environmentVariables` directive,
 or manually in the user interface in Apify Console.
 
 The environment variables can be set as secure in order to protect sensitive data such as API keys or passwords.
@@ -1080,8 +1069,6 @@ The target Actor input is stored to the default key-value store,
 under a key such as `INPUT-2` (the actual key is passed via the `ACTOR_INPUT_KEY` [environment variable](#environment-variables)).
 Internally, the target Actor can recursively metamorph into another Actor.
 
-**PROPOSAL:**
-
 An Actor can metamorph only to Actors that have compatible output schema as the main Actor,
 in order to ensure logical and consistent outcomes for users. 
 If the output schema of the target Actor is not compatible, the system should throw an error.
@@ -1182,7 +1169,7 @@ $ actor abort --run-id RUN_ID
 $ kill <PID>
 ```
 
-<!-- TODO: Include Actor.boot() or not? -->
+<!-- TODO: Include Actor.boot() or not? I'd say yes -->
 
 ### Live view web server
 
@@ -1211,9 +1198,27 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
 })
 ```
 
-### Standby Mode
+### Standby mode
 
-# TODO: Write this
+The Standby mode lets Actors run in the background and respond to incoming HTTP requests, like any web or API server.
+
+Starting an Actor run requires launching a Docker container, and so it comes with a performance penalty, sometimes in order of seconds for large images.
+For batch jobs this penalty is negligible, but for quick request-response interactions it becomes inefficient.
+The Standby mode lets developers run Actors as web servers to run jobs requiring quick response times.
+
+To use the Standby mode, start an HTTP web server at the `ACTOR_STANDBY_PORT` TCP port,
+and process arbitrary HTTP requests.
+
+The Actor system publishes the web server at URL reported in the `ACTOR_STANDBY_EXTERNAL_URL` environment variable,
+and will automatically start or abort the Actor as needed by the amount of HTTP requests.
+The external public URL can look like this: 
+
+```
+https://bob--screenshot-taker.apify.actor
+```
+
+Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
+but they might be in the future introduced as new settings in the `actor.json` file.
 
 
 ### Migration to another server
@@ -1248,10 +1253,18 @@ and it always must be present at `.actor/actor.json`.
 This file contains references to all other necessary files.
 
 ```json
-// TODO: Show small example
+{
+  "actorSpecification": 1,
+  "name": "screenshot-taker",
+  "title": "Screenshot Taker",
+  "description": "Take a screenshot of any URL",
+  "version": "0.0",
+  "input": "./input_schema.json",
+  "dockerfile": "./Dockerfile"
+}
 ```
 
-For details, see the [Actor file](./pages/ACTOR.md) page.
+For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
 
 
 ### Dockerfile
@@ -1262,14 +1275,70 @@ Actors are started by running their Docker image,
 both locally using the `apify run` command,
 as well as on the Apify platform.
 
-```dockerfile
-// TODO: Show small example
-```
+The Dockerfile is referenced from the [Actor file](#actor-file) using the `dockerfile`
+directive, and is typically stored at `.actor/Dockerfile`.
 
-The Dockerfile is referenced from the [Actor file](./pages/ACTOR.md) using the `dockerfile`
-directive, and typically stored at `.actor/Dockerfile`.
 Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
 Learn more about Dockerfiles in the official [Docker reference](https://docs.docker.com/engine/reference/builder/).
+
+#### Example Dockerfile of an Actor
+
+```dockerfile
+# Specify the base Docker image. You can read more about
+# the available images at https://crawlee.dev/docs/guides/docker-images
+# You can also use any other image from Docker Hub.
+FROM apify/actor-node-playwright-chrome:22-1.46.0 AS builder
+
+# Copy just package.json and package-lock.json
+# to speed up the build using Docker layer cache.
+COPY --chown=myuser package*.json ./
+
+# Install all dependencies. Don't audit to speed up the installation.
+RUN npm install --include=dev --audit=false
+
+# Next, copy the source files using the user set
+# in the base image.
+COPY --chown=myuser . ./
+
+# Install all dependencies and build the project.
+# Don't audit to speed up the installation.
+RUN npm run build
+
+# Create final image
+FROM apify/actor-node-playwright-firefox:22-1.46.0
+
+# Copy just package.json and package-lock.json
+# to speed up the build using Docker layer cache.
+COPY --chown=myuser package*.json ./
+
+# Install NPM packages, skip optional and development dependencies to
+# keep the image small. Avoid logging too much and print the dependency
+# tree for debugging
+RUN npm --quiet set progress=false \
+    && npm install --omit=dev --omit=optional \
+    && echo "Installed NPM packages:" \
+    && (npm list --omit=dev --all || true) \
+    && echo "Node.js version:" \
+    && node --version \
+    && echo "NPM version:" \
+    && npm --version \
+    && rm -r ~/.npm
+
+# Install all required Playwright dependencies for Firefox
+RUN npx playwright install firefox
+
+# Copy built JS files from builder image
+COPY --from=builder --chown=myuser /home/myuser/dist ./dist
+
+# Next, copy the remaining files and directories with the source code.
+# Since we do this after NPM install, quick build will be really fast
+# for most source file changes.
+COPY --chown=myuser . ./
+
+# Run the image. If you know you won't need headful browsers,
+# you can remove the XVFB start script for a micro perf gain.
+CMD ./start_xvfb_and_run_cmd.sh && ./run_protected.sh npm run start:prod --silent
+```
 
 
 ### README
@@ -1280,30 +1349,91 @@ format.
 It is used to generate Actor's public web page on Apify,
 and it should contain great explanation what the Actor does and how to use it.
 
-The README file is referenced from the [Actor file](./pages/ACTOR.md) using the `readme`
-directive, and typically stored at `.actor/README.md`.
+The README file is referenced from the [Actor file](#actor-file) using the `readme`
+property, and typically stored at `.actor/README.md`.
 
-Good documentation makes good Actors!
-[Learn more](https://docs.apify.com/actors/publishing/seo-and-promotion) how to write great SEO-optimized READMEs.
+Good documentation makes good Actors.
+[Learn more](https://docs.apify.com/academy/get-most-of-actors/seo-and-promotion) how to write great READMEs for SEO.
 
+### Input schema file
 
-### Schema files
+The structure of Actor's [input](#input) can be optionally
+dictated by the input schema file, which is linked in `.actor/actor.json` file
+as the `input` property, and typically stored at `.actor/input_schema.json`.
 
-The structure of Actor's [input and output](#input-and-output) can be optionally
-dictated by the input and output schema files.
-These files list properties accepted by Actor on input, and properties that the Actor produces on output,
-respectively.
-The input and output schema files are used to render a user interface
-to make it easy to run the Actor manually,
-to generate API documentation, render the view of Actor's output,
-validate the input,
-and to enable connecting Actor outputs to input of another Actor for rich workflows. 
+The input schema file list properties accepted by Actor on input. It is used by the system to:
 
-The input and output schema is defined by two JSON files that are linked 
-from the [Actor file](#actor-file):
+- Validate the passed input JSON object on Actor run,
+  so that Actors don't need to perform input validation and error handling in their code.
+- Render user interface for Actors to make it easy for users to run and test them manually
+- Generate Actor API documentation and integration code examples on the web or in CLI,
+  making Actors easy for users to integrate the Actors.
+- Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
+  that smartly pre-populate and link Actor input properties
 
-- [Input schema file](./pages/INPUT_SCHEMA.md)
-- [Output schema file](./pages/OUTPUT_SCHEMA.md)
+For example, the input schema for Actor `bob/screenshot-taker` will look like this:
+
+```json
+{
+  "title": "Input schema for Screenshot Taker Actor",
+  "description": "Enter a web page URL and it will take its screenshot with a specific width",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "url": {
+      "title": "URL",
+      "type": "string",
+      "editor": "textfield",
+      "description": "URL of the webpage"
+    },
+    "width": {
+      "title": "Viewport width",
+      "type": "integer",
+      "description": "Width of the browser window.",
+      "default": 1200,
+      "minimum": 1,
+      "unit": "pixels"
+    }
+  },
+  "required": [
+    "url"
+  ]
+}
+```
+
+For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
+
+### Output schema file
+
+Similar to the Actor input, the output object is generated automatically by the
+system based on the output schema file,
+which is linked in `.actor/actor.json` file
+as the `output` property, and typically stored at `.actor/output_schema.json`.
+
+The output schema defines the Actor stores its results and it is used by the system to:
+
+- Generate API documentation for users of Actors to figure where to find results.
+- Publish OpenAPI specification to make it easy for callers of Actors to figure where to find results
+- Simplifies integrating Actors with other systems and workflow automation
+
+For example, the output schema file for Actor `bob/screenshot-taker` will look as follows:
+
+```json
+{
+  "title": "Output schema for Screenshot Taker Actor",
+  "description": "The URL to the resulting screenshot",
+  "properties": {
+    "screenshotUrl": {
+      "type": "key-value-store.file",
+      "title": "Webpage screenshot"
+    }
+  }
+}
+```
+
+For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
+
+#### Storage schema files
 
 Both input and output schema files can additionally reference schema files 
 for specific storages:
@@ -1341,7 +1471,7 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
-TODO: Explain basic workflow with `apify` - create, run, push etc. Move the full local support for Actors
+TODO (Adam): Explain basic workflow with `apify` - create, run, push etc. Move the full local support for Actors
  to ideas (see https://github.com/apify/actor-specs/pull/7/files#r794681016 )
 
 `apify run` - starts the Actor using Dockerfile
@@ -1355,16 +1485,16 @@ The `apify push` CLI command takes information from the `.actor` directory and b
 so that you can run it remotely.
 
 ```bash
-TODO: Show code example
+TODO (Adam): Show code example
 ````
 
 
 ### Continuous integration and delivery
 
-TODO: Mention CI/CD, e.g. how to integrate with GiHub etc.
+The source code of the Actors can be hosted on external source control systems like GitHub or GitLab,
+and integrated to CI/CD pipelines. The implementation details are not part of this Actor specification.
 
-
-## "Actorizing" existing code
+## Actorizing existing code
 
 You can repackage many existing software repositories
 as an Actor by creating the `.actor/` directory with the [Actor definition files](#actor-definition-files),
@@ -1375,14 +1505,14 @@ into the configuration of the software, usually passed via command-line argument
 and then store the Actor output results. For example:
 
 ```bash
-TODO: Code examples of Dockerfile with "actor" command
+TODO (Adam): Code examples of Dockerfile with "actor" command
 ````
 
 The `actor init` CLI command can automatically
 generate the `.actor` directory and configuration files:
 
 ```bash
-$ actor init TODO: or `apify actorize`?
+$ actor init
 ```
 
 The command works on the best-effort basis, 
@@ -1390,29 +1520,36 @@ creating necessary configuration files for the specific programming language and
 
 ## Sharing and publishing
 
-...
+Once an Actor is developed, the Actor platform lets you share it with other specific users,
+and decide whether you want to make its source code open or closed.
 
-## Monetization
+You can also publish the Actor for anyone to use on a marketplace like [Apify Store](https://apify.com/store).
+The Actor will get its public landing page like `https://apify.com/bob/screenshot-taker`,
+showing its README, description of inputs, outputs, API examples, etc.
+Once published, your Actor is automatically exposed to organic traffic of users and potential customers.
 
-To create a SaaS product, one usually needs to:
+### Monetization
+
+To build a SaaS product, one usually needs to:
 
 1. Develop the product
-2. Write what it does and how to use it
-3. Setup infrastructure where it runs and scales
-4. Handle billing, taxes, and payments
-5. Find and buy a domain name
-6. Create a website
-7. Market the product (content, ads, SEO, ...)
-8. Sale the product (demos, procurement, )
-9. Customer support
+2. Write documentation
+3. Find and buy a domain name
+4. Set up a website
+5. Setup cloud infrastructure where it runs and scales
+6. Handle payments, billing, and taxes
+7. Marketing (content, ads, SEO, ...)
+8. Sales (demos, procurement, )
 
-Packaging software as an Actor and deploying it to a cloud platform such as Apify can take away steps 3 to 8,
-making it easier and faster to lunch new SaaS products and earn income on them.
+Building software as an Actor and deploying it to the Apify platform changes this to:
 
-The platforms can offer various payment models, such as regular fixed rental fee, payment per result,
-or variable payment per arbitrary item. The software can be closed-source or open-source. 
-This is the choice of the developer.
+1. Develop the Actor
+2. Write README
+3. Publish Actor on Apify Store
+4. Earn income
 
-Actors provide a new way for software developers to monetize their skills,
-brining creator economy model to SaaS products.
+Packaging your software as Actors makes it faster to lunch new small SaaS products and then earn income on them,
+using various monetization options, e.g. fixed rental fee or payment per result.
 
+Actors provide a new way for software developers like you to monetize their skills,
+bringing the creator economy model to SaaS.

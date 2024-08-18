@@ -1,4 +1,4 @@
-# Dataset Schema File
+# Dataset schema file specification
 
 Dataset storage enables you to sequentially save and retrieve data. Each Actor run is assigned its own dataset, which is created when the first item is stored to it. Datasets usually contain results from web scraping, crawling or data processing jobs. The data can be visualized as a table where each object is a row and its attributes are the columns. The data can be exported in JSON, CSV, XML, RSS, Excel or HTML formats.
 
