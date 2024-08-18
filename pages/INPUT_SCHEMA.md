@@ -1,7 +1,7 @@
 # Actor input schema file specification
 
-NOTE: Currently the Apify platform only supports [input schema v1](https://docs.apify.com/Actors/development/input-schema),
-this document describes how the v2 should look like, but it's not implemented yet.
+NOTE: Currently the Apify platform only supports [input schema version 1](https://docs.apify.com/Actors/development/input-schema),
+this document describes how the version 2 should look like, but it's not implemented yet.
 
 ## Work in progress
 
