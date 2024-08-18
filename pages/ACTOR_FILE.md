@@ -1,32 +1,43 @@
 # Actor file specification
 
-This JSON file must be present at `.actor/actor.json` and contains the main definition of the Actor.
+This JSON file must be present at `.actor/actor.json` and contains an object with the definition of the Actor.
 
-It looks as follows:
+The file looks as follows:
 
 ```jsonc
 {
-  "actorSpecification": 2, // required
+  // Required, indicates that this is an Actor definition file
+  "actorSpecification": 1,
+  
+  // Metadata
   "name": "google-search-scraper",
   "title": "Google Search Scraper",
   "description": "The 200-char description",
-  "version": "0.0", // required
-  "buildTag": "latest", // if omitted, builds with "latest" tag
+  "version": "0.0", // Required
+  "buildTag": "latest", // If omitted, builds with "latest" tag
   "environmentVariables": {
     "MYSQL_USER": "my_username",
     "MYSQL_PASSWORD": "@mySecretPassword"
   },
-  "dockerfile": "./Dockerfile", // if omitted, it checks "./Dockerfile" and "../Dockerfile"
-  "readme": "./ACTOR.md", // if omitted, it checks "./ACTOR.md" and "../README.md"
+  
+  // Optional min and max memory for running this Actor
+  "minMemoryMbytes": 128,
+  "maxMemoryMbytes": 4096,
+  
+  // Links to other Actor defintion files
+  "dockerfile": "./Dockerfile", // If omitted, it checks "./Dockerfile" and "../Dockerfile"
+  "readme": "./ACTOR.md", // If omitted, it checks "./ACTOR.md" and "../README.md"
   "input": "./input_schema.json",
   "output": "./output_schema.json",
-  "minMemoryMbytes": 128, // optional number, min memory in megabytes allowed for running this Actor
-  "maxMemoryMbytes": 4096, // optional number, max memory in megabytes allowed for running this Actor
+  
+  // Link to storage schema files
   "storages": {
     "keyValueStore": "./key_value_store_schema.json",
     "dataset": "../shared-schemas/dataset_schema.json",
     "requestQueue": "./request_queue_schema.json"
   },
+
+  // Scripts that might be used by the CLI for local Actor development 
   "scripts": {
     "post-create": "npm install",
     "run": "npm start"
