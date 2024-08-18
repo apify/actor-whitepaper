@@ -1642,8 +1642,15 @@ bringing the creator economy model to SaaS.
 
 ## Future work
 
-TODO: Write this
+The goal of this whitepaper is to introduce the Actors philosophy and programming model to the public,
+to receive feedback, and to open the way for making Actors an open standard.
+To create an open standard, however, there is more work, including:
 
-- Clearer definition of what is part of the standard and what is beyond the scope
-
-Tobik idea of HTTP layer to ease implementation
+- Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
+- Clearly separate what is the part of the standard and what is up to discretion of the implementations.
+- Define standardized low-level HTTP REST API interface to the Actor system,
+  to separate "frontend" and "backend" Actor programming model implementations.
+  For example, if somebody wants to build a support for Actor programming model in Rust,
+  they should need to just write a Rust "frontend" translating the commands to HTTP API calls,
+  rather than having to implement the entire system. And equally, if one decides
+  to develop a new Actor "backend", all existing client libraries for Rust or other languages should work with it.
