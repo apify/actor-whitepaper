@@ -6,6 +6,8 @@ Datasets usually contain results from web scraping, crawling or data processing 
 The data can be visualized as a table where each object is a row and its attributes are the columns.
 The data can be exported in JSON, CSV, XML, RSS, Excel, or HTML formats.
 
+The specification is also at https://docs.apify.com/platform/actors/development/actor-definition/output-schema 
+
 Dataset can be assigned a schema which describes:
 
 - Content of the dataset, i.e., the schema of objects that are allowed to be added
@@ -45,8 +47,8 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
     "title": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
 
-    // A JSON schema describing the dataset fields, with our extensions including description.
-    // TODO: maybe call this field "jsonSchema" or "schema" ?
+    // A JSON schema object describing the dataset fields, with our extensions: the "title", "description", and "example" properties.
+    // "example" is used to generate code and API examples for the Actor output.
     "fields": {
         "type": "object",
         "properties": {
