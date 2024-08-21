@@ -116,7 +116,8 @@ They can perform anything from simple actions such as
 filling out a web form or sending an email,
 to complex operations such as crawling an entire website,
 or removing duplicates from a large dataset.
-Actors can run as short or as long as necessary, from seconds to hours, even infinitely.
+Actors can persist their state and be restarted, and thus they can
+run as short or as long as necessary, from seconds to hours, even infinitely.
 
 Basically, Actors are programs packaged as Docker images,
 which accept a well-defined JSON input, perform
