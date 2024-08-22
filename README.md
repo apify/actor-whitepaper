@@ -60,6 +60,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [README](#readme)
   * [Input schema file](#input-schema-file)
   * [Output schema file](#output-schema-file)
+  * [Storage schema files](#storage-schema-files)
   * [Backward compatibility](#backward-compatibility)
 - [Development](#development)
   * [Local development](#local-development)
@@ -1495,7 +1496,7 @@ For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md
 Similar to the Actor input, the output object is generated automatically by the
 system based on the output schema file,
 which is linked in `.actor/actor.json` file
-as the `output` property, and typically stored at `.actor/output_schema.json`.
+under the `output` property, and typically stored at `.actor/output_schema.json`.
 
 The output schema defines the Actor stores its results, and it is used by the system to:
 
@@ -1520,10 +1521,11 @@ For example, the output schema file for Actor `bob/screenshot-taker` will look a
 
 For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
 
-#### Storage schema files
+### Storage schema files
 
-Both input and output schema files can additionally reference schema files 
-for specific storages:
+Both main Actor file and input and output schema files can additionally reference schema files 
+for specific storages.
+These files have custom JSON-based formats, see:
 
 - [Dataset schema file](./pages/DATASET_SCHEMA.md)
 - [Key-value store schema file](./pages/KEY_VALUE_STORE_SCHEMA.md)
@@ -1531,7 +1533,7 @@ for specific storages:
 
 These storage schemas are used to ensure that stored objects or files 
 fulfil specific criteria, their fields have certain types, etc.
-On Apify platform, the schemas can be applied to the storages directly,
+On the Apify platform, the schemas can be applied to the storages directly,
 without Actors.
 
 Note that all the storage schemas are weak, in a sense that if the schema doesn't define a property,
