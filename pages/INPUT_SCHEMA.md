@@ -1,86 +1,68 @@
-# Actor input schema file specification
+# Actor input schema file specification 1.0
 
 This JSON file defines the schema and description of the input object accepted by the
 Actor (see [Input](../README.md#input) for details).
 The file is referenced from the main [Actor file (.actor/actor.json)](ACTOR_FILE.md) using the `input` directive,
 and it is typically stored in `.actor/input_schema.json`.
 
-NOTE: Currently the Apify platform only supports [input schema version 1](https://docs.apify.com/Actors/development/input-schema),
-this document describes how the version 2 should look like, but it's not implemented yet.
+It defines input properties for an Actor, including documentation, default value, and user interface definition.
 
-**Backwards compatibility:** If the main Actor file is missing,
-the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/Actors/development/input-schema) in Actor's top-level directory (if present).
-
-
-## Older ideas that might never materialize
-
-Changes to the legacy `INPUT_SCHEMA.json`:
-- We removed `title`, it is largely useless.
-- Using `actorSpecification` instead of `schemaVersion`, to make it clear what is this file,
-  as file names can be arbitrary.
-- define what is required at field level instead of having a separate
-  property `"required": ["startUrls", "pageFunction"]`.
-
-The basic structure of the input schema is:
+## Example Actor input schema
 
 ```jsonc
 {
     "actorInputSchemaVersion": 1,
-    "description": "Text that is shown in the Input UI",
+    "title": "Input schema for Website Content Crawler",
+    "description": "Enter the start URL(s) of the website(s) to crawl, configure other optional settings, and run the Actor to crawl the pages and extract their text content.",
+    "type": "object",
     "properties": {
         "startUrls": {
             "title": "Start URLs",
-            "type": "Array",
-            "description": "URLs to start with",
-            "prefill": [
-                { "url": "http://example.com" },
-                { "url": "http://example.com/some-path" }
-            ],
+            "type": "array",
+            "description": "One or more URLs of the pages where the crawler will start. Note that the Actor will additionally only crawl sub-pages of these URLs. For example, for the start URL `https://www.example.com/blog`, it will crawl pages like `https://example.com/blog/article-1`, but will skip `https://example.com/docs/something-else`.",
             "editor": "requestListSources",
-            "required": true
+            "prefill": [{ "url": "https://docs.apify.com/" }]
         },
-        "pageFunction": {
-            "title": "Page function",
-            "type": "String",
-            "description": "Function executed for each request",
-            "prefill": "async () => {return $('title').text();}",
-            "editor": "javascript"
+        "crawlerType": {
+            "sectionCaption": "Crawler settings",
+            "title": "Crawler type",
+            "type": "string",
+            "enum": ["playwright:chrome", "cheerio", "jsdom"],
+            "enumTitles": ["Headless web browser (Chrome+Playwright)", "Raw HTTP client (Cheerio)", "Raw HTTP client with JS execution (JSDOM) (experimental!)"],
+            "description": "Select the crawling engine:\n- **Headless web browser** (default) - Useful for modern websites with anti-scraping protections and JavaScript rendering. It recognizes common blocking patterns like CAPTCHAs and automatically retries blocked requests through new sessions. However, running web browsers is more expensive as it requires more computing resources and is slower. It is recommended to use at least 8 GB of RAM.\n- **Raw HTTP client** - High-performance crawling mode that uses raw HTTP requests to fetch the pages. It is faster and cheaper, but it might not work on all websites.",
+            "default": "playwright:chrome"
         },
-        ...
+        "maxCrawlDepth": {
+            "title": "Max crawling depth",
+            "type": "integer",
+            "description": "The maximum number of links starting from the start URL that the crawler will recursively descend. The start URLs have a depth of 0, the pages linked directly from the start URLs have a depth of 1, and so on.\n\nThis setting is useful to prevent accidental crawler runaway. By setting it to 0, the Actor will only crawl start URLs.",
+            "minimum": 0,
+            "default": 20
+        },
+        "maxCrawlPages": {
+            "title": "Max pages",
+            "type": "integer",
+            "description": "The maximum number pages to crawl. It includes the start URLs, pagination pages, pages with no content, etc. The crawler will automatically finish after reaching this number. This setting is useful to prevent accidental crawler runaway.",
+            "minimum": 0,
+            "default": 9999999
+        },
+        // ...
     }
 }
 ```
 
-We have currently five input types:
-- `String` / `string`
-- `Boolean` / `boolean`
-- `Integer` / `integer`
-- `Object` / `object`
-- `Array` / `array`
+## Random notes
 
-Other types like `DefaultDataset` must start with upper case.
-
-And in order to make Actors easy to pipeline, we should also add `actor`, `actorRun` types and also
+To make Actors easier to pipeline, we could add e.g. 
 `dataset`, `keyValueStore` and `requestQueue` types, each optionally
 restricted by the referenced schema to make sure that selected storage is compatible.
 
-
-NOTE from Mara: The idea was that we should have an input type for any system resource,
-so perhaps even for the user. But it's a super low priority.
-
-The use case for `actor` could be for example a testing Actor with 3 inputs:
+Another idea is to add type `actor`. The use case could be for example a testing Actor with 3 inputs:
 - Actor to be tested
 - test function containing for example Jest unit test over the output
 - input for the Actor
 
-and the testing Actor would call the given Actor with a given output and in the end execute tests if the results are correct.
-Similarly you could have a `runId` on input but maybe there is no good usecase.
-
-
-TODO JC: Not sure how `actor` and `actorRun` are supposed to work? For example, if `actor`
-is a reference to other Actor to be called, why not use webhook?
-And how about `actorRun` ???
-
+...and the testing Actor would call the given Actor with a given output and in the end execute tests if the results are correct.
 
 
 
@@ -112,14 +94,3 @@ Note from Franta: It would be cool to have an option in the dropdown to create a
 new dataset/key-value store with the right schema,
 if it's the first time you're running some Actor,
 and then in the next runs you could reuse it.
-
-Note that the Actor's default dataset cannot be used as input, as it doesn't exist before the 
-Actor is started. That's quite logical. But it also means that if the Actor wants
-the default dataset to be set certain schema, this needs to be done in Output schema.
-
-## TODOs
-- This file should be a complete reference for the input schema...
-- We should properly reconsider our current schema format.
-  For example, the way we write string enum is suboptimal as the user has to separately
-  name keys and values instead of a simple map that is error-prone. (JC: Yes please!)
-- Also, e.g. change "editor: requesltListSoruces " to type: requesltListSoruces ... let's do this

@@ -1,4 +1,4 @@
-# Actor output schema file specification [work in progress]
+# Actor output schema file specification 1.0 [work in progress]
 
 This JSON file defines the schema of the [output](../README.md#output) object produced by a web Actor.
 The file is referenced from the main [Actor file](./ACTOR_FILE.md) using the `output` property,
@@ -21,16 +21,18 @@ The output schema is also used by the system to generate the user interface, API
   "actorOutputSchemaVersion": 1,
   "title": "Some title", // optional
   "description": "Text that is shown in the Output UI", // optional
+  "type": "object",
   // TODO: This should be JSON schema with extensions, for consistency with input schema and dataset schema
   "properties": {
     // Default dataset contains all the scraped products
     // In the "output" object, the field should be a link to dataset with the right view
     "currentProducts": {
       "type": "dataset",
-      "views": ["productVariants"] // optional, default means all views in dataset
-      // If the user wants to use an existing dataset,
-      // they should reference it from input:
-      "target": "$input.myProductsDatasetId" //optional
+      // You can reference views how to render the output, using "views" defined by the Dataset schema file
+      "views": ["productVariants"]
+      // Optionally, the output can reference an existing dataset to provide its results from,
+      // if it was passed via "type": "dataset" property.
+      "target": "$input.myProductsDatasetId"
     },
 
     // Selects a specific group of records with a certain prefix. In UI, this can be shown

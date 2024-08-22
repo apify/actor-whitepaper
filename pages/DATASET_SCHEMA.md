@@ -1,4 +1,4 @@
-# Dataset schema file specification
+# Dataset schema file specification 1.0
 
 Dataset storage enables you to sequentially store and retrieve data records, in various formats.
 Each Actor run is assigned its own dataset, which is created when the first item is stored to it.

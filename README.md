@@ -1445,9 +1445,10 @@ Good documentation makes good Actors.
 
 ### Input schema file
 
-The structure of Actor's [input](#input) can be optionally
-dictated by the input schema file, which is linked in `.actor/actor.json` file
-as the `input` property, and typically stored at `.actor/input_schema.json`.
+Actors accept an [input](#input) JSON object on start, whose schema can be defined
+by the input schema file. This file is referenced in the Actor file (`.actor/actor.json`) file
+as the `input` property.
+It is a standard JSON Schema file with our extensions, and it is typically stored at `.actor/input_schema.json`.
 
 The input schema file list properties accepted by Actor on input. It is used by the system to:
 
@@ -1459,14 +1460,16 @@ The input schema file list properties accepted by Actor on input. It is used by 
 - Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
   that smartly pre-populate and link Actor input properties
 
+For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
+
 For example, the input schema for Actor `bob/screenshot-taker` will look like this:
 
 ```json
 {
+  "actorInputSchemaVersion": 1,
   "title": "Input schema for Screenshot Taker Actor",
   "description": "Enter a web page URL and it will take its screenshot with a specific width",
   "type": "object",
-  "schemaVersion": 1,
   "properties": {
     "url": {
       "title": "URL",
@@ -1489,25 +1492,27 @@ For example, the input schema for Actor `bob/screenshot-taker` will look like th
 }
 ```
 
-For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
-
 ### Output schema file
 
-Similar to the Actor input, the output object is generated automatically by the
-system based on the output schema file,
-which is linked in `.actor/actor.json` file
-under the `output` property, and typically stored at `.actor/output_schema.json`.
+Similarly to input, Actors can generate an output JSON object, which link to their results.
+The Actor output schema files defines, how such output object looks like,
+including types of its properties and description.
 
-The output schema defines the Actor stores its results, and it is used by the system to:
+This file is referenced in the Actor file (`.actor/actor.json`) file
+as the `output` property.
+It is a standard JSON Schema file with our extensions, and it is typically stored at `.actor/output_schema.json`.
+
+The output schema describes how the Actor stores its results, and it is used by the other systems:
 
 - Generate API documentation for users of Actors to figure where to find results.
 - Publish OpenAPI specification to make it easy for callers of Actors to figure where to find results.
-- Simplifies integrating Actors with other systems and workflow automation.
+- Enable integrating Actors with external systems and automated workflows.
 
-For example, the output schema file for Actor `bob/screenshot-taker` will look as follows:
+For example, the output schema file for the `bob/screenshot-taker` Actor will look as follows:
 
 ```json
 {
+  "actorOutputSchemaVersion": 1,
   "title": "Output schema for Screenshot Taker Actor",
   "description": "The URL to the resulting screenshot",
   "properties": {
