@@ -1,11 +1,8 @@
 # Actor file specification
 
+This JSON file must be present at `.actor/actor.json` and defines core properties of a single web Actor.
 
-This JSON file must be present at `.actor/actor.json` and contains an object with the definition of the web Actor.
-
-
-
-The file looks as follows:
+The file has the following structure:
 
 ```jsonc
 {
@@ -23,7 +20,8 @@ The file looks as follows:
     "MYSQL_PASSWORD": "@mySecretPassword"
   },
   
-  // If true, it indicates the Actor uses the Standby mode.
+  // If true, the Actors indicates it can be run in the Standby mode,
+  // and being started by the system to handle incoming HTTP REST requests to the Actor web server.
   "usesStandbyMode": true,
  
   // A meta object enabling impelemtations to pass arbitrary additional properties
@@ -31,7 +29,7 @@ The file looks as follows:
     "something": "bla bla"
   },
   
-  // Optional min and max memory for running this Actor
+  // Optional min and max memory for running this Actor (TODO: shouldn't this be in "meta"?)
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
   
@@ -53,9 +51,10 @@ The file looks as follows:
   },
    
   // Link to OpenAPI schema file for the Standby web server API
-  "standbyServer": "./standby-openapi.json",
-  // TODO: or this? see https://github.com/apify/actor-specs/issues/40
   "webServer": "./web-server-openapi.json",
+  // TODO: I'd use just above, instead of extra line with a second server:
+  // "standbyServer": "./standby-openapi.json",
+  // See https://github.com/apify/actor-specs/issues/40
 
   // Scripts that might be used by the CLI to ease the local Actor development.
   "scripts": {

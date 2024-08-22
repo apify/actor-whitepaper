@@ -1340,7 +1340,7 @@ define the basics of the Actor and link to all other necessary files.
 
 For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
 
-#### Example Actor file
+#### Example Actor file at `.actor/actor.json`
 
 ```json
 {

@@ -43,13 +43,14 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 
 ```jsonc
 {
+    // TODO: This should be "actorDatasetSpecification" instead, to avoid confusion with actor.json!
     "actorSpecification": 1,
     "title": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
 
     // A JSON schema object describing the dataset fields, with our extensions: the "title", "description", and "example" properties.
     // "example" is used to generate code and API examples for the Actor output.
-    // For details, see https://docs.apify.com/platform/actors/development/actor-definition/output-schema
+    // For details, see https://docs.apify.com/platform/actors/development/actor-definition/dataset-schema
     "fields": {
         "type": "object",
         "properties": {
