@@ -1,5 +1,9 @@
 # Key-value store schema file specification [work in progress]
 
+This JSON file should contain schema for files stored in the key-value store,
+defining their name, format, or content type.
+
+**BEWARE: This is currently not implemented yet and work in progress.**
 
 ## Basic properties
 
@@ -46,8 +50,7 @@ as the implementation and API will be the same.
 
 ```jsonc
 {
-    "schemaType": "KeyValueStoreSchema",
-    "schemaVersion": 2,
+    "actorKeyValueStoreSchemaVersion": 1,
     "name": "My Instagram backup",
     "description": "Backup of my Instagram account",
     

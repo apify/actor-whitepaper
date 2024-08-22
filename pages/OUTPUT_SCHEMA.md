@@ -1,7 +1,6 @@
 # Actor output schema file specification [work in progress]
 
-A JSON file that defines structure of the [output](../README.md#output) produced by an
-Actor.
+This JSON file defines the schema of the [output](../README.md#output) object produced by a web Actor.
 The file is referenced from the main [Actor file](./ACTOR_FILE.md) using the `output` property,
 and it is typically stored in `.actor/output_schema.json`.
 
@@ -19,9 +18,10 @@ The output schema is also used by the system to generate the user interface, API
 
 ```jsonc
 {
-  "actorSpecification": 1,
+  "actorOutputSchemaVersion": 1,
   "title": "Some title", // optional
   "description": "Text that is shown in the Output UI", // optional
+  // TODO: This should be JSON schema with extensions, for consistency with input schema and dataset schema
   "properties": {
     // Default dataset contains all the scraped products
     // In the "output" object, the field should be a link to dataset with the right view

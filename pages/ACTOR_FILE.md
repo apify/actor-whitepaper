@@ -20,8 +20,8 @@ The file has the following structure:
     "MYSQL_PASSWORD": "@mySecretPassword"
   },
   
-  // If true, the Actors indicates it can be run in the Standby mode,
-  // and being started by the system to handle incoming HTTP REST requests to the Actor web server.
+  // If true, the Actor indicates it can be run in the Standby mode,
+  // to get started and be kept alive by the system to handle incoming HTTP REST requests by the Actor's web server.
   "usesStandbyMode": true,
  
   // A meta object enabling impelemtations to pass arbitrary additional properties
@@ -29,7 +29,7 @@ The file has the following structure:
     "something": "bla bla"
   },
   
-  // Optional min and max memory for running this Actor (TODO: shouldn't this be in "meta"?)
+  // Optional min and max memory for running this Actor (TODO: shouldn't this also be in "meta"?)
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
   
@@ -51,9 +51,9 @@ The file has the following structure:
   },
    
   // Link to OpenAPI schema file for the Standby web server API
-  "webServer": "./web-server-openapi.json",
+  "webServer": "./web_server_openapi.json",
   // TODO: I'd use just above, instead of extra line with a second server:
-  // "standbyServer": "./standby-openapi.json",
+  // "standbyServer": "./standby_openapi.json",
   // See https://github.com/apify/actor-specs/issues/40
 
   // Scripts that might be used by the CLI to ease the local Actor development.
