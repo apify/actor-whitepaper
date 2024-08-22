@@ -27,7 +27,7 @@ The output schema is also used by the system to generate the user interface, API
     // Default dataset contains all the scraped products
     // In the "output" object, the field should be a link to dataset with the right view
     "currentProducts": {
-      "type": "dataset",
+      "type": "$dataset",
       // You can reference views how to render the output, using "views" defined by the Dataset schema file
       "views": ["productVariants"]
       // Optionally, the output can reference an existing dataset to provide its results from,
@@ -38,7 +38,7 @@ The output schema is also used by the system to generate the user interface, API
     // Selects a specific group of records with a certain prefix. In UI, this can be shown
     // as a list of images. In the output object, this will be a link to a API with "prefix" param.
     "productImages": {
-      "type": "$keyValueStore.default",
+      "type": "$keyValueStore",
       "title": "Product images", //optional
       "description": "Yaddada", //optional
       "collections": ["screenshots"] // optional, default means all collections in key-value-store
@@ -47,7 +47,7 @@ The output schema is also used by the system to generate the user interface, API
     // If the users want to reference a single file, they do it via selecting a collection
     // that displays only a single file. In the output object, the result should be a link to file.
     "summaryReportView": {
-      "type": "key-value-store",
+      "type": "$keyValueStore",
       "title": "API server", // optional
       "collections": ["monitoringReport"],
       "target": "default" //optional
@@ -56,7 +56,7 @@ The output schema is also used by the system to generate the user interface, API
     // Live view
     // In the "output" object, the result should be a link to live view URL
     "apiServer": {
-      "type": "live-view",
+      "type": "$webServer",
       "title": "API server", // optional
       "description": "API documentation is available in swagger.com/api/xxxx", // optional
       "path": "/nice-report?query=123",
@@ -70,6 +70,10 @@ The output schema is also used by the system to generate the user interface, API
 
 
 ## Random notes
+
+The output schema can reference other datasets/kv-stores/queues
+but only those ones that are referenced in the input, or the default. Hence
+there's no point to include storage schema here again, as it's done elsewhere.
 
 - **NOTE:** The output schema should enable developers to define schema for the
   default dataset and key-value store. But how? It should be declarative
@@ -92,11 +96,6 @@ The output schema is also used by the system to generate the user interface, API
   - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
   - `output` will be a property of run object generated from Output schema
 
-NOTE: We decided that output schema can reference other datasets/kv-stores/queues
-but only those ones that are referenced in the input, or the default. Hence
-there's no point to include storage schema here again, as it's done elsewhere.
-
-TODO: Fix this
 
 
 ## Examples of ideal Actor run UI
