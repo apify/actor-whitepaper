@@ -1,6 +1,6 @@
 # The Web Actor Programming Model Whitepaper [DRAFT]
 
-**The whitepaper describes a new concept for building serverless microapps called _Actors_,
+**This whitepaper describes a new concept for building serverless microapps called _Actors_,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs or agents running in the cloud.**
@@ -1337,6 +1337,10 @@ and it always must be present at `.actor/actor.json`.
 This file has JSON format and contains a single object, whose properties 
 define the basics of the Actor and link to all other necessary files.
 
+For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
+
+#### Example Actor file
+
 ```json
 {
   "actorSpecification": 1,
@@ -1348,8 +1352,6 @@ define the basics of the Actor and link to all other necessary files.
   "dockerfile": "./Dockerfile"
 }
 ```
-
-For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
 
 
 ### Dockerfile

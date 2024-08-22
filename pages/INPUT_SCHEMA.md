@@ -1,17 +1,18 @@
 # Actor input schema file specification
 
-NOTE: Currently the Apify platform only supports [input schema version 1](https://docs.apify.com/Actors/development/input-schema),
-this document describes how the version 2 should look like, but it's not implemented yet.
-
-## Work in progress
-
 A JSON object that defines structure of the input object accepted by the
 Actor (see [Input and Output](../README.md#input-and-output) for details).
 The file is referenced from the main [Actor file](ACTOR_FILE.md) using the `input` directive,
 and it is typically stored in `.actor/input-schema.json`.
 
+NOTE: Currently the Apify platform only supports [input schema version 1](https://docs.apify.com/Actors/development/input-schema),
+this document describes how the version 2 should look like, but it's not implemented yet.
+
 **Backwards compatibility:** If the main Actor file is missing,
 the system uses the legacy [`INPUT_SCHEMA.json`](https://docs.apify.com/Actors/development/input-schema) in Actor's top-level directory (if present).
+
+
+## Older ideas that might never materialize
 
 Changes to the legacy `INPUT_SCHEMA.json`:
 - We removed `title`, it is largely useless.

@@ -1,6 +1,9 @@
 # Actor file specification
 
-This JSON file must be present at `.actor/actor.json` and contains an object with the definition of the Actor.
+
+This JSON file must be present at `.actor/actor.json` and contains an object with the definition of the web Actor.
+
+
 
 The file looks as follows:
 
@@ -22,9 +25,7 @@ The file looks as follows:
   
   // If true, it indicates the Actor uses the Standby mode.
   "usesStandbyMode": true,
-  // Link to OpenAPI schema for the Standby web server API
-  "standbySchemaOpenAPI": "./standby-openapi.json",
-  
+ 
   // A meta object enabling impelemtations to pass arbitrary additional properties
   "meta": {
     "something": "bla bla"
@@ -39,16 +40,22 @@ The file looks as follows:
   "readme": "./README.md", // If omitted, the system looks for "./ACTOR.md" and "../README.md"
   "changelog": "../../../shared/CHANGELOG.md",
   
-  // Links to input/output schema files, or inlined schema objects.
+  // Links to input/output JSON schema files, or inlined JSON schema objects.
   "input": "./input_schema.json",
   "output": "./output_schema.json",
   
-  // Links to storage schema files, or inlined schema objects.
+  // Links to storages schema files, or inlined schema objects.
+  // These aren't standard JSON schema files, but our own format. See ./DATASET_SCHEMA.md
   "storages": {
     "keyValueStore": "./key_value_store_schema.json",
     "dataset": "../shared_schemas/generic_dataset_schema.json",
     "requestQueue": "./request_queue_schema.json"
   },
+   
+  // Link to OpenAPI schema file for the Standby web server API
+  "standbyServer": "./standby-openapi.json",
+  // TODO: or this? see https://github.com/apify/actor-specs/issues/40
+  "webServer": "./web-server-openapi.json",
 
   // Scripts that might be used by the CLI to ease the local Actor development.
   "scripts": {
