@@ -225,9 +225,13 @@ The Actor results are typically fully available only after the Actor run finishe
 but the consumers of the results might want to access partial results during the run.
 Therefore, the Actors don't generate the output object directly, but rather
 define an [Output schema file](#output-schema-file), which contains
-instruction how to generate the output object. The output object is stored
-to the Actor run object under the `output` property, and returned via API immediately after
+instruction how to generate such output object automatically.
+
+The output object is stored by the system
+to the Actor run object under the `output` property, and returned via API immediately when
 the Actor is started, without the need to wait for it to finish or generate the actual results.
+This is useful to automatically generate UI previews of the results, API examples,
+and integrations.
 
 The output object is similar to input object, as it contains properties and values.
 For example, for the `bob/screenshot-taker` Actor the output object can look like this:
@@ -237,11 +241,6 @@ For example, for the `bob/screenshot-taker` Actor the output object can look lik
   "screenshotUrl": "https://api.apify.com/key-value-stores/FkspwWd8dFknjkxx/screenshot.png"
 }
 ```
-
-The output object is generated automatically by the system based on the [output schema file](#output-schema-file).
-
-The output schema and output object can then be used by callers of Actors to figure where to find
-Actor results, how to display them to users, or simplify plugging of Actors in workflow automation pipelines.
 
 ### Storage
 
