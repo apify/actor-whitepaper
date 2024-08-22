@@ -38,7 +38,7 @@ The output schema is also used by the system to generate the user interface, API
     // Selects a specific group of records with a certain prefix. In UI, this can be shown
     // as a list of images. In the output object, this will be a link to a API with "prefix" param.
     "productImages": {
-      "type": "key-value-store",
+      "type": "$keyValueStore.default",
       "title": "Product images", //optional
       "description": "Yaddada", //optional
       "collections": ["screenshots"] // optional, default means all collections in key-value-store

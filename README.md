@@ -1507,7 +1507,9 @@ The output schema describes how the Actor stores its results, and it is used by 
 - Publish OpenAPI specification to make it easy for callers of Actors to figure where to find results.
 - Enable integrating Actors with external systems and automated workflows.
 
-For example, the output schema file for the `bob/screenshot-taker` Actor will look as follows:
+For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
+
+This is an example of the output schema file for the `bob/screenshot-taker` Actor:
 
 ```json
 {
@@ -1516,14 +1518,12 @@ For example, the output schema file for the `bob/screenshot-taker` Actor will lo
   "description": "The URL to the resulting screenshot",
   "properties": {
     "screenshotUrl": {
-      "type": "key-value-store.file",
+      "type": "$defaultKeyValueStore.file",
       "title": "Webpage screenshot"
     }
   }
 }
 ```
-
-For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
 
 ### Storage schema files
 
