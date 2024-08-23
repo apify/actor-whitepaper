@@ -251,15 +251,14 @@ The Actor system provides two specialized storages that can be used by Actors fo
 the system automatically creates so-called **default storages** of both these types
 in empty state and makes them readily available for the Actor.
 
-Alternatively, a user can request reusing existing storage when starting a new Actor run.
+Alternatively, a caller can request reusing existing storage when starting a new Actor run.
 This is similar to redirecting standard input in UNIX,
-and it's useful if you want an Actor to operate on an existing Key-value store or Dataset instead of creating a new one.
-
+and it is useful if you want an Actor to operate on an existing Key-value store or Dataset instead of creating a new one.
 <!-- TODO: The above feature is not implemented yet -->
 
-Besides these so-called **default storages**, which are created automatically, the Actors are free to create new storages or
+Besides these so-called **default storages**, which are created or linked automatically, the Actors are free to create new storages or
 access existing ones, either by ID or a name that can be set to them (e.g. `bob/screenshots`).
-The [input](#input-schema-file) and [output schema files](#output-schema-file) provide special support for referencing these storages,
+The [input schema file](#input-schema-file) and [output schema file](#output-schema-file) provide special support for referencing these storages,
 in order to simplify linking an output of one Actor to an input of another.
 The storages are accessible through an API and SDK also externally, for example,
 to download results when the Actor finishes.
