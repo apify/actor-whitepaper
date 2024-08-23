@@ -50,6 +50,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Metamorph](#metamorph)
   * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
   * [Abort another Actor](#abort-another-actor)
+  * [Reboot the Actor](#reboot-the-actor)
   * [Live view web server](#live-view-web-server)
   * [Standby mode](#standby-mode)
   * [Migration to another server](#migration-to-another-server)
@@ -838,18 +839,19 @@ $ echo $ACTOR_RUN_ID
 
 ### Actor status
 
-Each Actor run has a status (the `status` field), which can be one of the following values:
+Each Actor run has a status (the `status` field), which indicates its stage in the Actor's lifecycle.
+The status can be one of the following values:
 
-|Status|Type|Description|
-|--- |--- |--- |
-|`READY`|initial|Started but not allocated to any worker yet|
-|`RUNNING`|transitional|Executing on a worker|
-|`SUCCEEDED`|terminal|Finished successfully|
-|`FAILED`|terminal|Run failed|
-|`TIMING-OUT`|transitional|Timing out now|
-|`TIMED-OUT`|terminal|Timed out|
-|`ABORTING`|transitional|Being aborted by user|
-|`ABORTED`|terminal|Aborted by user|
+|Status|Type| Description                                 |
+|--- |--- |---------------------------------------------|
+|`READY`|initial| Started but not allocated to any worker yet |
+|`RUNNING`|transitional| Executing on a worker                       |
+|`SUCCEEDED`|terminal| Finished successfully                       |
+|`FAILED`|terminal| Run failed                                  |
+|`TIMING-OUT`|transitional| Timing out now                              |
+|`TIMED-OUT`|terminal| Timed out                                   |
+|`ABORTING`|transitional| Being aborted by a user or system           |
+|`ABORTED`|terminal| Aborted by a user or system                 |
 
 Additionally, the Actor run has a status message (the `statusMessage` field),
 which contains a text for users informing them what the Actor is currently doing,
@@ -1180,7 +1182,37 @@ $ actor abort --run-id RUN_ID
 $ kill <PID>
 ```
 
-<!-- TODO: Include Actor.boot() or not? I'd say yes. See https://github.com/apify/actor-specs/issues/23 -->
+
+### Reboot the Actor
+
+Sometimes, an Actor might get into some error state from which it's not safe or possible to recover,
+e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job,
+the Actor can reboot its own Docker container and continue work from its previously persisted state.
+
+Normally, if an Actor crashes, the system restarts its container too, but
+if that happens too often in a short period of time, the system
+might completely [abort](#actor-status) the Actor run.
+The reboot operation can be used by the Actor developer to indicate
+this is a controlled operation, not considered by the system as a crash.
+
+#### Node.js
+
+```js
+await Actor.reboot();
+```
+
+#### Python
+
+```python
+await Actor.reboot()
+```
+
+#### CLI
+
+```bash
+$ actor reboot 
+```
+
 
 ### Live view web server
 

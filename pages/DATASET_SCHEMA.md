@@ -43,8 +43,7 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 
 ```jsonc
 {
-    // TODO: This should be "actorDatasetSchemaVersion" instead, to avoid confusion with actor.json!
-    "actorSpecification": 1,
+    "actorDatasetSchemaVersion": 1,
     "title": "Eshop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
 
