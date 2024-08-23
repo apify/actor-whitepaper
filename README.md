@@ -1480,19 +1480,19 @@ by the input schema file. This file is referenced in the Actor file (`.actor/act
 as the `input` property.
 It is a standard JSON Schema file with our extensions, and it is typically stored at `.actor/input_schema.json`.
 
-The input schema file list properties accepted by Actor on input. It is used by the system to:
+The input schema file defines properties accepted by Actor on input. It is used by the system to:
 
 - Validate the passed input JSON object on Actor run,
   so that Actors don't need to perform input validation and error handling in their code.
-- Render user interface for Actors to make it easy for users to run and test them manually
+- Render user interface for Actors to make it easy for users to run and test them manually.
 - Generate Actor API documentation and integration code examples on the web or in CLI,
-  making Actors easy for users to integrate the Actors.
+  making Actors easy to integrate for users.
 - Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
-  that smartly pre-populate and link Actor input properties
+  that smartly pre-populate and link Actor input properties.
 
 For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
 
-For example, the input schema for Actor `bob/screenshot-taker` will look like this:
+This is an example of the input schema file for the `bob/screenshot-taker` Actor::
 
 ```json
 {
@@ -1524,10 +1524,9 @@ For example, the input schema for Actor `bob/screenshot-taker` will look like th
 
 ### Output schema file
 
-Similarly to input, Actors can generate an output JSON object, which link to their results.
-The Actor output schema files defines, how such output object looks like,
+Similarly to input, Actors can generate an [output](#output) JSON object, which links to their results.
+The Actor output schema file defines how such output object looks like,
 including types of its properties and description.
-
 This file is referenced in the Actor file (`.actor/actor.json`) file
 as the `output` property.
 It is a standard JSON Schema file with our extensions, and it is typically stored at `.actor/output_schema.json`.
