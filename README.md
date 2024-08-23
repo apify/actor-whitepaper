@@ -81,7 +81,8 @@ a new kind of serverless microapps (or agents, cloud programs, functions) for ge
 language-agnostic computing and automation jobs.
 The main goal for Actors is to make it easy for developers build and ship reusable
 software automation tools, which are also easy to run
-and integrate by other users.
+and integrate by other users. For example, Actors are useful for building
+web scrapers, crawlers, AI agents, or automation backends.
 
 
 ### Background
@@ -247,11 +248,19 @@ For example, for the `bob/screenshot-taker` Actor the output object can look lik
 
 The Actor system provides two specialized storages that can be used by Actors for storing files and results:
 **Key-value store** and **Dataset**, respectively. For each Actor run,
-the system automatically creates both these storages 
+the system automatically creates so-called **default storages** of both these types
 in empty state and makes them readily available for the Actor.
 
-Besides these default storages, Actors are free to create new or
-access other existing Key-value stores and Datasets, either by ID or a name that can be set to them.
+Alternatively, a user can request reusing existing storage when starting a new Actor run.
+This is similar to redirecting standard input in UNIX,
+and it's useful if you want an Actor to operate on an existing Key-value store or Dataset instead of creating a new one.
+
+<!-- TODO: The above feature is not implemented yet -->
+
+Besides these so-called **default storages**, which are created automatically, the Actors are free to create new storages or
+access other existing ones, either by ID or a name that can be set to them (e.g. `bob/screenshots`).
+The [input](#input-schema-file) and [output](#output-schema-file) schema files provide special support for referencing these storages,
+in order to simplify linking an output of one Actor to an input of another.
 The storages are accessible through an API and SDK also externally, for example,
 to download results when the Actor finishes.
 
@@ -262,21 +271,25 @@ an SQL or a vector database.
 
 The Key-value store is a simple data storage that is used for saving and reading
 files or data records. The records are represented by a unique text key and the data associated with a MIME content type.
-Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of Actors.
+Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of Actors e.g. as a JSON file.
 
-Each Actor run is associated with a default empty key-value store, which is created exclusively for the run.
-The [Actor input](#input) is stored as JSON file into the default key-value store under the key defined by
+Each Actor run is associated with a default empty Key-value store, which is created exclusively for the run,
+or alternatively with an existing Key-value store if requested by the user on Actor start.
+The [Actor input](#input) is stored as JSON file into the default Key-value store under the key defined by
 the `ACTOR_INPUT_KEY` environment variable (usually `INPUT`).
-The Actor can read this object using the [Get input](#get-input) function.
+The Actor can read this input object using the [Get input](#get-input) function.
 
 The Actor can read and write records to key-value stores using the API. For details,
 see [Key-value store access](#key-value-store-access).
+
+The Actor can define a schema for the Key-value store to ensure files stored in it conform to certain rules.
+For details, see [Storage schema files](#storage-schema-files).
 
 #### Dataset
 
 The Dataset is an append-only storage that allows you to store a series of data objects
 such as results from web scraping, crawling, or data processing jobs.
-You can export your datasets to formats such as JSON, CSV, XML, RSS, Excel, or HTML.
+You or your users can then export the Dataset to formats such as JSON, CSV, XML, RSS, Excel, or HTML.
 
 The Dataset represents a store for structured data where each object stored has the same attributes,
 such as online store products or real estate offers. You can imagine it as a table, where each object is
@@ -284,6 +297,8 @@ a row and its attributes are columns. Dataset is an append-only storage—you ca
 it, but you cannot modify or remove existing records. Typically, it is used to store an array or collection of results,
 such as a lit of products or web pages.
 
+The Actor can define a schema for the Dataset to ensure objects stored in it conform to certain rules.
+For details, see [Storage schema files](#storage-schema-files).
 
 ### Integrations
 
