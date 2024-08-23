@@ -9,7 +9,7 @@ By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
 [Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team.
 
-**Version 0.9 (August 2024)**
+**Version 1.0 (August 2024)**
 
 ## Contents
 
@@ -1367,7 +1367,7 @@ in particular when creating an Actor from pre-existing software repositories.
 This is the main definition file of the Actor,
 and it always must be present at `.actor/actor.json`.
 This file has JSON format and contains a single object, whose properties 
-define the basics of the Actor and link to all other necessary files.
+define the main features of the Actor and link to all other necessary files.
 
 For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
 
@@ -1391,13 +1391,13 @@ For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
 This file contains instructions for the system how to build the Actor's
 Docker image and how to run it.
 Actors are started by running their Docker image,
-both locally using the `apify run` command,
+both locally using the `apify run` command
 as well as on the Apify platform.
 
 The Dockerfile is referenced from the [Actor file](#actor-file) using the `dockerfile`
 directive, and is typically stored at `.actor/Dockerfile`.
 
-Note that paths in Dockerfile are ALWAYS specified relative to the Dockerfile's location.
+Note that paths in Dockerfile are always specified relative to the Dockerfile's location.
 Learn more about Dockerfiles in the official [Docker reference](https://docs.docker.com/engine/reference/builder/).
 
 #### Example Dockerfile of an Actor
@@ -1463,10 +1463,9 @@ CMD ./start_xvfb_and_run_cmd.sh && ./run_protected.sh npm run start:prod --silen
 ### README
 
 The README file contains Actor documentation written
-in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
-format.
-It is used to generate Actor's public web page on Apify,
-and it should contain great explanation what the Actor does and how to use it.
+in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+It should contain great explanation what the Actor does and how to use it.
+The README file is used to generate Actor's public web page on Apify and other things.
 
 The README file is referenced from the [Actor file](#actor-file) using the `readme`
 property, and typically stored at `.actor/README.md`.

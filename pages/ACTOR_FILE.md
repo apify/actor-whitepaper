@@ -6,13 +6,13 @@ The file has the following structure:
 
 ```jsonc
 {
-  // Required, indicates that this is an Actor definition file
+  // Required, indicates that this is an Actor definition file and the specific version of the Actor specification.
   "actorSpecification": 1,
   
   // Properties
   "name": "google-search-scraper",
   "title": "Google Search Scraper",
-  "description": "The 200-char description",
+  "description": "A 200-char description",
   "version": "0.0", // Required
   "buildTag": "latest", // If omitted, builds with "latest" tag
   "environmentVariables": {
