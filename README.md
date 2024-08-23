@@ -258,14 +258,14 @@ and it's useful if you want an Actor to operate on an existing Key-value store o
 <!-- TODO: The above feature is not implemented yet -->
 
 Besides these so-called **default storages**, which are created automatically, the Actors are free to create new storages or
-access other existing ones, either by ID or a name that can be set to them (e.g. `bob/screenshots`).
-The [input](#input-schema-file) and [output](#output-schema-file) schema files provide special support for referencing these storages,
+access existing ones, either by ID or a name that can be set to them (e.g. `bob/screenshots`).
+The [input](#input-schema-file) and [output schema files](#output-schema-file) provide special support for referencing these storages,
 in order to simplify linking an output of one Actor to an input of another.
 The storages are accessible through an API and SDK also externally, for example,
 to download results when the Actor finishes.
 
 Note that the Actors are free to access any other external storage system through a third-party API, e.g.
-an SQL or a vector database.
+an SQL database or a vector database.
 
 #### Key-value store
 
