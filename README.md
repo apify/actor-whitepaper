@@ -248,18 +248,19 @@ For example, for the `bob/screenshot-taker` Actor the output object can look lik
 The Actor system provides two specialized storages that can be used by Actors for storing files and results:
 **Key-value store** and **Dataset**, respectively. For each Actor run,
 the system automatically creates both these storages 
-in empty state, and makes them readily available for the Actor.
+in empty state and makes them readily available for the Actor.
 
 Besides these default storages, Actors are free to create new or
-access other existing key-value stores and datasets, either by ID or a name that can be set to them.
+access other existing Key-value stores and Datasets, either by ID or a name that can be set to them.
 The storages are accessible through an API and SDK also externally, for example,
 to download results when the Actor finishes.
 
-Note that the Actors are free to access any other external storage through any third-party API.
+Note that the Actors are free to access any other external storage system through a third-party API, e.g.
+an SQL or a vector database.
 
 #### Key-value store
 
-The key-value store is a simple data storage that is used for saving and reading
+The Key-value store is a simple data storage that is used for saving and reading
 files or data records. The records are represented by a unique text key and the data associated with a MIME content type.
 Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of Actors.
 
@@ -273,17 +274,16 @@ see [Key-value store access](#key-value-store-access).
 
 #### Dataset
 
-Dataset storage allows you to store a series of data objects such as results from web scraping, crawling or data processing jobs. You can export your datasets in JSON, CSV, XML, RSS, Excel or HTML formats.
+The Dataset is an append-only storage that allows you to store a series of data objects
+such as results from web scraping, crawling, or data processing jobs.
+You can export your datasets to formats such as JSON, CSV, XML, RSS, Excel, or HTML.
 
 The Dataset represents a store for structured data where each object stored has the same attributes,
 such as online store products or real estate offers. You can imagine it as a table, where each object is
-a row and its attributes are columns. Dataset is an append-only storage - you can only add new records to
-it, but you cannot modify or remove existing records. Typically, it is used to store crawling results.
+a row and its attributes are columns. Dataset is an append-only storage—you can only add new records to
+it, but you cannot modify or remove existing records. Typically, it is used to store an array or collection of results,
+such as a lit of products or web pages.
 
-Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
-When an Actor starts, by default it is associated with a newly-created empty default dataset.
-The Actor can create additional datasets or access existing datasets created by other Actors,
-and use those as needed.
 
 ### Integrations
 
