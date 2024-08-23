@@ -384,7 +384,8 @@ The following table shows equivalents of key concepts of UNIX programs and Actor
 - Optimize for the users of the Actors, help them understand what the Actor does, easily run it, and integrate.
 - Also optimize for interoperability, to make it ever easier to connect Actors with other systems.
   Expect objects your work with might contain additional not-yet-known fields.
-- Keep the API as simple as possible and write a great documentation, so that Actors can be built and used by >90% of software developers, even the no-code ones!
+- Keep the API as simple as possible and write a great documentation, so that Actors can be built and used by >90% of software developers,
+  even ones using no-code tools (yes, that's also software development!).
 
 ### Relation to the Actor model
 
