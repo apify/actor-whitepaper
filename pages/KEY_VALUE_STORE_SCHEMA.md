@@ -3,7 +3,7 @@
 This JSON file should contain schema for files stored in the key-value store,
 defining their name, format, or content type.
 
-**BEWARE: This is currently not implemented yet and work in progress.**
+**BEWARE: This is currently not implemented yet and subject to change.**
 
 ## Basic properties
 
@@ -19,7 +19,7 @@ UI and API.
    "collections": {
       "screenshots": {
             "name": "Post images",
-            "keyPrefix": "images-",
+            "keyPrefixes": ["images-"],
             "contentTypes": ["image/jpeg", "image/png"]
        }
    }

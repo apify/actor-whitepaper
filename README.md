@@ -1563,9 +1563,21 @@ This is an example of the output schema file for the `bob/screenshot-taker` Acto
   "title": "Output schema for Screenshot Taker Actor",
   "description": "The URL to the resulting screenshot",
   "properties": {
+
+    "currentProducts": {
+      "type": "$defaultDataset",
+      "views": ["productVariants"]
+    },
+    
     "screenshotUrl": {
-      "type": "$defaultKeyValueStore.file",
-      "title": "Webpage screenshot"
+      "type": "$defaultKeyValueStore",
+      "keys": ["screenshot.png"],
+      "title": "Product page screenshot"
+    },
+
+    "productExplorer": {
+      "type": "$defaultWebServer",
+      "title": "API server"
     }
   }
 }
