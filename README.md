@@ -229,7 +229,7 @@ Therefore, Actors don't generate the output object in their code, but they
 define an [Output schema file](#output-schema-file), which contains
 instruction how to generate such output object automatically.
 
-You can define how the Actor output looks like using the [Output schema file](#output-schema-file),
+You can define how the Actor output looks like using the [Output schema file](#output-schema-file).
 The system uses this information to automatically generate an immutable JSON file,
 which tells users where to find the results produced by the Actor.
 The output object is stored by the system
