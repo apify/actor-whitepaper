@@ -3,13 +3,13 @@
 **This whitepaper describes a new concept for building serverless microapps called _Actors_,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
-for programs or agents running in the cloud.**
+for programs (aka agents) running in the cloud.**
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
 [Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team.
 
-**Version 1.0 (August 2024)**
+**Version 0.99 (September 2024)**
 
 ## Contents
 
@@ -76,13 +76,13 @@ By [Jan Čurn](https://apify.com/jancurn),
 
 ## Introduction
 
-This whitepaper introduces _Actors_,
-a new kind of serverless microapps (or agents, cloud programs, functions) for general-purpose
+This whitepaper introduces **Actors**,
+a new kind of serverless programs (aka agents, functions, apps, ...) for general-purpose
 language-agnostic computing and automation jobs.
 The main goal for Actors is to make it easy for developers build and ship reusable
-software automation tools, which are also easy to run
-and integrate by other users. For example, Actors are useful for building
-web scrapers, crawlers, AI agents, or automation backends.
+software tools, which are also easy to run
+and integrate by others. For example, Actors are useful for building
+web scrapers, crawlers, automations, and AI agents.
 
 
 ### Background
@@ -114,7 +114,7 @@ described in this whitepaper. This is work in progress.
 
 ### Overview
 
-Actors are serverless programs or agents running in the cloud.
+Actors are serverless programs running in the cloud.
 They can perform anything from simple actions such as
 filling out a web form or sending an email,
 to complex operations such as crawling an entire website,
