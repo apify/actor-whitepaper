@@ -14,6 +14,8 @@ to see format of its results as it's predefined by the output schema.
 
 The output schema is also used by the system to generate the user interface, API examples, integrations, etc.
 
+The file format is a JSON Schema with our extensions.
+
 ## Structure
 
 ```jsonc
@@ -22,47 +24,61 @@ The output schema is also used by the system to generate the user interface, API
   "title": "Some title", // optional
   "description": "Text that is shown in the Output UI", // optional
   "type": "object",
-  // TODO: This should be JSON schema with extensions, for consistency with input schema and dataset schema
   "properties": {
-    // Default dataset contains all the scraped products
-    // In the "output" object, the field should be a link to dataset with the right view
+  
+    // Properties in output reference Actor run's default storages,
+    // or live view / Standby mode server.
+     
     "currentProducts": {
+      // We extend JSON Schema "type" with the new ones, all prefixed with '$':
       "type": "$dataset",
-      // You can reference views how to render the output, using "views" defined by the Dataset schema file
-      "views": ["productVariants"]
-      // Optionally, the output can reference an existing dataset to provide its results from,
-      // if it was passed via "type": "dataset" property.
-      "target": "$input.myProductsDatasetId"
+      // or specific storage JSON schema file
+      "type": "./dataset_schema.json", 
+      
+      // Specify where the value will eventually be produced 
+      "link": "$actor.dataset", 
+      // you can also reference a property from input object,
+      // the linkage will be checked for type compatibility
+      "link": "$input.myProductsDatasetId",
+      
+      // Select views how to render the output, using "views" defined by the Dataset schema file
+      "views": ["productVariants"],
     },
 
     // Selects a specific group of records with a certain prefix. In UI, this can be shown
     // as a list of images. In the output object, this will be a link to a API with "prefix" param.
     "productImages": {
       "type": "$keyValueStore",
-      "title": "Product images", //optional
-      "description": "Yaddada", //optional
-      "collections": ["screenshots"] // optional, default means all collections in key-value-store
-    },
-    
-    // If the users want to reference a single file, they do it via selecting a collection
-    // that displays only a single file. In the output object, the result should be a link to file.
-    "summaryReportView": {
-      "type": "$keyValueStore",
-      "title": "API server", // optional
-      "collections": ["monitoringReport"],
-      "target": "default" //optional
+      // or specific storage JSON schema file
+      "type": "./key_value_store_schema.json", 
+      
+      "link": "$actor.keyValueStore", 
+
+      "title": "Product images",
+      "description": "Yaddada", // optional
+      
+      // optionally, you can specify which files to display in UI for key-value stores
+      "keyPrefixes": ["images-"],
+      "collection": "screenshots",
     },
 
-    // Live view
-    // In the "output" object, the result should be a link to live view URL
-    "apiServer": {
-      "type": "$webServer",
-      "title": "API server", // optional
+    // Live view web server for to the Actor, or Standby mode fixed URL
+    // In the "output" view, this page is rendered in an IFRAME
+    "productExplorer": {
+      // a generic web server
+      "type": "$defaultWebServer",
+      
+      // Reference an OpenAPI schema of the web server
+      "type": "./web_server_openapi.json"
+      
+      "link": "$actor.webServer", 
+
+      "title": "API server",
+      
       "description": "API documentation is available in swagger.com/api/xxxx", // optional
-      "path": "/nice-report?query=123",
-      // IDEA: In the future, we could perhaps work with the API/swagger schema on more advanced level,
-      // but it might be an overkill
-      "schema": "TODO"
+      
+      // specify a path to open?
+      "viewPath": "/nice-report?query=123",
     }
   }
 }
@@ -126,42 +142,3 @@ This tab will be at the first position and displayed by default. Tab will show t
 - Default setup, i.e., what output components should be displayed at the default run tab
 - Optionally, the setup for different states
 - Be able to pragmatically changes this using API by Actor itself
-
-
-## OUTPUT.json
-
-```jsonc
-{
-    "title": "Some title",
-    "description": "Some description",
-    "properties": {
-        "currentProducts": {
-            "id": "lkspwWd8dFknjkxx",
-            "type": "dataset",
-            "url": "https://api.apify.com/datasets/lkspwWd8dFknjkxx",
-            "views": {
-                "productVariants": {
-                    "title": "Product variants",
-                    "description": "yadayada",
-                    "url": "https://api.apify.com/datasets/lkspwWd8dFknjkxx/?view=productVariants"
-                 }
-            }
-        },
-        "productImages": {
-            "id": "FkspwWd8dFknjkxx",
-            "type": "key-value-store",
-            "title": "Product images",
-            "description": "Yaddada",
-            "url": "https://api.apify.com/key-value-stores/FkspwWd8dFknjkxx",
-            "collections": {
-                "screenshots": {
-                    "title": "...",
-                    "description": "...",
-                    "url": "https://api.apify.com/key-value-stores//lkspwWd8dFknjkxx/?collection=screenshots"
-                }
-            }
-        }
-    }
-}
-```
-
