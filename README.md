@@ -11,6 +11,7 @@ By [Jan Čurn](https://apify.com/jancurn),
 
 **Version 0.99 (September 2024)**
 
+
 ## Contents
 
 <!-- toc -->
