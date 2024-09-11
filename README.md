@@ -77,8 +77,8 @@ By [Jan Čurn](https://apify.com/jancurn),
 ## Introduction
 
 This whitepaper introduces **Actors**,
-a new kind of serverless programs (aka agents, functions, apps, ...) for general-purpose
-language-agnostic computing and automation jobs.
+a new kind of serverless programs for general-purpose
+language-agnostic computing and automation jobs (also known as agents, functions, apps, ...).
 The main goal for Actors is to make it easy for developers build and ship reusable
 software tools, which are also easy to run
 and integrate by others. For example, Actors are useful for building
