@@ -143,6 +143,8 @@ systems on top of simple ones.
 
 ![Apify Actor diagram](./img/apify-actor-diagram.png)
 
+<!-- Image source: https://docs.google.com/presentation/d/1nDgrI0p2r8ouP_t_Wn02aTllP8_Std-kRuIbO8QLE7M/edit -->
+
 
 ### Apify platform
 
