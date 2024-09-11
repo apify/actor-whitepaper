@@ -1698,6 +1698,8 @@ The Actor will get its public landing page like `https://apify.com/bob/screensho
 showing its README, description of inputs, outputs, API examples, etc.
 Once published, your Actor is automatically exposed to organic traffic of users and potential customers.
 
+![Apify Actor Store](./img/apify-store.png)
+
 ### Monetization
 
 To build a SaaS product, one usually needs to:
