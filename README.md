@@ -245,7 +245,7 @@ and integrations.
 The output object is similar to input object, as it contains properties and values.
 For example, for the `bob/screenshot-taker` Actor, the output object can look like this:
 
-```json
+```jsonc
 {
   "screenshotUrl": "https://api.apify.com/v2/key-value-stores/skgGkFLQpax59AsFD/records/screenshot.jpg",
   "productImages": "https://api.apify.com/v2/key-value-stores/skgGkFLQpax59AsFD/records/product*.jpg",
