@@ -141,7 +141,7 @@ and integrate the results of the Actor into their other workflows.
 Actors can easily call and interact with each other, enabling building more complex
 systems on top of simple ones.
 
-![Apify Actor diagram](./img/apify-actor-diagram.png)
+![Apify Actor diagram](./img/apify-actor-drawing.png)
 
 <!-- Image source: https://docs.google.com/presentation/d/1nDgrI0p2r8ouP_t_Wn02aTllP8_Std-kRuIbO8QLE7M/edit -->
 
