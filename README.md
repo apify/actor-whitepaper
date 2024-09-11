@@ -3,7 +3,7 @@
 **This whitepaper describes a new concept for building serverless microapps called _Actors_,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
-for programs (aka agents) running in the cloud.**
+for programs running in the cloud (aka agents).**
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
