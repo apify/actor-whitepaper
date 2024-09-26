@@ -51,7 +51,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
   * [Abort another Actor](#abort-another-actor)
   * [Reboot the Actor](#reboot-the-actor)
-  * [Live view web server](#live-view-web-server)
+  * [Actor web server](#actor-web-server)
   * [Standby mode](#standby-mode)
   * [Migration to another server](#migration-to-another-server)
   * [Charging money](#charging-money)
@@ -212,7 +212,7 @@ which is useful for development and debugging.
 To inform the users about the progress, the Actors might set a [status message](#actor-status),
 which is then displayed in the user interface and also available via API.
 
-Running Actors can also launch a [live-view web server](#live-view-web-server),
+Running Actors can also launch a [web server](#actor-web-server),
 which is assigned a unique local or public URL to receive HTTP requests. For example,
 this is useful for messaging and interaction between Actors, for running request-response REST APIs, or 
 providing a full-featured website.
@@ -810,27 +810,26 @@ Actors have access to standard process environment variables.
 The Apify platform uses environment variables prefixed with `ACTOR_` to pass the Actors information
 about the execution context.
 
-| Environment variable               | Description                                                                                                                                                            |
-|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ACTOR_ID`                         | ID of the Actor.                                                                                                                                                       |
-| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                   |
-| `ACTOR_BUILD_ID`                   | ID of the Actor build.                                                                                                                                                 |
-| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build.                                                                                                          |
-| `ACTOR_TASK_ID`                    | ID of the saved Actor task.                                                                                                                                            |
-| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                          |
-| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                         |
-| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                             |
-| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                               |
-| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                     |
-| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                           |
-| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                 |
-| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for details.                                                  |
-| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world. See [Live view web server](#live-view-web-server) section for details. |
-| `ACTOR_WEB_SERVER_URL`             | A unique public URL under which the Actor run web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for details.  |
-| `ACTOR_STANDBY_PORT`               | A TCP port on which the Actor Standby can start a HTTP server to receive messages from the outside world. See [Standby mode](#standby-mode) for details.               |                                                                      |                                                                                                                                                                          |                                                                                                                                                                           |
-| `ACTOR_STANDBY_URL`                | A unique public URL under which the Actor run Standny web server is accessible from the outside world. See [Standby mode](#standby-mode) for details.                  |                                                                      |                                                                                                                                                                          |
-| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                             |
-| `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                    |
+| Environment variable               | Description                                                                                                                                                                                     |
+|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ACTOR_ID`                         | ID of the Actor.                                                                                                                                                                                |
+| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                                            |
+| `ACTOR_BUILD_ID`                   | ID of the Actor build.                                                                                                                                                                          |
+| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build.                                                                                                                                   |
+| `ACTOR_TASK_ID`                    | ID of the saved Actor task.                                                                                                                                                                     |
+| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                                                   |
+| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                  |
+| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                      |
+| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                                                        |
+| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                                              |
+| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                                    |
+| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                                          |
+| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for details.                                                                           |
+| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world, either as [Live view web server](#live-view-web-server) or in the [Standby mode](#standby-mode). |
+| `ACTOR_WEB_SERVER_URL`             | A unique hard-to-guess URL under which the current Actor run's web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for details.          |
+| `ACTOR_STANDBY_URL`                | A general public URL under which the Actor can be started and its web server accessed in the [Standby mode](#standby-mode).                                        |                                                                      |                                                                                                                                                                          |
+| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                                      |
+| `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                                             |
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in local development environment or on the Apify platform.
@@ -1242,18 +1241,27 @@ await Actor.reboot()
 $ actor reboot 
 ```
 
+### Actor web server
 
-### Live view web server
-
-An Actor can launch an HTTP web server that is exposed to the outer world.
+An Actor can launch an HTTP web server that is exposed to the outer world to handle requests.
 This enables Actors to provide a custom HTTP API to integrate with other systems,
 to provide a web application for human users, to show Actor run details, diagnostics, charts,
 or to run an arbitrary web app.
 
-On Apify platform, the port on which the Actor can launch the public web server,
+The port on which the Actor can launch the web server
 is specified by the `ACTOR_WEB_SERVER_PORT` environment variable.
-The web server is then exposed to the public internet on a URL identified 
-by the `ACTOR_WEB_SERVER_URL`, for example `https://hard-to-guess-identifier.runs.apify.net`.
+
+The web server is started, it is exposed to the public internet on a **live view URL** identified 
+by the `ACTOR_WEB_SERVER_URL`, for example:
+
+```
+https://hard-to-guess-identifier.runs.apify.net
+```
+
+The live view URL has a unique hostname, which is practically impossible to guess.
+This lets you keep the web server hidden from public yet accessible from the external internet by the parties,
+with whom you share the URL.
+
 
 #### Node.js
 
@@ -1272,27 +1280,32 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
 
 ### Standby mode
 
-The Standby mode lets Actors run in the background and respond to incoming HTTP requests, like any web or API server.
+The Standby mode lets Actors run in the background and respond to incoming HTTP requests,
+like a web or API server.
 
-Starting an Actor run requires launching a Docker container, and so it comes with a performance penalty, sometimes in order of seconds for large images.
+Starting an Actor run requires launching a Docker container, and so it comes with a performance penalty, sometimes many seconds for large images.
 For batch jobs this penalty is negligible, but for quick request-response interactions it becomes inefficient.
-The Standby mode lets developers run Actors as web servers to run jobs requiring quick response times.
+The Standby mode lets developers run Actors as web servers to run jobs that require quick response times.
 
-To use the Standby mode, start an HTTP web server at the `ACTOR_STANDBY_PORT` TCP port,
-and process arbitrary HTTP requests.
+To use the Standby mode, start an HTTP web server at the `ACTOR_WEB_SERVER_PORT` TCP port,
+and process HTTP requests.
 
-The Actor system publishes the web server at URL reported in the `ACTOR_STANDBY_EXTERNAL_URL` environment variable,
-and will automatically start or abort the Actor as needed by the amount of HTTP requests.
-The external public URL can look like this: 
+The Actor system publishes a Standby Actor's web server
+at URL reported in the `ACTOR_STANDBY_URL` environment variable,
+and will automatically start or abort an Actor run as needed by the volume of HTTP requests or system load.
+The external Standby public URL can look like this: 
 
 ```
 https://bob--screenshot-taker.apify.actor
 ```
 
+Unlike the live view URL reported in the `ACTOR_WEB_SERVER_URL` environment variable,
+the Standby URL is the same for all runs of the Actor, and it's intended to be publicly known.
+The Actor system can perform authentication of the requests going to the Standby URL using API tokens.
+
 Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
 but they might be in the future introduced as new settings in the `actor.json` file.
 
-<!-- TODO: Consider unifying Standby mode with Live view web server, they are really two sides of the same thing -->
 
 ### Migration to another server
 
