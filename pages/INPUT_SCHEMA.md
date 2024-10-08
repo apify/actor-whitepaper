@@ -5,7 +5,11 @@ Actor (see [Input](../README.md#input) for details).
 The file is referenced from the main [Actor file (.actor/actor.json)](ACTOR_FILE.md) using the `input` directive,
 and it is typically stored in `.actor/input_schema.json`.
 
-It defines input properties for an Actor, including documentation, default value, and user interface definition.
+The file is a JSON schema with our extensions,
+which defines input properties for an Actor, including documentation, default value, and user interface definition.
+
+For full references, see [Input schema specification](https://docs.apify.com/platform/actors/development/actor-definition/input-schema/specification/v1).
+
 
 ## Example Actor input schema
 
@@ -71,14 +75,16 @@ For example:
 ```jsonc
   "inputDataset": {
     "title": "Input dataset",
-    "type": "dataset",
+    "type": "string",
+    "resourceType": "Dataset",
     "schema": "./input_dataset_schema.json",
     "description": "Dataset to be processed",
   },
 
   "inputScreenshots": {
     "title": "Input screenshots",
-    "type": "keyValueStore",
+    "type": "string",
+    "resourceType": "KeyValueStore",
     "description": "Screenshots to be compressed",
     "schema": "./input_key_value_store_schema.json",
     // Specify records groups from the schema that Actor is interested in.
