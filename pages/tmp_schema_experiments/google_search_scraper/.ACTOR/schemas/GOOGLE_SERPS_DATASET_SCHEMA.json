@@ -1,0 +1,62 @@
+{
+  "name": "Google Search Results",
+  "description": "Data about Google Search results yadadada",
+
+  // This is basically a dataset schema here (so maybe call it "schema"?):
+  "fields": {
+    "url": "string",
+    "hasNextPage": "boolean",
+    "resultsTotal": "number",
+    "relatedQueries": "array",
+    "searchQuery": {
+      "term": "string",
+      "page": "number",
+      "type": "string",
+      "domain": "string",
+      "countryCode": "string",
+      "languageCode": "string",
+      "locationUule": "string",
+      "resultsPerPage": "number"
+    },
+    "organicResults": "array",
+    "organicResults.$": {
+      // ... xxx
+    },
+    "paidResults": "array",
+    // Or use this syntax?
+    "searchQuery": "object",
+    "searchQuery.term": {
+      "type": "string",
+      "optional": true
+    },
+    "searchQuery.page": "number",
+    "searchQuery.type": "string",
+    "searchQuery.domain": "string",
+    "searchQuery.countryCode": "string",
+    "searchQuery.languageCode": "string",
+    "searchQuery.locationUule": "string",
+    "searchQuery.resultsPerPage": "number"
+  },
+  // This should tell the output consumers how to render or preview the data.
+  "views": {
+    "default": {
+      "name": "All SERPs grouped by page",
+      "fields": "searchQuery.term,organicResults",
+      "descending": true,
+      "format": "html" // Is this needed? The consumer of output should pick the format
+    },
+    "raw": {
+      "name": "All search results",
+      "unwind": "organicResults",
+      "fields": "searchQuery,organicResults"
+    }
+  },
+
+  // Similar to prefill, not sure about this, who will fill this?
+  //  Maybe go back to example run, or just dataset URL?
+  "example": [{
+    "url": "http://google.com",
+    "searchQuery": "ffwef",
+    ...
+  }]
+}
