@@ -8,8 +8,9 @@ and it is typically stored in `.actor/input_schema.json`.
 The file is a JSON schema with our extensions,
 which defines input properties for an Actor, including documentation, default value, and user interface definition.
 
-For full references, see [Input schema specification](https://docs.apify.com/platform/actors/development/actor-definition/input-schema/specification/v1).
+**For full reference, see [Input schema specification](https://docs.apify.com/platform/actors/development/actor-definition/input-schema/specification/v1) in Apify documentation.**
 
+<!-- TODO: Move the full specs to this repo -->
 
 ## Example Actor input schema
 
