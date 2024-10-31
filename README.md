@@ -732,21 +732,22 @@ printf("Hello world\tColum 2\tColumn 3");
 
 ### Exit Actor
 
-When the main Actor process exits (i.e. the Docker container stops running),
+When the main Actor process exits and the Docker container stops running,
 the Actor run is considered finished and the process exit code is used to determine
 whether the Actor has succeeded (exit code `0` leads to status `SUCCEEDED`)
-or failed (exit code not equal to `0` leads to status `SUCCEEDED`).
-In this case, the platforms set a status message to a default value like `Actor exit with exit code 0`,
-which is not very descriptive for the users.
+or failed (exit code not equal to `0` leads to status `FAILED`).
 
-An alternative and preferred way to exit an Actor is using the `exit` function in SDK, as
-shown below. This has two advantages:
+In case of non-zero exit code, the system automatically sets the Actor [status message](#actor-status)
+to something like `Actor exited with code 0`, and it might attempt
+to restart the Actor to recover from the error, depending on the system and Actor configuration.
 
-- You can provide a custom status message for users to tell them what the Actor achieved
-  On error, try to explain to users
-  what happened and most importantly, how they can fix the error.
-  This greatly improves user experience.
-- The system emits the `exit` event, which can be listened to and used by various
+A preferred way to exit an Actor intentionally is using the `exit` or `fail` functions in SDK, as
+shown below. This has several advantages:
+
+- You can provide a custom status message for users to tell them what the Actor achieved,
+  or why it failed and how they can fix it. This greatly improves user experience.
+- When using `fail` to fail the Actor, the system considers the error permanent  and will not attempt to restart the Actor.
+- The SDK emits the `exit` event, which can be listened to and used by various
   components of the Actor to perform a cleanup, persist state, etc.
   Note that the caller of exit can specify how long should the system wait for all `exit`
   event handlers to complete before closing the process, using the `timeoutSecs` option.
