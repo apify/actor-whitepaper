@@ -1,0 +1,22 @@
+{
+  "staticChart": {
+    "title": "Static Chart",
+    "description": "The static HTML .",
+    "type/source": "key-value-store",
+    "file": "view.html" // ???
+  },
+
+  // log, requestQueue, OUTPUT.json, ..., adhoc-webhooks?
+
+  "dynamicChart": {
+    "title": "Dynamic chart",
+    "description": "Web browser showing rich interactive view.",
+    // This type says that the result is available in live-view, and can be rendered as HTML
+    "type/source": "live-view",
+    "defaultView": true,
+    // Perhaps better way is:
+    "source": "live-view",
+    "viewer": "iframe" / "modal-iframe" ???
+  },
+}
+

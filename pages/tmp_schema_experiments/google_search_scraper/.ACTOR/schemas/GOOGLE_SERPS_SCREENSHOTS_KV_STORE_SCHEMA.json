@@ -1,0 +1,8 @@
+
+
+// TODO: Does this make sense??? What for??? Dataset is different than KV-store...
+//  Maybe it would be useful that it would:
+//  1) Check the new records have a correct content-type when storing them and fail otherwise
+//  2) Somehow render the view differently???
+// IMHO boths cases are quite weak, plus we'd need to allow multiple such schemas per KV-store (unlike KV-store),
+// so I'd skip this.

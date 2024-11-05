@@ -1,0 +1,32 @@
+{
+    // The system will generate OUTPUT.json file and save it there right away, according to the schema below,
+    // so the consumers can read it right away after start of Actor. This is done before writing INPUT.json
+    "searchResults": {
+        "title": "Search results",
+        "description": "The main results of the Actor, each record is one Google SERPs page.",
+        "type": "dataset", // or "default-dataset"  ?
+        // How to tell the system it should use default dataset, or named? Or what if Actor caller
+        // could say which dataset/kv-store should be used for the run (new or existing with name),
+        // and "dataset" here would just mean that dataset produced by the Actor.
+        "default": true,
+        "schemaFile": "./schemas/GOOGLE_SERPS_DATASET_SCHEMA.json"
+    },
+
+    "pageHtmlSnapshots": {
+        "title": "Page HTML snapshots",
+        "description": "Saved snapshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
+        "type/source/target/location": "key-value-store", // or "default-key-value-store" ?
+        // Tells filter for the records to show/return, we'd have to add "perfix" query param to kv-store API
+        "prefix": "SNAPSHOT-html-",
+        // How to enforce???? Maybe future
+        "contentType": "image/png"
+    },
+
+    "pageScreenshots": {
+        "title": "Page screenshots",
+        "description": "Saved screenshots of the search result pages. Only available if enabled on input. Useful for testing, to review the original source.",
+        "type": "key-value-store", // or "default-key-value-store" ?
+        "prefix": "SCREENSHOT-png-"
+    }
+}
+
