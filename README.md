@@ -9,7 +9,7 @@ By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
 [Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team.
 
-**Version 0.99 (September 2024)**
+**Version 0.0.99 (Final Draft, September 2024)**
 
 ## Contents
 
