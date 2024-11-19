@@ -1339,6 +1339,16 @@ const chargeInfo = await Actor.charge({
 });
 ```
 
+```bash
+$ actor charge gpt-4o-token \
+  --count=1000
+  --chargePerEventUsd=0.0001
+```
+
+```python
+TODO python example here, fix sections
+```
+
 Specify the maximum amount you're willing to pay when starting an Actor.
 
 ```js
@@ -1352,6 +1362,15 @@ const run = await Actor.call(
 );
 ```
 
+```bash
+$ actor call bob/analyse-images \
+  --input='{"imageUrls": ["https://www.example.com/image.png"]}'
+  --max-total-charge-usd=5
+```
+
+```python
+TODO python example here
+```
 <!-- TODO: Add Python and CLI examples -->
 
 #### Rules for building Actors with variable charging
@@ -1639,6 +1658,12 @@ so that you can run it remotely.
 
 ```bash
 TODO (Adam): Show code example
+             Verify
+
+$ apify login
+? Choose how you want to log in to Apify (Use arrow keys)
+❯ Through Apify Console in your default browser
+$ apify push
 ````
 
 ### Continuous integration and delivery
@@ -1662,11 +1687,26 @@ and then store the Actor output results. For example:
 TODO (Adam): Code examples of Dockerfile with "actor" command
 ````
 
-The `actor init` CLI command can automatically
+The `actor bootstrap` CLI command can automatically
 generate the `.actor` directory and configuration files:
 
 ```bash
-$ actor init
+$ actor bootstrap
+? Actor name: actor-test
+Success: The Actor has been initialized in the current directory.
+$ tree -a
+.
+|-- .actor
+|   `-- actor.json
+|-- .gitignore
+`-- storage
+    |-- datasets
+    |   `-- default
+    |-- key_value_stores
+    |   `-- default
+    |       `-- INPUT.json
+    `-- request_queues
+        `-- default
 ```
 
 The command works on the best-effort basis,
