@@ -1371,7 +1371,8 @@ $ actor call bob/analyse-images \
 ```python
 TODO python example here
 ```
-<!-- TODO: Add Python and CLI examples -->
+
+
 
 #### Rules for building Actors with variable charging
 
@@ -1684,7 +1685,18 @@ into the configuration of the software, usually passed via command-line argument
 and then store the Actor output results. For example:
 
 ```bash
-TODO (Adam): Code examples of Dockerfile with "actor" command
+FROM alpine/curl:latest
+
+# Install node to the Alpine Docker image
+COPY --from=node:current-alpine /usr/lib /usr/lib
+COPY --from=node:current-alpine /usr/local/lib /usr/local/lib
+COPY --from=node:current-alpine /usr/local/include /usr/local/include
+COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
+
+# Install the Actor CI
+RUN npm -g install apify-cli
+
+RUN curl http://example.com | actor set-value example-com --contentType text/html
 ````
 
 The `actor bootstrap` CLI command can automatically
