@@ -1707,7 +1707,7 @@ COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
 # Install the Actor CI
 RUN npm -g install apify-cli
 
-RUN curl http://example.com | actor set-value example-com --contentType text/html
+RUN curl $(actor get-input) | actor set-value example-com --contentType text/html
 ````
 
 The `actor bootstrap` CLI command can automatically
