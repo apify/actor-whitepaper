@@ -1659,9 +1659,49 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
-TODO (Adam): Explain basic workflow with `apify` - create, run, push etc. Move the full local support for Actors
- to ideas (see https://github.com/apify/actor-specs/pull/7/files#r794681016 )
+Actor Programming Model is language agnostic, but it has native support for detection of Javascript and Python languages. Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) comes with a [convenient tamplates](https://apify.com/templates) you can bootrap an Actor with for Python and Javascript.
 
+This example is describing how to create a simple "echo" Actor localy. The Actor will get the [Input Object](#input) and it'll [pushes](#push-results-to-dataset) it to the [default [dataset](#dataset). 
+
+#### Bootstrap the Actor directory
+The `actor bootstrap` CLI command will automatically
+generate the `.actor` directory and configuration files:
+
+```bash
+$ actor bootstrap
+? Actor name: actor-test
+Success: The Actor has been initialized in the current directory.
+$ tree -a
+.
+|-- .actor
+|   `-- actor.json
+|-- .gitignore
+`-- storage
+    |-- datasets
+    |   `-- default
+    |-- key_value_stores
+    |   `-- default
+    |       `-- INPUT.json
+    `-- request_queues
+        `-- default
+```
+
+The command works on the best-effort basis,
+creating necessary configuration files for the specific programming language and libraries.
+
+#### Add the Actor code
+```
+$ cat << EOF > Dockerfile
+FROM node:alpine
+RUN npm -g install apify-cli 
+RUN actor get-input | actor push-data
+```
+
+#### Run to test the Actor localy
+```
+$ actor run -o -s --input='"Hello World"'
+["Hello World"]
+```
 `apify run` - starts the Actor using Dockerfile
 referenced from `.actor/actor.json` or Dockerfile in the Actor top-level directory
 (if the first is not present)
@@ -1704,36 +1744,11 @@ COPY --from=node:current-alpine /usr/local/lib /usr/local/lib
 COPY --from=node:current-alpine /usr/local/include /usr/local/include
 COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
 
-# Install the Actor CI
+# Install the Actor CLI
 RUN npm -g install apify-cli
 
 RUN curl $(actor get-input) | actor set-value example-com --contentType text/html
 ````
-
-The `actor bootstrap` CLI command can automatically
-generate the `.actor` directory and configuration files:
-
-```bash
-$ actor bootstrap
-? Actor name: actor-test
-Success: The Actor has been initialized in the current directory.
-$ tree -a
-.
-|-- .actor
-|   `-- actor.json
-|-- .gitignore
-`-- storage
-    |-- datasets
-    |   `-- default
-    |-- key_value_stores
-    |   `-- default
-    |       `-- INPUT.json
-    `-- request_queues
-        `-- default
-```
-
-The command works on the best-effort basis,
-creating necessary configuration files for the specific programming language and libraries.
 
 Actorization of existing code gives the developers an easy way to give their code
 presence in the cloud in a form of an Actor, so that the users can easily try it without
