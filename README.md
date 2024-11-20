@@ -1327,9 +1327,9 @@ by the subsequent Actors are taken from the calling Actor's allowance.
 This enables Actor economy, where Actors hierarchically pay other Actors or external APIs
 to perform parts of the job.
 
-#### Node.js
+As an actor developer, you can charge the current user of the Actor a specific amount of USD
 
-Charge the current user of the Actor a specific amount of USD:
+#### Node.js
 
 ```js
 const chargeInfo = await Actor.charge({
@@ -1339,17 +1339,26 @@ const chargeInfo = await Actor.charge({
 });
 ```
 
+#### Python
+```python
+charge_info = await Actor.charge(
+  event_name='gpt-4o-token',
+  count=1000,
+  charge_per_event_usd: 0.0001,
+);
+```
+
+#### CLI
 ```bash
 $ actor charge gpt-4o-token \
   --count=1000
   --chargePerEventUsd=0.0001
 ```
 
-```python
-TODO python example here, fix sections
-```
 
-Specify the maximum amount you're willing to pay when starting an Actor.
+As the Actor consumer, you can specify the maximum amount you're willing to pay when starting an Actor.
+
+#### Node.js
 
 ```js
 const run = await Actor.call(
@@ -1362,17 +1371,22 @@ const run = await Actor.call(
 );
 ```
 
+#### Python
+
+```python
+run = await Actor.call(
+    'bob/analyse-images' ,
+    {'imageUrls': ['https://www.example.com/image.png']},
+    max_total_charge_usd: 5
+)
+```
+
+#### CLI
 ```bash
 $ actor call bob/analyse-images \
   --input='{"imageUrls": ["https://www.example.com/image.png"]}'
   --max-total-charge-usd=5
 ```
-
-```python
-TODO python example here
-```
-
-
 
 #### Rules for building Actors with variable charging
 
@@ -1658,9 +1672,6 @@ The `apify push` CLI command takes information from the `.actor` directory and b
 so that you can run it remotely.
 
 ```bash
-TODO (Adam): Show code example
-             Verify
-
 $ apify login
 ? Choose how you want to log in to Apify (Use arrow keys)
 ❯ Through Apify Console in your default browser
