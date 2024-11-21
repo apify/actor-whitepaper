@@ -1661,7 +1661,7 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 Actor Programming Model is language agnostic, but it has native support for detection of Javascript and Python languages. Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) comes with a [convenient tamplates](https://apify.com/templates) you can bootrap an Actor with for Python and Javascript.
 
-This example is describing how to create a simple "echo" Actor localy. The Actor will get the [Input Object](#input) and it'll [pushes](#push-results-to-dataset) it to the [default [dataset](#dataset). 
+This example is describing how to create a simple "echo" Actor localy. The Actor will get the [Input Object](#input) and it'll [pushes](#push-results-to-dataset) it to the default [dataset](#dataset). 
 
 #### Bootstrap the Actor directory
 The `actor bootstrap` CLI command will automatically
@@ -1700,7 +1700,7 @@ EOF
 
 #### Run to test the Actor localy
 ```
-$ echo '{"bar": "foo"}' | actor run -o -s'
+$ echo '{"bar": "foo"}' | actor run -o -s
 [{
   "foo": "bar"
 }]
