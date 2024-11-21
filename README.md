@@ -1377,7 +1377,7 @@ const run = await Actor.call(
 run = await Actor.call(
     'bob/analyse-images' ,
     {'imageUrls': ['https://www.example.com/image.png']},
-    max_total_charge_usd: 5
+    max_total_charge_usd=5
 )
 ```
 
