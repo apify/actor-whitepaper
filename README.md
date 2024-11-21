@@ -1694,13 +1694,16 @@ creating necessary configuration files for the specific programming language and
 $ cat << EOF > Dockerfile
 FROM node:alpine
 RUN npm -g install apify-cli 
-RUN actor get-input | actor push-data
+CMD actor push-data $(actor get-input)
+EOF
 ```
 
 #### Run to test the Actor localy
 ```
-$ actor run -o -s --input='"Hello World"'
-["Hello World"]
+$ echo '{"bar": "foo"}' | actor run -o -s'
+[{
+  "foo": "bar"
+}]
 ```
 `apify run` - starts the Actor using Dockerfile
 referenced from `.actor/actor.json` or Dockerfile in the Actor top-level directory
