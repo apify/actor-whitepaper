@@ -1344,8 +1344,8 @@ const chargeInfo = await Actor.charge({
 charge_info = await Actor.charge(
   event_name='gpt-4o-token',
   count=1000,
-  charge_per_event_usd: 0.0001,
-);
+  charge_per_event_usd=0.0001
+)
 ```
 
 #### CLI
