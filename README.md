@@ -1666,8 +1666,7 @@ Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-act
 This example is describing how to create a simple "echo" Actor locally. The Actor will retrieve the [Input Object](#input) and it will [push](#push-results-to-dataset) it to the default [dataset](#dataset). 
 
 #### Bootstrap the Actor directory
-The `actor bootstrap` CLI command will automatically
-generate the `.actor` directory and configuration files:
+The `actor bootstrap` CLI command will automatically generate the `.actor` directory and configuration files:
 
 ```bash
 $ actor bootstrap
@@ -1738,7 +1737,9 @@ and providing a Dockerfile with instruction how to run the software.
 
 The `actor` CLI command can be used from the Dockerfile's `RUN` script transform the Actor JSON input
 into the configuration of the software, usually passed via command-line arguments,
-and then store the Actor output results. For example:
+and then store the Actor output results. 
+
+This example wraps the [`curl`](https://curl.se/docs/tutorial.html) UNIX command and pushes the result to the Actor's [key-value store](#key-value-store):
 
 ```bash
 FROM alpine/curl:latest
@@ -1752,7 +1753,7 @@ COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
 # Install the Actor CLI
 RUN npm -g install apify-cli
 
-RUN curl $(actor get-input) | actor set-value example-com --contentType text/html
+CMD curl $(actor get-input) | actor set-value example-com --contentType text/html
 ````
 
 Actorization of existing code gives the developers an easy way to give their code
