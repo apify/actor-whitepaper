@@ -1327,7 +1327,7 @@ by the subsequent Actors are taken from the calling Actor's allowance.
 This enables Actor economy, where Actors hierarchically pay other Actors or external APIs
 to perform parts of the job.
 
-As an actor developer, you can charge the current user of the Actor a specific amount of USD
+As an Actor developer, you can charge the current user of the Actor a specific amount of USD
 
 #### Node.js
 
@@ -1356,7 +1356,7 @@ $ actor charge gpt-4o-token \
 ```
 
 
-As the Actor consumer, you can specify the maximum amount you're willing to pay when starting an Actor.
+As the Actor user, you can specify the maximum amount you're willing to pay when starting an Actor.
 
 #### Node.js
 
