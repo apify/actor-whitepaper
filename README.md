@@ -1327,7 +1327,7 @@ by the subsequent Actors are taken from the calling Actor's allowance.
 This enables Actor economy, where Actors hierarchically pay other Actors or external APIs
 to perform parts of the job.
 
-As an Actor developer, you can charge the current user of the Actor a specific amount of USD
+As an Actor developer, you can charge the current user of the Actor a specific amount of USD.
 
 #### Node.js
 
@@ -1659,9 +1659,9 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
-Actor Programming Model is language agnostic, but the framework has native support for detection of Javascript and Python languages. 
+Actor programming model is language agnostic, but the framework has native support for detection of JavaScript and Python languages. 
 
-Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) comes with [convenient tamplates](https://apify.com/templates) you can bootsrap an Actor with for Python and Javascript.
+Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) provides [convenient templates](https://apify.com/templates) to bootstrap an Actor in Python, JavaScript, and TypeScript.
 
 This example is describing how to create a simple "echo" Actor locally. The Actor will retrieve the [Input Object](#input) and it will [push](#push-results-to-dataset) it to the default [dataset](#dataset). 
 
