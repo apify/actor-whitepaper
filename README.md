@@ -1327,9 +1327,9 @@ by the subsequent Actors are taken from the calling Actor's allowance.
 This enables Actor economy, where Actors hierarchically pay other Actors or external APIs
 to perform parts of the job.
 
-#### Node.js
+As an Actor developer, you can charge the current user of the Actor a specific amount of USD.
 
-Charge the current user of the Actor a specific amount of USD:
+#### Node.js
 
 ```js
 const chargeInfo = await Actor.charge({
@@ -1339,7 +1339,26 @@ const chargeInfo = await Actor.charge({
 });
 ```
 
-Specify the maximum amount you're willing to pay when starting an Actor.
+#### Python
+```python
+charge_info = await Actor.charge(
+  event_name='gpt-4o-token',
+  count=1000,
+  charge_per_event_usd=0.0001
+)
+```
+
+#### CLI
+```bash
+$ actor charge gpt-4o-token \
+  --count=1000
+  --chargePerEventUsd=0.0001
+```
+
+
+As the Actor user, you can specify the maximum amount you're willing to pay when starting an Actor.
+
+#### Node.js
 
 ```js
 const run = await Actor.call(
@@ -1352,7 +1371,22 @@ const run = await Actor.call(
 );
 ```
 
-<!-- TODO: Add Python and CLI examples -->
+#### Python
+
+```python
+run = await Actor.call(
+    'bob/analyse-images' ,
+    {'imageUrls': ['https://www.example.com/image.png']},
+    max_total_charge_usd=5
+)
+```
+
+#### CLI
+```bash
+$ actor call bob/analyse-images \
+  --input='{"imageUrls": ["https://www.example.com/image.png"]}'
+  --max-total-charge-usd=5
+```
 
 #### Rules for building Actors with variable charging
 
@@ -1625,9 +1659,53 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
-TODO (Adam): Explain basic workflow with `apify` - create, run, push etc. Move the full local support for Actors
- to ideas (see https://github.com/apify/actor-specs/pull/7/files#r794681016 )
+Actor programming model is language agnostic, but the framework has native support for detection of JavaScript and Python languages. 
 
+Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) provides [convenient templates](https://apify.com/templates) to bootstrap an Actor in Python, JavaScript, and TypeScript.
+
+This example is describing how to create a simple "echo" Actor locally. The Actor will retrieve the [Input Object](#input) and it will [push](#push-results-to-dataset) it to the default [dataset](#dataset). 
+
+#### Bootstrap the Actor directory
+The `actor bootstrap` CLI command will automatically generate the `.actor` directory and configuration files:
+
+```bash
+$ actor bootstrap
+? Actor name: actor-test
+Success: The Actor has been initialized in the current directory.
+$ tree -a
+.
+|-- .actor
+|   `-- actor.json
+|-- .gitignore
+`-- storage
+    |-- datasets
+    |   `-- default
+    |-- key_value_stores
+    |   `-- default
+    |       `-- INPUT.json
+    `-- request_queues
+        `-- default
+```
+
+The command works on the best-effort basis,
+creating necessary configuration files for the specific programming language and libraries.
+
+#### Add the Actor code
+```
+$ cat << EOF > Dockerfile
+FROM node:alpine
+RUN npm -g install apify-cli 
+CMD actor push-data $(actor get-input)
+EOF
+```
+
+#### Run to test the Actor localy
+```
+$ echo '{"bar": "foo"}' | actor run -o -s
+[{
+  "foo": "bar"
+}]
+```
 `apify run` - starts the Actor using Dockerfile
 referenced from `.actor/actor.json` or Dockerfile in the Actor top-level directory
 (if the first is not present)
@@ -1638,7 +1716,10 @@ The `apify push` CLI command takes information from the `.actor` directory and b
 so that you can run it remotely.
 
 ```bash
-TODO (Adam): Show code example
+$ apify login
+? Choose how you want to log in to Apify (Use arrow keys)
+❯ Through Apify Console in your default browser
+$ apify push
 ````
 
 ### Continuous integration and delivery
@@ -1656,21 +1737,24 @@ and providing a Dockerfile with instruction how to run the software.
 
 The `actor` CLI command can be used from the Dockerfile's `RUN` script transform the Actor JSON input
 into the configuration of the software, usually passed via command-line arguments,
-and then store the Actor output results. For example:
+and then store the Actor output results. 
+
+This example wraps the [`curl`](https://curl.se/docs/tutorial.html) UNIX command and pushes the result to the Actor's [key-value store](#key-value-store):
 
 ```bash
-TODO (Adam): Code examples of Dockerfile with "actor" command
+FROM alpine/curl:latest
+
+# Install node to the Alpine Docker image
+COPY --from=node:current-alpine /usr/lib /usr/lib
+COPY --from=node:current-alpine /usr/local/lib /usr/local/lib
+COPY --from=node:current-alpine /usr/local/include /usr/local/include
+COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
+
+# Install the Actor CLI
+RUN npm -g install apify-cli
+
+CMD curl $(actor get-input) | actor set-value example-com --contentType text/html
 ````
-
-The `actor init` CLI command can automatically
-generate the `.actor` directory and configuration files:
-
-```bash
-$ actor init
-```
-
-The command works on the best-effort basis,
-creating necessary configuration files for the specific programming language and libraries.
 
 Actorization of existing code gives the developers an easy way to give their code
 presence in the cloud in a form of an Actor, so that the users can easily try it without
