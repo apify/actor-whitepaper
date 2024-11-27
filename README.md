@@ -1757,3 +1757,8 @@ To create an open standard, however, there is more work, including:
   they should need to just write a Rust "frontend" translating the commands to HTTP API calls,
   rather than having to implement the entire system. And equally, if one decides
   to develop a new Actor "backend", all existing client libraries for Rust or other languages should work with it.
+
+
+## Links
+
+- [Open-source Actors on GitHub](https://github.com/search?q=path%3A.actor%2Factor.json+&type=code)
