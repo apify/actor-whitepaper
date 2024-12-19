@@ -1090,7 +1090,7 @@ posix_spawn();
 
 ### Metamorph
 
-🪄This is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor,
+This is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor,
 similarly to UNIX `exec` command.
 It is used for building new Actors on top of existing ones.
 You simply define input schema and write README for a specific use case,
@@ -1661,7 +1661,7 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
-Actor programming model is language agnostic, but the framework has native support for detection of JavaScript and Python languages. 
+The Actor programming model is language agnostic, but the framework has native support for detection of JavaScript and Python languages. 
 
 Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) provides [convenient templates](https://apify.com/templates) to bootstrap an Actor in Python, JavaScript, and TypeScript.
 
@@ -1701,7 +1701,7 @@ CMD actor push-data $(actor get-input)
 EOF
 ```
 
-#### Run to test the Actor localy
+#### Run to test the Actor locally
 ```
 $ echo '{"bar": "foo"}' | actor run -o -s
 [{

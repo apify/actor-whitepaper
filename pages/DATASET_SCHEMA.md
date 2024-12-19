@@ -44,7 +44,7 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 ```jsonc
 {
     "actorDatasetSchemaVersion": 1,
-    "title": "Eshop products",
+    "title": "E-shop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
 
     // A JSON schema object describing the dataset fields, with our extensions: the "title", "description", and "example" properties.
@@ -98,7 +98,7 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
                     },                           
                     "imageUrl": {
                         "label": "Image",
-                        "format": "image" // optional, in this case the format is overriden to show "image" instead of image link "text". "image" format only works with .jpeg, .png or other image format urls.
+                        "format": "image" // optional, in this case the format is overridden to show "image" instead of image link "text". "image" format only works with .jpeg, .png or other image format urls.
                     },
                     "stockInfo.availability": {
                         "label": "Availability"
