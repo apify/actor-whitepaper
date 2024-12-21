@@ -24,7 +24,7 @@ The file has the following structure:
   // to get started and be kept alive by the system to handle incoming HTTP REST requests by the Actor's web server.
   "usesStandbyMode": true,
  
-  // A meta object enabling impelemtations to pass arbitrary additional properties
+  // A meta object enabling implementations to pass arbitrary additional properties
   "meta": {
     "something": "bla bla"
   },
@@ -33,7 +33,7 @@ The file has the following structure:
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
   
-  // Links to other Actor defintion files
+  // Links to other Actor definition files
   "dockerfile": "./Dockerfile", // If omitted, the system looks for "./Dockerfile" and "../Dockerfile"
   "readme": "./README.md", // If omitted, the system looks for "./ACTOR.md" and "../README.md"
   "changelog": "../../../shared/CHANGELOG.md",

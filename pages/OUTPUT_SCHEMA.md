@@ -107,7 +107,7 @@ there's no point to include storage schema here again, as it's done elsewhere.
 - Same as we show Output in UI, we need to autogenerate the OUTPUT in API e.g. JSON format.
   There would be properties like in the output_schema.json file, with e.g. URL to dataset,
   log file, kv-store, live view etc. So it would be an auto-generated field "output"
-  that we can add to JSON returned by the Run API enpoints
+  that we can add to JSON returned by the Run API endpoints
   (e.g. https://docs.apify.com/api/v2#/reference/actor-tasks/run-collection/run-task)
   - Also see: https://github.com/apify/actor-specs/pull/5#discussion_r775641112
   - `output` will be a property of run object generated from Output schema
