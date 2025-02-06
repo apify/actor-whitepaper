@@ -1,3 +1,14 @@
+.DS_Store
 .idea
 node_modules
 package-lock.json
+
+# Vale
+.github/styles/*
+!.github/styles/config/
+
+.github/styles/config/*
+!.github/styles/config/vocabularies/
+
+.github/styles/config/vocabularies/*
+!.github/styles/config/vocabularies/Whitepaper
