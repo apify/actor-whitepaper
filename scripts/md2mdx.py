@@ -122,6 +122,22 @@ def remove_picture_components(content: str) -> str:
     )
 
 
+def transform_schema_links(content: str) -> str:
+    print('\n󰋼  Transforming schema links...')
+    
+    replacements = {
+        r'\[([^]]+)\]\(./pages/([^)]+)_SCHEMA\.md\)': 
+            lambda m: f'[{m.group(1)}](/{ m.group(2).lower().replace("_", "-")}-schema)',
+        r'\[([^]]+)\]\(./pages/([^)]+)_FILE\.md\)': 
+            lambda m: f'[{m.group(1)}](/{ m.group(2).lower().replace("_", "-")}-file)'
+    }
+    
+    for pattern, replacement in replacements.items():
+        content = re.sub(pattern, replacement, content)
+    
+    return content
+
+
 def transform_markdown_to_mdx(content: str) -> str:
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
@@ -133,6 +149,7 @@ def transform_markdown_to_mdx(content: str) -> str:
     transformed = add_github_header(transformed)
     transformed = remove_bold_formatting(transformed)
     transformed = remove_picture_components(transformed)
+    transformed = transform_schema_links(transformed)
 
     print('\n󰋼  Combining with Astro imports...')
     return f'{ASTRO_IMPORTS}\n\n{transformed}'
