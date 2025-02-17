@@ -6,9 +6,23 @@ from pathlib import Path
 import frontmatter
 import re
 
-PROJECT_ROOT = Path(__file__).parent.parent.absolute()
-SOURCE_FILE = str(PROJECT_ROOT / 'README.md')  # Source is in project root
+# Get the project root - need to handle both direct run and test-sync run.
+SCRIPT_PATH = Path(__file__).resolve()
+
+if 'test-sync/source' in str(SCRIPT_PATH):
+    # Running from test-sync/source/scripts/md2mdx.py.
+    PROJECT_ROOT = SCRIPT_PATH.parent.parent.parent.parent
+else:
+    # Running directly from scripts/md2mdx.py.
+    PROJECT_ROOT = SCRIPT_PATH.parent.parent
+
+SOURCE_FILE = str(PROJECT_ROOT / 'README.md')
 TARGET_FILE = str(PROJECT_ROOT / 'test-sync/target/src/content/pages/index.mdx')
+
+print(f'  Script location: {__file__}')
+print(f'  Project root: {PROJECT_ROOT}')
+print(f'  Source file: {SOURCE_FILE}')
+print(f'  Target file: {TARGET_FILE}')
 
 ASTRO_IMPORTS = '''import { Picture } from 'astro:assets';
 

@@ -59,7 +59,9 @@ python3 -m pip install -r ./requirements.txt
 
 echo -e "\n"
 echo -e "\n󰋼  Running MD to MDX conversion..."
-python3 scripts/md2mdx.py
+cd ..
+python3 source/scripts/md2mdx.py
+cd source
 
 echo -e "\n"
 
