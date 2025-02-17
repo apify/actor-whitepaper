@@ -65,6 +65,16 @@ def transform_image_references(content: str) -> str:
     )
 
 
+def remove_html_comments(content: str) -> str:
+    print('\n󰋼  Removing HTML comments...')
+    
+    return re.sub(
+        r'<!--[\s\S]*?-->(\n)?',
+        '',
+        content
+    )
+
+
 def transform_markdown_to_mdx(content: str) -> str:
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
@@ -72,6 +82,7 @@ def transform_markdown_to_mdx(content: str) -> str:
     transformed = remove_table_of_contents(post.content)
     transformed = transform_code_blocks(transformed)
     transformed = transform_image_references(transformed)
+    transformed = remove_html_comments(transformed)
 
     print('\n󰋼  Combining with Astro imports...')
     return f'{ASTRO_IMPORTS}\n\n{transformed}'
