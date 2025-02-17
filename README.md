@@ -1616,6 +1616,8 @@ The output schema describes how the Actor stores its results, and it is used by 
 
 For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
 
+<div class="clear-both" />
+
 This is an example of the output schema file for the `bob/screenshot-taker` Actor:
 
 ```json
