@@ -111,6 +111,17 @@ def remove_bold_formatting(content: str) -> str:
     )
 
 
+def remove_picture_components(content: str) -> str:
+    print('\n󰋼  Removing Picture components...')
+    
+    return re.sub(
+        r'<Picture.*?/>',
+        '',
+        content,
+        flags=re.MULTILINE | re.DOTALL
+    )
+
+
 def transform_markdown_to_mdx(content: str) -> str:
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
@@ -121,6 +132,7 @@ def transform_markdown_to_mdx(content: str) -> str:
     transformed = remove_html_comments(transformed)
     transformed = add_github_header(transformed)
     transformed = remove_bold_formatting(transformed)
+    transformed = remove_picture_components(transformed)
 
     print('\n󰋼  Combining with Astro imports...')
     return f'{ASTRO_IMPORTS}\n\n{transformed}'
