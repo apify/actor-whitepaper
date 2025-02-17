@@ -171,7 +171,14 @@ and how Actors differ from other serverless computing systems.
 
 ### Input
 
-<!-- ASTRO: <Illustration description="Each Actor accepts an input object, which tells it what it should do." position="content" image={illuBasicConceptsInput} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Each Actor accepts an input object, which tells it what it should do."
+    position="content"
+    image={illuBasicConceptsInput}
+    noCaption
+/>
+-->
 
 Each Actor accepts an **input object**, which tells it what it should do.
 The object is passed in JSON format, and its properties have
@@ -204,7 +211,13 @@ and simplify integration with external systems.
 
 ### Run environment
 
-<!-- ASTRO: <Illustration description="The Actors run within an isolated Docker container" position="right" image={illuBasicConceptsRunEnvironment} /> -->
+<!-- ASTRO:
+<Illustration
+    description="The Actors run within an isolated Docker container"
+    position="right"
+    image={illuBasicConceptsRunEnvironment}
+/>
+-->
 
 Actors run within an isolated Docker container with access to local file system and network,
 and they can perform arbitrary computing activity or call external APIs.
@@ -225,7 +238,13 @@ from which they can be easily exported using API or integrated in other Actors.
 
 ### Output
 
-<!-- ASTRO: <Illustration description="The Actors can generate an output object, which is a standardized way to display, consume, and integrate Actors' results." position="right" image={illuBasicConceptsOutput} /> -->
+<!-- ASTRO:
+<Illustration
+    description="The Actors can generate an output object, which is a standardized way to display, consume, and integrate Actors' results."
+    position="right"
+    image={illuBasicConceptsOutput}
+/>
+-->
 
 While the input object provides a standardized way to invoke Actors,
 Actors can also generate an **output object**, which is a standardized way to display, consume, and integrate
@@ -265,7 +284,14 @@ For example, for the `bob/screenshot-taker` Actor, the output object can look li
 
 ### Storage
 
-<!-- ASTRO: <Illustration description="The Actor system provides two specialized storages that can be used by Actors for storing files and results: Key-value store and Dataset" position="content" image={illuBasicConceptsStorage} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="The Actor system provides two specialized storages that can be used by Actors for storing files and results: Key-value store and Dataset"
+    position="content"
+    image={illuBasicConceptsStorage}
+    noCaption
+/>
+-->
 
 The Actor system provides two specialized storages that can be used by Actors for storing files and results:
 **key-value store** and **dataset**, respectively. For each Actor run,
@@ -289,7 +315,13 @@ an SQL database or a vector database.
 
 #### Key-value store
 
-<!-- ASTRO: <Illustration description="The key-value store is a simple data storage that is used for saving and reading files or data records" position="right" image={illuBasicConceptsStorageKeyValueStore} /> -->
+<!-- ASTRO:
+<Illustration
+    description="The key-value store is a simple data storage that is used for saving and reading files or data records"
+    position="right"
+    image={illuBasicConceptsStorageKeyValueStore}
+/>
+-->
 
 The key-value store is a simple data storage that is used for saving and reading
 files or data records. The records are represented by a unique text key and the data associated with a MIME content type.
@@ -309,7 +341,13 @@ For details, see [Storage schema files](#storage-schema-files).
 
 #### Dataset
 
-<!-- ASTRO: <Illustration description="The dataset is an append-only storage that allows you to store a series of data objects such as results from web scraping, crawling, or data processing jobs." position="right" image={illuBasicConceptsStorageDataset} /> -->
+<!-- ASTRO:
+<Illustration
+    description="The dataset is an append-only storage that allows you to store a series of data objects such as results from web scraping, crawling, or data processing jobs."
+    position="right"
+    image={illuBasicConceptsStorageDataset}
+/>
+-->
 
 The dataset is an append-only storage that allows you to store a series of data objects
 such as results from web scraping, crawling, or data processing jobs.
@@ -326,7 +364,14 @@ For details, see [Storage schema files](#storage-schema-files).
 
 ### Integrations
 
-<!-- ASTRO: <Illustration description="Actors are designed for interoperability. Thanks to the input and output schemas, it's easy to connect Actors with external systems, be it directly via REST API, Node.js or Python clients, CLI, or no-code automations." position="content" image={illuBasicConceptsIntegrations} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Actors are designed for interoperability. Thanks to the input and output schemas, it's easy to connect Actors with external systems, be it directly via REST API, Node.js or Python clients, CLI, or no-code automations."
+    position="content"
+    image={illuBasicConceptsIntegrations}
+    noCaption
+/>
+-->
 
 **Actors are designed for interoperability.** Thanks to the input and output
 schemas, it easy to connect Actors with external systems,
@@ -598,7 +643,14 @@ int main (int argc, char *argv[]) {
 
 ### Get input
 
-<!-- ASTRO: <Illustration description="The input object is passed by the user and stored in the Actor's default key-value store. The input is an object with properties. If the Actor defines the input schema, the input object is guaranteed to conform to it." position="right" image={illuAPIGetInput} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="The input object is passed by the user and stored in the Actor's default key-value store. The input is an object with properties. If the Actor defines the input schema, the input object is guaranteed to conform to it."
+    position="right"
+    image={illuAPIGetInput}
+    noCaption
+/>
+-->
 
 Get access to the Actor input object passed by the user.
 It is parsed from a JSON file, which is stored by the system in the Actor's default key-value store,
@@ -647,7 +699,14 @@ int main (int argc, char *argv[]) {}
 
 ### Key-value store access
 
-<!-- ASTRO: <Illustration description="Write and read arbitrary files using a storage called Key-value store. When an Actor starts, by default it is associated with a newly-created key-value store, which only contains one file with input of the Actor." position="right" image={illuAPIKeyValueStoreAccess} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Write and read arbitrary files using a storage called Key-value store. When an Actor starts, by default it is associated with a newly-created key-value store, which only contains one file with input of the Actor."
+    position="right"
+    image={illuAPIKeyValueStoreAccess}
+    noCaption
+/>
+-->
 
 Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
@@ -696,7 +755,14 @@ $ cat file.txt
 
 ### Push results to dataset
 
-<!-- ASTRO: <Illustration description="Larger results can be saved to append-only object storage called Dataset. When an Actor starts, by default it is associated with a newly-created empty default dataset. The Actor can create additional datasets or access existing datasets created by other Actors, and use those as needed." position="right" image={illuAPIPush} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Larger results can be saved to append-only object storage called Dataset. When an Actor starts, by default it is associated with a newly-created empty default dataset. The Actor can create additional datasets or access existing datasets created by other Actors, and use those as needed."
+    position="right"
+    image={illuAPIPush}
+    noCaption
+/>
+-->
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an Actor starts, by default it is associated with a newly-created empty default dataset.
@@ -1047,7 +1113,14 @@ $ ps -a
 
 ### Start another Actor
 
-<!-- ASTRO: <Illustration description="Actor can start other Actors, if they have permission. It can override the default dataset or key-value store, and e.g. forwarding the data to another named dataset, that will be consumed by the other Actor." position="content" image={illuAPIStartAnother} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Actor can start other Actors, if they have permission. It can override the default dataset or key-value store, and e.g. forwarding the data to another named dataset, that will be consumed by the other Actor."
+    position="content"
+    image={illuAPIStartAnother}
+    noCaption
+/>
+-->
 
 Actor can start other Actors, if they have permission.
 
@@ -1128,7 +1201,14 @@ posix_spawn();
 
 ### Metamorph
 
-<!-- ASTRO: <Illustration description="Metamorph is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor, similarly to UNIX `exec` command. It is used for building new Actors on top of existing ones. You simply define input schema and write README for a specific use case, and then delegate the work to another Actor." position="content" image={illuAPIMetamorph} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Metamorph is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor, similarly to UNIX `exec` command. It is used for building new Actors on top of existing ones. You simply define input schema and write README for a specific use case, and then delegate the work to another Actor."
+    position="content"
+    image={illuAPIMetamorph}
+    noCaption
+/>
+-->
 
 This is the most magical Actor operation. It replaces a running Actor’s Docker image with another Actor,
 similarly to UNIX `exec` command.
@@ -1245,7 +1325,14 @@ $ kill <PID>
 
 ### Reboot an Actor
 
-<!-- ASTRO: <Illustration description="Sometimes, an Actor might get into some error state from which it's not safe or possible to recover, e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job, the Actor can reboot its own Docker container and continue work from its previously persisted state." position="right" image={illuAPIReboot} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Sometimes, an Actor might get into some error state from which it's not safe or possible to recover, e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job, the Actor can reboot its own Docker container and continue work from its previously persisted state."
+    position="right"
+    image={illuAPIReboot}
+    noCaption
+/>
+-->
 
 Sometimes, an Actor might get into some error state from which it's not safe or possible to recover,
 e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job,
@@ -1298,7 +1385,14 @@ The live view URL has a unique hostname, which is practically impossible to gues
 This lets you keep the web server hidden from the public yet accessible from the external internet by any parties
 with whom you share the URL.
 
-<!-- ASTRO: <Illustration description="An Actor can launch an HTTP web server that is exposed to the outside world to handle requests. This enables Actors to provide a custom HTTP API to integrate with other systems, to provide a web application for human users, to show Actor run details, diagnostics, charts, or to run an arbitrary web app." position="left" image={illuAPIWebServer} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="An Actor can launch an HTTP web server that is exposed to the outside world to handle requests. This enables Actors to provide a custom HTTP API to integrate with other systems, to provide a web application for human users, to show Actor run details, diagnostics, charts, or to run an arbitrary web app."
+    position="left"
+    image={illuAPIWebServer}
+    noCaption
+/>
+-->
 
 <div class="clear-both" />
 
@@ -1355,7 +1449,14 @@ After migration, the Actor is restarted on a new host. It can restore its custom
 
 ### Charging money
 
-<!-- ASTRO: <Illustration description="To run an Actor on the Apify platform or another cloud platform, a user typically needs to pay to cover the computing costs. Additionally, the platforms are free to introduce other monetization mechanisms, such as charging the users a fixed monthly fee for 'renting' the Actor, or a variable fee for the number of results produced by the Actor. These charging mechanisms are beyond the scope of this whitepaper." position="right" image={illuSharingChargingMoney} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="To run an Actor on the Apify platform or another cloud platform, a user typically needs to pay to cover the computing costs. Additionally, the platforms are free to introduce other monetization mechanisms, such as charging the users a fixed monthly fee for 'renting' the Actor, or a variable fee for the number of results produced by the Actor. These charging mechanisms are beyond the scope of this whitepaper."
+    position="right"
+    image={illuSharingChargingMoney}
+    noCaption
+/>
+-->
 
 To run an Actor on the Apify platform or another cloud platform,
 a user typically needs to pay to cover the computing costs.
@@ -1586,7 +1687,14 @@ Good documentation makes good Actors.
 
 ### Input schema file
 
-<!-- ASTRO: <Illustration description="Actors accept an input JSON object on start, whose schema can be defined by the input schema file. This file is referenced in the Actor file as the `input` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/input_schema.json." position="right" image={illuDefinitionFilesInputSchemaFile} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Actors accept an input JSON object on start, whose schema can be defined by the input schema file. This file is referenced in the Actor file as the `input` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/input_schema.json."
+    position="right"
+    image={illuDefinitionFilesInputSchemaFile}
+    noCaption
+/>
+-->
 
 Actors accept an [input](#input) JSON object on start, whose schema can be defined
 by the input schema file. This file is referenced in the Actor file (`.actor/actor.json`) file
@@ -1639,7 +1747,14 @@ This is an example of the input schema file for the `bob/screenshot-taker` Actor
 
 ### Output schema file
 
-<!-- ASTRO: <Illustration description="Similarly to input, Actors can generate an output JSON object, which links to their results. The Actor output schema file defines how such output object looks like, including types of its properties and description. This file is referenced in the Actor file as the `output` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/output_schema.json." position="right" image={illuDefinitionFilesOutputSchemaFile} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="Similarly to input, Actors can generate an output JSON object, which links to their results. The Actor output schema file defines how such output object looks like, including types of its properties and description. This file is referenced in the Actor file as the `output` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/output_schema.json."
+    position="right"
+    image={illuDefinitionFilesOutputSchemaFile}
+    noCaption
+/>
+-->
 
 Similarly to input, Actors can generate an [output](#output) JSON object, which links to their results.
 The Actor output schema file defines how such output object looks like,
@@ -1723,7 +1838,14 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
-<!-- ASTRO: <Illustration description="The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages." position="right" image={illuDevelopmentLocal} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages."
+    position="right"
+    image={illuDevelopmentLocal}
+    noCaption
+/>
+-->
 
 The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages. 
 
@@ -1788,7 +1910,14 @@ $ apify login
 $ apify push
 ````
 
-<!-- ASTRO: <Illustration description="The `apify push` CLI command takes information from the `.actor` directory and builds an Actor on the Apify platform, so that you can run it remotely." position="left" image={illuDevelopmentDeployment} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="The `apify push` CLI command takes information from the `.actor` directory and builds an Actor on the Apify platform, so that you can run it remotely."
+    position="left"
+    image={illuDevelopmentDeployment}
+    noCaption
+/>
+-->
 
 ### Continuous integration and delivery
 
@@ -1844,7 +1973,14 @@ Once published, your Actor is automatically exposed to organic traffic of users 
 
 ### Monetization
 
-<!-- ASTRO: <Illustration description="The monetization options for Actors include fixed rental fee, payment per result, or payment per event." position="right" image={illuSharingMonetization} noCaption /> -->
+<!-- ASTRO:
+<Illustration
+    description="The monetization options for Actors include fixed rental fee, payment per result, or payment per event."
+    position="right"
+    image={illuSharingMonetization}
+    noCaption
+/>
+-->
 
 To build a SaaS product, you usually need to:
 
