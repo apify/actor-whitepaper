@@ -75,6 +75,17 @@ def remove_html_comments(content: str) -> str:
     )
 
 
+def add_github_header(content: str) -> str:
+    print('\n󰋼  Adding GitHub header...')
+    
+    return re.sub(
+        r'(#\s+[^\n]*\n)(\n?)',
+        r'\1\n<GitHubHeader repoUrl="https://github.com/apify/actor-whitepaper" />\n\n',
+        content,
+        count=1
+    )
+
+
 def transform_markdown_to_mdx(content: str) -> str:
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
@@ -83,6 +94,7 @@ def transform_markdown_to_mdx(content: str) -> str:
     transformed = transform_code_blocks(transformed)
     transformed = transform_image_references(transformed)
     transformed = remove_html_comments(transformed)
+    transformed = add_github_header(transformed)
 
     print('\n󰋼  Combining with Astro imports...')
     return f'{ASTRO_IMPORTS}\n\n{transformed}'
