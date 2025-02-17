@@ -86,6 +86,27 @@ def add_github_header(content: str) -> str:
     )
 
 
+def enhance_italic_text(content: str) -> str:
+    print('\n󰋼  Enhancing italic text with bold...')
+    
+    return re.sub(
+        r'(?<!\_)\_([^\s\_][^\_]*[^\s\_])\_(?!\_)',
+        r'**_\1_**',
+        content
+    )
+
+
+def remove_bold_formatting(content: str) -> str:
+    print('\n󰋼  Removing bold formatting...')
+    
+    return re.sub(
+        r'^\*\*(.*?)\*\*$',
+        r'\1',
+        content,
+        flags=re.MULTILINE
+    )
+
+
 def transform_markdown_to_mdx(content: str) -> str:
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
@@ -95,6 +116,8 @@ def transform_markdown_to_mdx(content: str) -> str:
     transformed = transform_image_references(transformed)
     transformed = remove_html_comments(transformed)
     transformed = add_github_header(transformed)
+    transformed = enhance_italic_text(transformed)
+    transformed = remove_bold_formatting(transformed)
 
     print('\n󰋼  Combining with Astro imports...')
     return f'{ASTRO_IMPORTS}\n\n{transformed}'
