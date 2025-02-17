@@ -236,6 +236,8 @@ the Actor is started, without the need to wait for it to finish or generate the 
 This is useful to automatically generate UI previews of the results, API examples,
 and integrations.
 
+<div class="clear-both" />
+
 The output object is similar to the input object, as it contains properties and values.
 For example, for the `bob/screenshot-taker` Actor, the output object can look like this:
 
@@ -512,6 +514,8 @@ The SDKs provide convenience methods to initialize the Actor and handle its resu
 During initialization, the SDK loads environment variables, checks the configuration, prepares to receive system events,
 and optionally purges previous state from local storage.
 
+<div class="clear-both" />
+
 #### Node.js
 
 In Node.js the Actor is initialized by calling the `init()` method. It should be paired with an `exit()` method
@@ -582,6 +586,8 @@ The input is an object with properties.
 If the Actor defines the input schema, the input object is guaranteed to conform to it.
 For details, see [Input](#input).
 
+<div class="clear-both" />
+
 #### Node.js
 
 ```js
@@ -627,6 +633,8 @@ which only contains one file with the input of the Actor (see [Get input](#get-i
 The user can override this behavior and specify another key-value store or input key
 when running the Actor.
 
+<div class="clear-both" />
+
 #### Node.js
 
 ```js
@@ -671,6 +679,8 @@ and use those as needed.
 
 Note that datasets can optionally be equipped with schema that ensures only certain kinds
 of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.md) for more details.
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -862,6 +872,8 @@ $ echo $ACTOR_RUN_ID
 
 Each Actor run has a status (the `status` field), which indicates its stage in the Actor's lifecycle.
 The status can be one of the following values:
+
+<div class="clear-both" />
 
 |Status|Type| Description                                 |
 |--- |--- |---------------------------------------------|
@@ -1131,6 +1143,8 @@ $ exec /bin/bash
 
 Run another Actor or an external HTTP API endpoint after an Actor run finishes or fails.
 
+<div class="clear-both" />
+
 #### Node.js
 
 ```js
@@ -1178,6 +1192,8 @@ $ command1 || command2  # ("orf" symbol)
 Abort itself or another Actor running on the Apify platform.
 Aborting an Actor changes its [status](#actor-status) to `ABORTED`.
 
+<div class="clear-both" />
+
 #### Node.js
 
 ```js
@@ -1208,6 +1224,8 @@ if that happens too often in a short period of time, the system
 might completely [abort](#actor-status) the Actor run.
 The reboot operation can be used by the Actor developer to indicate that
 this is a controlled operation, and not to be considered by the system as a crash.
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -1247,6 +1265,8 @@ https://hard-to-guess-identifier.runs.apify.net
 The live view URL has a unique hostname, which is practically impossible to guess.
 This lets you keep the web server hidden from the public yet accessible from the external internet by any parties
 with whom you share the URL.
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -1546,6 +1566,8 @@ The input schema file defines properties accepted by Actor on input. It is used 
   that smartly pre-populate and link Actor input properties.
 
 For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
+
+<div class="clear-both" />
 
 This is an example of the input schema file for the `bob/screenshot-taker` Actor::
 
