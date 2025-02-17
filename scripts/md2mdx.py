@@ -94,6 +94,11 @@ def process_files():
             f.write(transformed_content)
         print(f'  Successfully transformed: {SOURCE_FILE} → {TARGET_FILE}')
 
+        print('\n󰋼  Formatting MDX file...')
+        os.system('npm run format-sync')
+        
+        print('\n  Done')
+        
     except Exception as error:
         print('\n❌ Error processing files:', str(error))
         sys.exit(1)
