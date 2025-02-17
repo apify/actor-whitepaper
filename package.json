@@ -7,7 +7,9 @@
     "markdown-toc": "^1.2.0"
   },
   "scripts": {
-    "build-toc": "./node_modules/.bin/markdown-toc README.md -i --maxdepth 3 && ./node_modules/.bin/markdown-link-check README.md"
+    "build-toc": "./node_modules/.bin/markdown-toc README.md -i --maxdepth 3 && ./node_modules/.bin/markdown-link-check README.md",
+    "setup": "chmod +x scripts/*.sh && ./scripts/setup.sh",
+    "test-sync": "chmod +x scripts/*.sh && ./scripts/test-sync.sh"
   },
   "repository": {
     "type": "git",
