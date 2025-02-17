@@ -1,6 +1,6 @@
-# The Web Actor Programming Model Whitepaper [DRAFT]
+# The Web Actor Programming Model Whitepaper
 
-**This whitepaper describes a new concept for building serverless microapps called _Actors_,
+**This whitepaper describes a new concept for building serverless microapps called **_Actors_**,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
@@ -76,7 +76,7 @@ By [Jan Čurn](https://apify.com/jancurn),
 
 ## Introduction
 
-This whitepaper introduces **Actors**,
+This whitepaper introduces **_Actors_**,
 a new kind of serverless programs for general-purpose
 language-agnostic computing and automation jobs (also known as agents, functions, or apps).
 The main goal for Actors is to make it easy for developers to build and ship reusable
