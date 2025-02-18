@@ -1,6 +1,6 @@
-# The Web Actor Programming Model Whitepaper [DRAFT]
+# The Web Actor Programming Model Whitepaper
 
-**This whitepaper describes a new concept for building serverless microapps called _Actors_,
+**This whitepaper describes a new concept for building serverless microapps called **_Actors_**,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
@@ -76,7 +76,7 @@ By [Jan Čurn](https://apify.com/jancurn),
 
 ## Introduction
 
-This whitepaper introduces **Actors**,
+This whitepaper introduces **_Actors_**,
 a new kind of serverless programs for general-purpose
 language-agnostic computing and automation jobs (also known as agents, functions, or apps).
 The main goal for Actors is to make it easy for developers to build and ship reusable
@@ -140,6 +140,8 @@ and integrate the results of the Actor into their other workflows.
 Actors can easily call and interact with each other, enabling the building of more complex
 systems on top of simple ones.
 
+<!-- ASTRO: <Diagram horizontal={illuDiagramHoriz} vertical={illuDiagramVert} alt="Actor drawing" /> -->
+
 ![Apify Actor diagram](./img/apify-actor-drawing.png)
 
 <!-- Image source: https://docs.google.com/presentation/d/1nDgrI0p2r8ouP_t_Wn02aTllP8_Std-kRuIbO8QLE7M/edit -->
@@ -169,6 +171,15 @@ and how Actors differ from other serverless computing systems.
 
 ### Input
 
+<!-- ASTRO:
+<Illustration
+    description="Each Actor accepts an input object, which tells it what it should do."
+    position="content"
+    image={illuBasicConceptsInput}
+    noCaption
+/>
+-->
+
 Each Actor accepts an **input object**, which tells it what it should do.
 The object is passed in JSON format, and its properties have
 a similar role as command-line arguments when running a program in a UNIX-like operating system.
@@ -196,7 +207,17 @@ and simplify integration with external systems.
 
 ![Screenshot Taker Input UI](./img/screenshot-taker-input.png)
 
+<!-- ASTRO: <Picture src={illuTakerInput} alt="Taker input" formats={['avif', 'webp']} /> -->
+
 ### Run environment
+
+<!-- ASTRO:
+<Illustration
+    description="The Actors run within an isolated Docker container"
+    position="right"
+    image={illuBasicConceptsRunEnvironment}
+/>
+-->
 
 Actors run within an isolated Docker container with access to local file system and network,
 and they can perform arbitrary computing activity or call external APIs.
@@ -217,6 +238,14 @@ from which they can be easily exported using API or integrated in other Actors.
 
 ### Output
 
+<!-- ASTRO:
+<Illustration
+    description="The Actors can generate an output object, which is a standardized way to display, consume, and integrate Actors' results."
+    position="right"
+    image={illuBasicConceptsOutput}
+/>
+-->
+
 While the input object provides a standardized way to invoke Actors,
 Actors can also generate an **output object**, which is a standardized way to display, consume, and integrate
 Actors' results.
@@ -236,6 +265,8 @@ the Actor is started, without the need to wait for it to finish or generate the 
 This is useful to automatically generate UI previews of the results, API examples,
 and integrations.
 
+<div class="clear-both" />
+
 The output object is similar to the input object, as it contains properties and values.
 For example, for the `bob/screenshot-taker` Actor, the output object can look like this:
 
@@ -252,6 +283,15 @@ For example, for the `bob/screenshot-taker` Actor, the output object can look li
 ```
 
 ### Storage
+
+<!-- ASTRO:
+<Illustration
+    description="The Actor system provides two specialized storages that can be used by Actors for storing files and results: Key-value store and Dataset"
+    position="content"
+    image={illuBasicConceptsStorage}
+    noCaption
+/>
+-->
 
 The Actor system provides two specialized storages that can be used by Actors for storing files and results:
 **key-value store** and **dataset**, respectively. For each Actor run,
@@ -275,6 +315,14 @@ an SQL database or a vector database.
 
 #### Key-value store
 
+<!-- ASTRO:
+<Illustration
+    description="The key-value store is a simple data storage that is used for saving and reading files or data records"
+    position="right"
+    image={illuBasicConceptsStorageKeyValueStore}
+/>
+-->
+
 The key-value store is a simple data storage that is used for saving and reading
 files or data records. The records are represented by a unique text key and the data associated with a MIME content type.
 Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of Actors e.g. as a JSON file.
@@ -293,6 +341,14 @@ For details, see [Storage schema files](#storage-schema-files).
 
 #### Dataset
 
+<!-- ASTRO:
+<Illustration
+    description="The dataset is an append-only storage that allows you to store a series of data objects such as results from web scraping, crawling, or data processing jobs."
+    position="right"
+    image={illuBasicConceptsStorageDataset}
+/>
+-->
+
 The dataset is an append-only storage that allows you to store a series of data objects
 such as results from web scraping, crawling, or data processing jobs.
 You or your users can then export the dataset to formats such as JSON, CSV, XML, RSS, Excel, or HTML.
@@ -307,6 +363,15 @@ An Actor can define a schema for the Dataset to ensure objects stored in it conf
 For details, see [Storage schema files](#storage-schema-files).
 
 ### Integrations
+
+<!-- ASTRO:
+<Illustration
+    description="Actors are designed for interoperability. Thanks to the input and output schemas, it's easy to connect Actors with external systems, be it directly via REST API, Node.js or Python clients, CLI, or no-code automations."
+    position="content"
+    image={illuBasicConceptsIntegrations}
+    noCaption
+/>
+-->
 
 **Actors are designed for interoperability.** Thanks to the input and output
 schemas, it easy to connect Actors with external systems,
@@ -430,6 +495,8 @@ They work well with Puppeteers and Playwrights.
 
 To make it clear that Actors are not people, the letter "A" is capitalized.
 
+<!-- ASTRO: <Illustration description="Actors" position="content" image={illuPhilosophyWhyTheName} noCaption /> -->
+
 ## Installation and setup
 
 Below are the steps to start building Actors in various languages and environments.
@@ -512,6 +579,8 @@ The SDKs provide convenience methods to initialize the Actor and handle its resu
 During initialization, the SDK loads environment variables, checks the configuration, prepares to receive system events,
 and optionally purges previous state from local storage.
 
+<div class="clear-both" />
+
 #### Node.js
 
 In Node.js the Actor is initialized by calling the `init()` method. It should be paired with an `exit()` method
@@ -574,6 +643,15 @@ int main (int argc, char *argv[]) {
 
 ### Get input
 
+<!-- ASTRO:
+<Illustration
+    description="The input object is passed by the user and stored in the Actor's default key-value store. The input is an object with properties. If the Actor defines the input schema, the input object is guaranteed to conform to it."
+    position="right"
+    image={illuAPIGetInput}
+    noCaption
+/>
+-->
+
 Get access to the Actor input object passed by the user.
 It is parsed from a JSON file, which is stored by the system in the Actor's default key-value store,
 Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_INPUT_KEY` [environment variable](#environment-variables).
@@ -581,6 +659,8 @@ Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_I
 The input is an object with properties.
 If the Actor defines the input schema, the input object is guaranteed to conform to it.
 For details, see [Input](#input).
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -619,6 +699,15 @@ int main (int argc, char *argv[]) {}
 
 ### Key-value store access
 
+<!-- ASTRO:
+<Illustration
+    description="Write and read arbitrary files using a storage called Key-value store. When an Actor starts, by default it is associated with a newly-created key-value store, which only contains one file with input of the Actor."
+    position="right"
+    image={illuAPIKeyValueStoreAccess}
+    noCaption
+/>
+-->
+
 Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
 When an Actor starts, by default it is associated with a newly-created key-value store,
@@ -626,6 +715,8 @@ which only contains one file with the input of the Actor (see [Get input](#get-i
 
 The user can override this behavior and specify another key-value store or input key
 when running the Actor.
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -664,6 +755,15 @@ $ cat file.txt
 
 ### Push results to dataset
 
+<!-- ASTRO:
+<Illustration
+    description="Larger results can be saved to append-only object storage called Dataset. When an Actor starts, by default it is associated with a newly-created empty default dataset. The Actor can create additional datasets or access existing datasets created by other Actors, and use those as needed."
+    position="right"
+    image={illuAPIPush}
+    noCaption
+/>
+-->
+
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an Actor starts, by default it is associated with a newly-created empty default dataset.
 The Actor can create additional datasets or access existing datasets created by other Actors,
@@ -671,6 +771,8 @@ and use those as needed.
 
 Note that datasets can optionally be equipped with schema that ensures only certain kinds
 of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.md) for more details.
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -863,6 +965,8 @@ $ echo $ACTOR_RUN_ID
 Each Actor run has a status (the `status` field), which indicates its stage in the Actor's lifecycle.
 The status can be one of the following values:
 
+<div class="clear-both" />
+
 |Status|Type| Description                                 |
 |--- |--- |---------------------------------------------|
 |`READY`|initial| Started but not allocated to any worker yet |
@@ -1009,6 +1113,15 @@ $ ps -a
 
 ### Start another Actor
 
+<!-- ASTRO:
+<Illustration
+    description="Actor can start other Actors, if they have permission. It can override the default dataset or key-value store, and e.g. forwarding the data to another named dataset, that will be consumed by the other Actor."
+    position="content"
+    image={illuAPIStartAnother}
+    noCaption
+/>
+-->
+
 Actor can start other Actors, if they have permission.
 
 The Actor can override the default dataset or key-value store,
@@ -1088,6 +1201,15 @@ posix_spawn();
 
 ### Metamorph
 
+<!-- ASTRO:
+<Illustration
+    description="Metamorph is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor, similarly to UNIX `exec` command. It is used for building new Actors on top of existing ones. You simply define input schema and write README for a specific use case, and then delegate the work to another Actor."
+    position="content"
+    image={illuAPIMetamorph}
+    noCaption
+/>
+-->
+
 This is the most magical Actor operation. It replaces a running Actor’s Docker image with another Actor,
 similarly to UNIX `exec` command.
 It is used for building new Actors on top of existing ones.
@@ -1130,6 +1252,8 @@ $ exec /bin/bash
 ### Attach webhook to an Actor run
 
 Run another Actor or an external HTTP API endpoint after an Actor run finishes or fails.
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -1178,6 +1302,8 @@ $ command1 || command2  # ("orf" symbol)
 Abort itself or another Actor running on the Apify platform.
 Aborting an Actor changes its [status](#actor-status) to `ABORTED`.
 
+<div class="clear-both" />
+
 #### Node.js
 
 ```js
@@ -1199,6 +1325,15 @@ $ kill <PID>
 
 ### Reboot an Actor
 
+<!-- ASTRO:
+<Illustration
+    description="Sometimes, an Actor might get into some error state from which it's not safe or possible to recover, e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job, the Actor can reboot its own Docker container and continue work from its previously persisted state."
+    position="right"
+    image={illuAPIReboot}
+    noCaption
+/>
+-->
+
 Sometimes, an Actor might get into some error state from which it's not safe or possible to recover,
 e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job,
 the Actor can reboot its own Docker container and continue work from its previously persisted state.
@@ -1208,6 +1343,8 @@ if that happens too often in a short period of time, the system
 might completely [abort](#actor-status) the Actor run.
 The reboot operation can be used by the Actor developer to indicate that
 this is a controlled operation, and not to be considered by the system as a crash.
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -1247,6 +1384,17 @@ https://hard-to-guess-identifier.runs.apify.net
 The live view URL has a unique hostname, which is practically impossible to guess.
 This lets you keep the web server hidden from the public yet accessible from the external internet by any parties
 with whom you share the URL.
+
+<!-- ASTRO:
+<Illustration
+    description="An Actor can launch an HTTP web server that is exposed to the outside world to handle requests. This enables Actors to provide a custom HTTP API to integrate with other systems, to provide a web application for human users, to show Actor run details, diagnostics, charts, or to run an arbitrary web app."
+    position="left"
+    image={illuAPIWebServer}
+    noCaption
+/>
+-->
+
+<div class="clear-both" />
 
 #### Node.js
 
@@ -1300,6 +1448,15 @@ All executed writes to the default Actor [storage](#storage) are guaranteed to b
 After migration, the Actor is restarted on a new host. It can restore its customer state from the storages again.
 
 ### Charging money
+
+<!-- ASTRO:
+<Illustration
+    description="To run an Actor on the Apify platform or another cloud platform, a user typically needs to pay to cover the computing costs. Additionally, the platforms are free to introduce other monetization mechanisms, such as charging the users a fixed monthly fee for 'renting' the Actor, or a variable fee for the number of results produced by the Actor. These charging mechanisms are beyond the scope of this whitepaper."
+    position="right"
+    image={illuSharingChargingMoney}
+    noCaption
+/>
+-->
 
 To run an Actor on the Apify platform or another cloud platform,
 a user typically needs to pay to cover the computing costs.
@@ -1530,6 +1687,15 @@ Good documentation makes good Actors.
 
 ### Input schema file
 
+<!-- ASTRO:
+<Illustration
+    description="Actors accept an input JSON object on start, whose schema can be defined by the input schema file. This file is referenced in the Actor file as the `input` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/input_schema.json."
+    position="right"
+    image={illuDefinitionFilesInputSchemaFile}
+    noCaption
+/>
+-->
+
 Actors accept an [input](#input) JSON object on start, whose schema can be defined
 by the input schema file. This file is referenced in the Actor file (`.actor/actor.json`) file
 as the `input` property.
@@ -1546,6 +1712,8 @@ The input schema file defines properties accepted by Actor on input. It is used 
   that smartly pre-populate and link Actor input properties.
 
 For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
+
+<div class="clear-both" />
 
 This is an example of the input schema file for the `bob/screenshot-taker` Actor::
 
@@ -1579,6 +1747,15 @@ This is an example of the input schema file for the `bob/screenshot-taker` Actor
 
 ### Output schema file
 
+<!-- ASTRO:
+<Illustration
+    description="Similarly to input, Actors can generate an output JSON object, which links to their results. The Actor output schema file defines how such output object looks like, including types of its properties and description. This file is referenced in the Actor file as the `output` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/output_schema.json."
+    position="right"
+    image={illuDefinitionFilesOutputSchemaFile}
+    noCaption
+/>
+-->
+
 Similarly to input, Actors can generate an [output](#output) JSON object, which links to their results.
 The Actor output schema file defines how such output object looks like,
 including types of its properties and description.
@@ -1593,6 +1770,8 @@ The output schema describes how the Actor stores its results, and it is used by 
 - Enable integrating Actors with external systems and automated workflows.
 
 For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
+
+<div class="clear-both" />
 
 This is an example of the output schema file for the `bob/screenshot-taker` Actor:
 
@@ -1659,6 +1838,15 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
+<!-- ASTRO:
+<Illustration
+    description="The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages."
+    position="right"
+    image={illuDevelopmentLocal}
+    noCaption
+/>
+-->
+
 The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages. 
 
 Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) provides [convenient templates](https://apify.com/templates) to bootstrap an Actor in Python, JavaScript, and TypeScript.
@@ -1720,7 +1908,16 @@ $ apify login
 ? Choose how you want to log in to Apify (Use arrow keys)
 ❯ Through Apify Console in your default browser
 $ apify push
-````
+```
+
+<!-- ASTRO:
+<Illustration
+    description="The `apify push` CLI command takes information from the `.actor` directory and builds an Actor on the Apify platform, so that you can run it remotely."
+    position="left"
+    image={illuDevelopmentDeployment}
+    noCaption
+/>
+-->
 
 ### Continuous integration and delivery
 
@@ -1754,7 +1951,7 @@ COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
 RUN npm -g install apify-cli
 
 CMD curl $(actor get-input) | actor set-value example-com --contentType text/html
-````
+```
 
 Actorization of existing code gives developers an easy way to give their code
 a presence in the cloud in the form of an Actor, so that the users can easily try it without
@@ -1772,7 +1969,18 @@ Once published, your Actor is automatically exposed to organic traffic of users 
 
 ![Apify Actor Store](./img/apify-store.png)
 
+<!-- ASTRO: <Picture src={illuApifyStore} alt="Apify Store" formats={['avif', 'webp']} /> -->
+
 ### Monetization
+
+<!-- ASTRO:
+<Illustration
+    description="The monetization options for Actors include fixed rental fee, payment per result, or payment per event."
+    position="right"
+    image={illuSharingMonetization}
+    noCaption
+/>
+-->
 
 To build a SaaS product, you usually need to:
 
