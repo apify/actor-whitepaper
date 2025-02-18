@@ -151,7 +151,7 @@ def transform_schema_links(content: str) -> str:
         text, path = match.groups()
         new_path = f'/{path.lower().replace("_", "-")}-{suffix_lower}'
         print(f'  ⭮  {text} →  {new_path}')
-        return f'[{text}]{new_path}'
+        return f'[{text}]({new_path})'
     
     replacements = {
         r'\[([^]]+)\]\(./pages/([^)]+)_SCHEMA\.md\)': 
