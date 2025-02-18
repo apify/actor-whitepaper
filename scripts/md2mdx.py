@@ -79,16 +79,6 @@ def transform_image_references(content: str) -> str:
     )
 
 
-def remove_html_comments(content: str) -> str:
-    print('\n󰋼  Removing HTML comments...')
-    
-    return re.sub(
-        r'<!--[\s\S]*?-->(\n)?',
-        '',
-        content
-    )
-
-
 def add_github_header(content: str) -> str:
     print('\n󰋼  Adding GitHub header...')
     
@@ -115,7 +105,7 @@ def remove_picture_components(content: str) -> str:
     print('\n󰋼  Removing Picture components...')
     
     return re.sub(
-        r'<Picture.*?/>',
+        r'(?<!<!-- ASTRO: )<Picture.*?/>',
         '',
         content,
         flags=re.MULTILINE | re.DOTALL
@@ -138,6 +128,17 @@ def transform_schema_links(content: str) -> str:
     return content
 
 
+def process_astro_blocks(content: str) -> str:
+    print('\n󰋼  Processing Astro blocks...')
+    
+    return re.sub(
+        r'<!--\s*ASTRO:\s*(.*?)\s*-->',
+        r'\1',
+        content,
+        flags=re.MULTILINE | re.DOTALL
+    )
+
+
 def transform_markdown_to_mdx(content: str) -> str:
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
@@ -145,10 +146,10 @@ def transform_markdown_to_mdx(content: str) -> str:
     transformed = remove_table_of_contents(post.content)
     transformed = transform_code_blocks(transformed)
     transformed = transform_image_references(transformed)
-    transformed = remove_html_comments(transformed)
+    transformed = remove_picture_components(transformed)
+    transformed = process_astro_blocks(transformed)
     transformed = add_github_header(transformed)
     transformed = remove_bold_formatting(transformed)
-    transformed = remove_picture_components(transformed)
     transformed = transform_schema_links(transformed)
 
     print('\n󰋼  Combining with Astro imports...')
