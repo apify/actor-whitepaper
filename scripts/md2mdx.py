@@ -34,9 +34,14 @@ import GitHubHeader from '../../components/GitHubHeader.astro';'''
 
 def remove_table_of_contents(content: str) -> str:
     print('\n󰋼  Removing table of contents...')
+    
+    def replace_toc(match):
+        print('  ⭮  Removed table of contents section')
+        return ''
+    
     return re.sub(
         r'## Contents\n\n<!-- toc -->[\s\S]*?<!-- tocstop -->',
-        '',
+        replace_toc,
         content
     )
 
@@ -47,7 +52,7 @@ def transform_code_blocks(content: str) -> str:
     def replace_code_block(match):
         language, code = match.groups()
         if language in ['bash', 'javascript', 'python']:
-            print(f'  Found {language} code block')
+            print(f'  ⭮  {language} code block')
             return f'<CodeExample title="{language.upper()}">\n{language}{code}</CodeExample>'
         return match.group(0)
 
@@ -63,7 +68,7 @@ def transform_image_references(content: str) -> str:
 
     def replace_image(match):
         alt, src = match.groups()
-        print(f'  Found image: {src}')
+        print(f'  ⭮  {src}')
         basename = os.path.basename(src)
         return f'''<Picture
     src={basename}
@@ -81,6 +86,7 @@ def transform_image_references(content: str) -> str:
 
 def add_github_header(content: str) -> str:
     print('\n󰋼  Adding GitHub header...')
+    print('  ⭮  Adding GitHub header')
     
     return re.sub(
         r'(#\s+[^\n]*\n)(\n?)',
@@ -93,9 +99,14 @@ def add_github_header(content: str) -> str:
 def remove_bold_formatting(content: str) -> str:
     print('\n󰋼  Removing bold formatting...')
     
+    def replace_bold(match):
+        text = match.group(1)
+        print(f'  ⭮  {text[:120]}')
+        return text
+    
     return re.sub(
         r'^\*\*(.*?)\*\*$',
-        r'\1',
+        replace_bold,
         content,
         flags=re.MULTILINE
     )
@@ -104,9 +115,30 @@ def remove_bold_formatting(content: str) -> str:
 def remove_picture_components(content: str) -> str:
     print('\n󰋼  Removing Picture components...')
     
+    def replace_picture(match):
+        picture = re.sub(r'\s+', ' ', match.group(0))
+        print(f'  ⭮  {picture[:120]}')
+        return ''
+    
     return re.sub(
-        r'(?<!<!-- ASTRO: )<Picture.*?/>',
-        '',
+        r'(?<!<!-- ASTRO: )<Picture[\s\S]*?/>',
+        replace_picture,
+        content,
+        flags=re.MULTILINE | re.DOTALL
+    )
+
+
+def process_astro_blocks(content: str) -> str:
+    print('\n󰋼  Processing Astro blocks...')
+    
+    def replace_astro(match):
+        block = re.sub(r'\s+', ' ', match.group(1))
+        print(f'  ⭮  {block[:120]}')
+        return match.group(1)
+    
+    return re.sub(
+        r'<!--\s*ASTRO:\s*(.*?)\s*-->',
+        replace_astro,
         content,
         flags=re.MULTILINE | re.DOTALL
     )
@@ -115,28 +147,23 @@ def remove_picture_components(content: str) -> str:
 def transform_schema_links(content: str) -> str:
     print('\n󰋼  Transforming schema links...')
     
+    def replace_link(match, suffix_lower):
+        text, path = match.groups()
+        new_path = f'/{path.lower().replace("_", "-")}-{suffix_lower}'
+        print(f'  ⭮  {text} →  {new_path}')
+        return f'[{text}]{new_path}'
+    
     replacements = {
         r'\[([^]]+)\]\(./pages/([^)]+)_SCHEMA\.md\)': 
-            lambda m: f'[{m.group(1)}](/{ m.group(2).lower().replace("_", "-")}-schema)',
+            lambda m: replace_link(m, 'schema'),
         r'\[([^]]+)\]\(./pages/([^)]+)_FILE\.md\)': 
-            lambda m: f'[{m.group(1)}](/{ m.group(2).lower().replace("_", "-")}-file)'
+            lambda m: replace_link(m, 'file')
     }
     
     for pattern, replacement in replacements.items():
         content = re.sub(pattern, replacement, content)
     
     return content
-
-
-def process_astro_blocks(content: str) -> str:
-    print('\n󰋼  Processing Astro blocks...')
-    
-    return re.sub(
-        r'<!--\s*ASTRO:\s*(.*?)\s*-->',
-        r'\1',
-        content,
-        flags=re.MULTILINE | re.DOTALL
-    )
 
 
 def transform_markdown_to_mdx(content: str) -> str:
@@ -165,13 +192,13 @@ def process_files():
 
         print('\n󰋼  Transforming content...')
         transformed_content = transform_markdown_to_mdx(content)
-        print(f'  Transformed size: {len(transformed_content)} bytes')
+        print(f'  ⭮  {len(transformed_content)} bytes')
 
         print('\n󰋼  Writing target file...')
         os.makedirs(os.path.dirname(TARGET_FILE), exist_ok=True)
         with open(TARGET_FILE, 'w', encoding='utf-8') as f:
             f.write(transformed_content)
-        print(f'  Successfully transformed: {SOURCE_FILE} → {TARGET_FILE}')
+        print(f'  ⭮  {SOURCE_FILE} →  {TARGET_FILE}')
 
         print('\n󰋼  Formatting MDX file...')
         os.system('npm run format-sync')
