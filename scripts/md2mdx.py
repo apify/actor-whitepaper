@@ -70,12 +70,7 @@ def transform_image_references(content: str) -> str:
         alt, src = match.groups()
         print(f'  ⭮  {src}')
         basename = os.path.basename(src)
-        return f'''<Picture
-    src={basename}
-    alt="{alt}"
-    width={800}
-    height={600}
-/>'''
+        return f'<Picture src={basename} alt="{alt}" width={800} height={600} />'
 
     return re.sub(
         r'!\[(.*?)\]\((.*?)\)',
