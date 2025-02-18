@@ -1908,7 +1908,7 @@ $ apify login
 ? Choose how you want to log in to Apify (Use arrow keys)
 ❯ Through Apify Console in your default browser
 $ apify push
-````
+```
 
 <!-- ASTRO:
 <Illustration
@@ -1951,7 +1951,7 @@ COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
 RUN npm -g install apify-cli
 
 CMD curl $(actor get-input) | actor set-value example-com --contentType text/html
-````
+```
 
 Actorization of existing code gives developers an easy way to give their code
 a presence in the cloud in the form of an Actor, so that the users can easily try it without
