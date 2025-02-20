@@ -30,7 +30,7 @@ jobs:
         with:
           path: source
 
-      # Step 2: Clone the target repo (Astro site) into ./target directory.
+      # Step 2: Clone the target repo (Astro site) into ./target directory
       - name: Checkout target repo
         uses: actions/checkout@v4
         with:

@@ -27,8 +27,6 @@ Dependencies:
     - python-frontmatter
     - pathlib
     - re (regex)
-    
-TMP
 """
 
 import os
