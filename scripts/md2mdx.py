@@ -92,12 +92,14 @@ import illuSharingMonetization from './illu-sharing-monetization@2x.png';
 import Illustration from '../../components/Illustration.astro';
 import illuTakerInput from './illu-taker-input@2x.png';'''
 
+
 IGNORED_FILES = {
     'license.md',  # ignore case-insensitive
     # Add more files here as needed, e.g.:
     # 'contributing.md',
     # 'changelog.md',
 }
+
 
 def should_process_file(path: Path) -> bool:
     """Determine if a file should be processed based on ignore rules."""
@@ -107,6 +109,7 @@ def should_process_file(path: Path) -> bool:
         print(f'\n󰋼  Skipping ignored file: {path.name}')
         return False
     return True
+
 
 def remove_table_of_contents(content: str) -> str:
     """Remove the table of contents section from the markdown content."""
@@ -313,7 +316,123 @@ def remove_html_comments(content: str) -> str:
     )
 
 
-def transform_markdown_to_mdx(content: str) -> str:
+def transform_internal_links(content: str) -> str:
+    """Transform internal markdown links to the new MDX format."""
+    
+    print('\n󰋼  Transforming internal links...')
+
+    def format_link_text(text):
+        """Convert technical names to readable titles."""
+        
+        # Remove file extensions.
+        text = re.sub(r'\.(json|md)$', '', text)
+        
+        # Handle special cases.
+        if text == 'README':
+            return 'Documentation'
+            
+        # Convert UPPER_CASE to Title Case.
+        if text.isupper():
+            words = text.split('_')
+            return ' '.join(word.capitalize() for word in words)
+            
+        return text
+
+    def replace_link(match):
+        text, path, anchor = match.groups()
+        
+        # Handle different link types.
+        if path:
+            # Remove .md extension if present.
+            path = path.replace('.md', '')
+            
+            if path == '../README':
+                # Links to README become root links.
+                new_path = '/'
+            else:
+                # Remove ./ or / prefix if present.
+                path = path.lstrip('./').lstrip('/')
+                
+                # Convert to kebab case.
+                new_path = '/' + path.lower().replace('_', '-')
+        else:
+            new_path = ''
+            
+        # Add anchor if present.
+        if anchor:
+            new_path = f"{new_path}{anchor}"
+            
+        # Format the link text if it's a technical name.
+        if text.endswith('.md') or text.endswith('.json') or text.isupper() or '.json' in text:
+            text = format_link_text(text)
+            
+        print(f'  ⭮  {text} → {new_path}')
+        return f'[{text}]({new_path})'
+
+    # First pass: handle standard markdown links.
+    pattern = r'\[([^\]]+)\]\(((?!http)[^)#\s]+)?([#][^)\s]+)?\)'
+    content = re.sub(pattern, replace_link, content)
+    
+    # Second pass: handle already transformed links but with technical names.
+    pattern = r'\[([A-Z_]+(?:\.(?:json|md))?)\](/[a-z-]+(?:[#][^)\s]+)?)\)'
+    content = re.sub(pattern, lambda m: f'[{format_link_text(m.group(1))}]{m.group(2)}', content)
+
+    return content
+
+
+def remove_img_tags(content: str) -> str:
+    """Remove HTML img tags from the content."""
+    
+    print('\n󰋼  Removing img tags...')
+
+    def replace_img(match):
+        img = match.group(0)
+        print(f'  ⭮  Removing img tag: {img[:120]}')
+        return ''
+
+    return re.sub(
+        r'<img[^>]+>',
+        replace_img,
+        content
+    )
+
+
+def transform_inline_references(content: str) -> str:
+    """Transform inline file references and URLs to proper format."""
+    
+    print('\n󰋼  Transforming inline references...')
+
+    def replace_reference(match):
+        path = match.group(1)
+        
+        # Remove .md extension if present.
+        path = path.replace('.md', '')
+        
+        # Convert to kebab case and add leading slash.
+        new_path = '/' + path.lstrip('./').lstrip('/').lower().replace('_', '-')
+        
+        print(f'  ⭮  {path} → {new_path}')
+        
+        return new_path
+
+    # Transform file references like ./DATASET_SCHEMA.md to /dataset-schema.
+    content = re.sub(
+        r'(?<=See )\.?/?([A-Z_]+\.md)',
+        replace_reference,
+        content
+    )
+
+    # Transform TODO references.
+    content = re.sub(
+        r'Move to ([A-Z_]+\.md)',
+        lambda m: f'Move to {replace_reference(re.match(r"([A-Z_]+\.md)", m.group(1)))}',
+        content
+    )
+
+    return content
+
+
+def transform_markdown_to_mdx(content: str, source_file: Path) -> str:
     """Main transformation pipeline to convert markdown to MDX format."""
     
     print('\n󰋼  Parsing frontmatter...')
@@ -329,7 +448,10 @@ def transform_markdown_to_mdx(content: str) -> str:
     transformed = add_github_header(transformed, is_readme)
     transformed = remove_bold_formatting(transformed)
     transformed = transform_schema_links(transformed)
-    transformed = remove_html_comments(transformed)  # Added as final cleanup step
+    transformed = transform_internal_links(transformed)
+    transformed = transform_inline_references(transformed)
+    transformed = remove_html_comments(transformed)
+    transformed = remove_img_tags(transformed)
 
     print('\n󰋼  Combining with Astro imports...')
     return f'{ASTRO_IMPORTS}\n\n{transformed}'
@@ -382,7 +504,7 @@ def process_files():
             
             # Transform content.
             print('\n󰋼  Transforming content...')
-            transformed_content = transform_markdown_to_mdx(content)
+            transformed_content = transform_markdown_to_mdx(content, source_file)
             print(f'  ⭮  {len(transformed_content)} bytes')
             
             # Write target file.
