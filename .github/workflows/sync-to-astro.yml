@@ -60,21 +60,6 @@ jobs:
         run: |
           python source/scripts/md2mdx.py
 
-      # Debug: Check target repo structure
-      - name: Debug target repo
-        run: |
-          echo "Target repo contents:"
-          ls -la target/
-          echo "\nTarget src contents:"
-          ls -la target/src || echo "No src directory!"
-          echo "\nTarget content directory (if exists):"
-          ls -la target/src/content || echo "No content directory!"
-          echo "\nPages content directory (if exists):"
-          ls -la target/src/content/pages || echo "No content directory!"
-          echo "\nGit status of target:"
-          cd target && git status
-          pwd
-
       # Step 6: Create or update PR with changes.
       - name: Create Pull Request
         env:

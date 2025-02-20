@@ -40,18 +40,9 @@ import glob
 SCRIPT_PATH = Path(__file__).resolve()
 CURRENT_DIR = Path.cwd()
 
-if 'source' in str(CURRENT_DIR):
-    # Running from source directory (GitHub Actions).
-    print('************************* Running from source directory')
-    PROJECT_ROOT = CURRENT_DIR.parent
-    SOURCE_ROOT = CURRENT_DIR
-    TARGET_ROOT = PROJECT_ROOT / 'target'
-else:
-    # Running directly from project root.
-    print('************************* Running from project root')
-    PROJECT_ROOT = SCRIPT_PATH.parent.parent
-    SOURCE_ROOT = PROJECT_ROOT
-    TARGET_ROOT = PROJECT_ROOT / '../target'
+PROJECT_ROOT = SCRIPT_PATH.parent
+SOURCE_ROOT = PROJECT_ROOT / 'source'
+TARGET_ROOT = PROJECT_ROOT / 'target'
 
 print(f'  Script location: {__file__}')
 print(f'  Project root: {PROJECT_ROOT}')
