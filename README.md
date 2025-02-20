@@ -507,6 +507,9 @@ You can develop and run Actors in [Apify Console](https://console.apify.com/acto
 installing any software locally. Just create a free Apify account, and start building Actors
 in an online IDE.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 ### Node.js
 
 The most complete implementation of the Actor system is provided by the Apify SDK for Node.js,
@@ -518,6 +521,9 @@ You can install it to your Node.js project by running:
 $ npm install apify
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 ### Python
 
 To build Actors in Python, simply install the Apify SDK for Python,
@@ -527,6 +533,9 @@ into your project:
 ```bash
 $ pip3 install apify
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 ### Command-line interface (CLI)
 
@@ -543,6 +552,9 @@ or via the [apify-cli](https://www.npmjs.com/package/apify-cli) Node.js package:
 ```bash
 $ npm install -g apify-cli
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 You can confirm the installation succeeded and log in to the Apify platform by running:
 
@@ -581,6 +593,9 @@ and optionally purges previous state from local storage.
 
 <div class="clear-both" />
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 In Node.js the Actor is initialized by calling the `init()` method. It should be paired with an `exit()` method
@@ -609,6 +624,9 @@ Actor.main(async () => {
 });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -623,6 +641,9 @@ async def main():
 asyncio.run(main())
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 No initialization needed, the process exit terminates the Actor, with the process status code
@@ -633,6 +654,9 @@ $ actor set-status-message "My work is done, friend"
 $ exit 0
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```c
@@ -640,6 +664,9 @@ int main (int argc, char *argv[]) {
   ...
 }
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Get input
 
@@ -662,6 +689,9 @@ For details, see [Input](#input).
 
 <div class="clear-both" />
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -671,12 +701,18 @@ console.log(input);
 // prints: { "option1": "aaa", "option2": 456 }
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
 input = Actor.get_input()
 print(input)
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -687,6 +723,9 @@ $ actor get-input | jq
 > { "option1": "aaa", "option2": 456 }
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```bash
@@ -696,6 +735,9 @@ $ command --option1=aaa --option2=bbb
 ```c
 int main (int argc, char *argv[]) {}
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Key-value store access
 
@@ -718,6 +760,9 @@ when running the Actor.
 
 <div class="clear-both" />
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -733,6 +778,9 @@ const store = await Actor.openKeyValueStore('screenshots-store');
 const imageBuffer = await store.getValue('screenshot.png');
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -746,12 +794,18 @@ await Actor.set_value('screenshot', buffer, content_type='image/png')
 state = await Actor.get_value('my-state')
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX"> -->
+
 #### UNIX
 
 ```bash
 $ echo "hello world" > file.txt
 $ cat file.txt
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Push results to dataset
 
@@ -774,6 +828,9 @@ of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.
 
 <div class="clear-both" />
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -787,6 +844,9 @@ const dataset = await Actor.openDataset('bob/poll-results-2019');
 await dataset.pushData({ someResult: 123 });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -797,6 +857,9 @@ await Actor.push_data({ 'some_result': 123 })
 dataset = await Actor.open_dataset('bob/poll-results-2019')
 await dataset.push_data({ 'some_result': 123 })
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -817,11 +880,17 @@ $ actor push-data --dataset=bob/election-data someResult=123
 $ actor push-data --dataset=./my_dataset someResult=123
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```c
 printf("Hello world\tColum 2\tColumn 3");
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Exit Actor
 
@@ -846,6 +915,9 @@ shown below. This has several advantages:
   event handlers to complete before closing the process, using the `timeoutSecs` option.
   For details, see [System Events](#system-events).
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -868,6 +940,9 @@ Actor.on('exit', ({ statusMessage, exitCode, timeoutSecs }) => {
 })
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -880,6 +955,9 @@ await Actor.exit('Could not finish the crawl, try increasing memory', exit_code=
 await Actor.fail('Could not finish the crawl, try increasing memory');
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
@@ -891,11 +969,17 @@ $ actor exit --message "Email sent"
 $ actor exit --code=1 --message "Couldn't fetch the URL"
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```c
 exit(1);
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Environment variables
 
@@ -935,6 +1019,9 @@ The environment variables can be set as secure in order to protect sensitive dat
 The value of a secure environment variable is encrypted and can only be retrieved by the Actors during their run,
 but not outside runs. Furthermore, values of secure environment variables are omitted from the log.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 For convenience, rather than using environment vars directly, we provide a `Configuration` class
@@ -947,18 +1034,26 @@ const token = Actor.config.get('token');
 Actor.config.set('token', 's0m3n3wt0k3n')
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
 $ echo "$ACTOR_RUN_ID started at $ACTOR_STARTED_AT"
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
 
 #### UNIX equivalent
 
 ```bash
 $ echo $ACTOR_RUN_ID
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Actor status
 
@@ -989,6 +1084,9 @@ When the Actor is running, it should periodically update the status message as f
 to keep users informed and happy. The function can be called as often as necessary,
 the SDK only invokes API if status changed. This is to simplify usage.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -998,11 +1096,17 @@ await Actor.setStatusMessage('Crawled 45 of 100 pages');
 await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
 await Actor.set_status_message('Crawled 45 of 100 pages')
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -1013,6 +1117,9 @@ $ actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 
 Convention: The end user of an Actor should never need to look into the log to understand what happened,
 e.g. why the Actor failed. All necessary information must be set by the Actor in the status message.
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### System events
 
@@ -1051,6 +1158,9 @@ The system sends messages in JSON format in the following structure:
 Note that some events (e.g. `persistState`) are not sent by the system via the web socket,
 but generated virtually on the Actor SDK level.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -1066,6 +1176,9 @@ Actor.off('systemInfo');
 // Remove a specific event handler
 Actor.off('systemInfo', handler);
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
 
 #### Python
 
@@ -1086,11 +1199,17 @@ Actor.off(Event.SYSTEM_INFO);
 Actor.off(Event.SYSTEM_INFO, handler);
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```c
 signal(SIGINT, handle_sigint);
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Get memory information
 
@@ -1098,11 +1217,17 @@ Get information about the total and available memory of the Actor’s container 
 This is useful to, for example, auto-scale a pool
 of workers used for crawling large websites.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
-```
+```js
 const memoryInfo = await Actor.getMemoryInfo();
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
 
 #### UNIX equivalent
 
@@ -1110,6 +1235,9 @@ const memoryInfo = await Actor.getMemoryInfo();
 # Print memory usage of programs
 $ ps -a
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Start another Actor
 
@@ -1130,6 +1258,9 @@ and, e.g. forward the data to another named dataset that will be consumed by the
 The `call` operation waits for the other Actor to finish, the `start` operation
 returns immediately.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -1147,6 +1278,9 @@ const run2 = await Actor.call(
   { memory: 2048 },
 );
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -1167,6 +1301,9 @@ $ cat input.json | actor call apify/google-search-scraper --json
 $ apify call file:../some-dir someInput='xxx'
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Slack"> -->
+
 #### Slack
 
 It will also be possible to run Actors from the Slack app.
@@ -1175,6 +1312,9 @@ The following command starts the Actor, and then prints the messages to a Slack 
 ```
 /apify start bob/google-search-scraper startUrl=afff
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
 #### API
 
@@ -1187,6 +1327,9 @@ The following command starts the Actor, and then prints the messages to a Slack 
   returnDataset=true
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```bash
@@ -1198,6 +1341,9 @@ $ command <arg1>, <arg2>, … &
 // Spawn another process
 posix_spawn();
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Metamorph
 
@@ -1225,6 +1371,9 @@ An Actor can metamorph only to Actors that have compatible output schema as the 
 in order to ensure logical and consistent outcomes for users.
 If the output schema of the target Actor is not compatible, the system should throw an error.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -1235,6 +1384,9 @@ await Actor.metamorph(
 );
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
@@ -1243,17 +1395,26 @@ $ actor metamorph --input=@input.json --json --memory=4096 \
   bob/web-scraper
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```bash
 $ exec /bin/bash
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Attach webhook to an Actor run
 
 Run another Actor or an external HTTP API endpoint after an Actor run finishes or fails.
 
 <div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -1270,6 +1431,9 @@ await Actor.addWebhook({
     }`,
 });
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -1288,6 +1452,9 @@ $ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
 $ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```bash
@@ -1297,6 +1464,9 @@ $ command1 && command2  # ("andf" symbol)
 $ command1 || command2  # ("orf" symbol)
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Abort another Actor
 
 Abort itself or another Actor running on the Apify platform.
@@ -1304,11 +1474,17 @@ Aborting an Actor changes its [status](#actor-status) to `ABORTED`.
 
 <div class="clear-both" />
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
 await Actor.abort({ statusMessage: 'Your job is done, friend.', actorRunId: 'RUN_ID' });
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -1316,12 +1492,18 @@ await Actor.abort({ statusMessage: 'Your job is done, friend.', actorRunId: 'RUN
 $ actor abort --run-id RUN_ID 
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```bash
 # Terminate a program
 $ kill <PID>
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Reboot an Actor
 
@@ -1346,11 +1528,17 @@ this is a controlled operation, and not to be considered by the system as a cras
 
 <div class="clear-both" />
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
 await Actor.reboot();
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
 
 #### Python
 
@@ -1358,11 +1546,17 @@ await Actor.reboot();
 await Actor.reboot()
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
 $ actor reboot 
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Actor web server
 
@@ -1396,6 +1590,9 @@ with whom you share the URL.
 
 <div class="clear-both" />
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -1410,6 +1607,9 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
   console.log(`Example live view web server running at ${process.env.ACTOR_WEB_SERVER_URL}`)
 })
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Standby mode
 
@@ -1486,6 +1686,9 @@ to perform parts of the job.
 
 An Actor developer can also charge the current user of an Actor a specific amount of USD.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -1496,6 +1699,9 @@ const chargeInfo = await Actor.charge({
 });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 ```python
 charge_info = await Actor.charge(
@@ -1505,6 +1711,9 @@ charge_info = await Actor.charge(
 )
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 ```bash
 $ actor charge gpt-4o-token \
@@ -1512,8 +1721,13 @@ $ actor charge gpt-4o-token \
   --chargePerEventUsd=0.0001
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 An Actor user can specify the maximum amount they are willing to pay when starting an Actor.
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -1528,6 +1742,9 @@ const run = await Actor.call(
 );
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -1538,12 +1755,18 @@ run = await Actor.call(
 )
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 ```bash
 $ actor call bob/analyse-images \
   --input='{"imageUrls": ["https://www.example.com/image.png"]}'
   --max-total-charge-usd=5
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 #### Rules for building Actors with variable charging
 
