@@ -46,23 +46,6 @@ def remove_table_of_contents(content: str) -> str:
     )
 
 
-def transform_code_blocks(content: str) -> str:
-    print('\n󰋼  Transforming code blocks...')
-
-    def replace_code_block(match):
-        language, code = match.groups()
-        if language in ['bash', 'javascript', 'python']:
-            print(f'  ⭮  {language} code block')
-            return f'<CodeExample title="{language.upper()}">\n{language}{code}</CodeExample>'
-        return match.group(0)
-
-    return re.sub(
-        r'`{3}(\w+)([\s\S]*?)`{3}',
-        replace_code_block,
-        content
-    )
-
-
 def transform_image_references(content: str) -> str:
     print('\n󰋼  Transforming image references...')
 
@@ -123,20 +106,80 @@ def remove_picture_components(content: str) -> str:
     )
 
 
-def process_astro_blocks(content: str) -> str:
-    print('\n󰋼  Processing Astro blocks...')
+def transform_astro_blocks(content: str) -> str:
+    """Transform ASTRO comments into component tags.
     
-    def replace_astro(match):
-        block = re.sub(r'\s+', ' ', match.group(1))
-        print(f'  ⭮  {block[:120]}')
-        return match.group(1)
+    This function processes:
+    1. CodeSwitcher and CodeExample components, removing redundant titles
+    2. Illustration, Diagram and Picture components
     
-    return re.sub(
+    Args:
+        content: The source Markdown content
+        
+    Returns:
+        Content with ASTRO comments converted to component tags
+    """
+    print('\n󰋼  Transforming ASTRO blocks...')
+    
+    def replace_astro_block(match):
+        # Get the component definition but preserve internal whitespace
+        component = match.group(1).strip()
+        
+        # Handle CodeSwitcher
+        if component == '<CodeSwitcher>':
+            print('  ⭮  Adding CodeSwitcher opening tag')
+            return '<CodeSwitcher>'
+        elif component == '</CodeSwitcher>':
+            print('  ⭮  Adding CodeSwitcher closing tag')
+            return '</CodeSwitcher>'
+            
+        # Handle CodeExample
+        code_example_match = re.match(r'<CodeExample\s+title="([^"]+)">', component)
+        if code_example_match:
+            title = code_example_match.group(1)
+            print(f'  ⭮  Adding CodeExample tag with title: {title}')
+            return f'<CodeExample title="{title}">'
+        elif component == '</CodeExample>':
+            print('  ⭮  Adding CodeExample closing tag')
+            return '</CodeExample>'
+            
+        # Handle Illustration, Diagram, and Picture
+        if (component.startswith('<Illustration') or 
+            component.startswith('<Diagram') or 
+            component.startswith('<Picture')):
+            print(f'  ⭮  {component[:120]}')
+            return component
+            
+        # Return unchanged if not a matching component
+        return f'<!-- ASTRO: {match.group(1)} -->'
+    
+    # First transform all ASTRO comments to components
+    content = re.sub(
         r'<!--\s*ASTRO:\s*(.*?)\s*-->',
-        replace_astro,
+        replace_astro_block,
         content,
         flags=re.MULTILINE | re.DOTALL
     )
+    
+    # Then remove redundant titles inside CodeExample blocks
+    def remove_redundant_titles(match):
+        block = match.group(0)
+        # Remove any heading that appears right after the CodeExample opening tag
+        block = re.sub(
+            r'(<CodeExample[^>]+>)(\s*\n)*\s*#{3,4}[^\n]+\n',
+            lambda m: print(f'  ⭮  Removing heading after CodeExample') or m.group(1) + '\n',
+            block,
+            count=1
+        )
+        return block
+    
+    content = re.sub(
+        r'<CodeExample[^>]+>[\s\S]+?</CodeExample>',
+        remove_redundant_titles,
+        content
+    )
+    
+    return content
 
 
 def transform_schema_links(content: str) -> str:
@@ -166,10 +209,9 @@ def transform_markdown_to_mdx(content: str) -> str:
     post = frontmatter.loads(content)
 
     transformed = remove_table_of_contents(post.content)
-    transformed = transform_code_blocks(transformed)
     transformed = transform_image_references(transformed)
     transformed = remove_picture_components(transformed)
-    transformed = process_astro_blocks(transformed)
+    transformed = transform_astro_blocks(transformed)
     transformed = add_github_header(transformed)
     transformed = remove_bold_formatting(transformed)
     transformed = transform_schema_links(transformed)
