@@ -79,6 +79,7 @@ import illuBasicConceptsRunEnvironment from './illu-basic-concepts-docker@2x.gif
 import illuBasicConceptsStorage from './illu-basic-concepts-storage@2x.png';
 import illuBasicConceptsStorageDataset from './illu-basic-concepts-storage-dataset@2x.png';
 import illuBasicConceptsStorageKeyValueStore from './illu-basic-concepts-storage-key-value-store@2x.png';
+import illuDatasetSchema from './illu-dataset-schema@2x.png';
 import illuDefinitionFilesInputSchemaFile from './illu-definition-files-input-schema-file@2x.png';
 import illuDefinitionFilesOutputSchemaFile from './illu-definition-files-output-schema-file@2x.png';
 import illuDevelopmentDeployment from './illu-development-deployment@2x.png';
