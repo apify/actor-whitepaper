@@ -66,11 +66,11 @@ def remove_table_of_contents(content: str) -> str:
     """Remove the table of contents section from the markdown content."""
 
     print('\n󰋼  Removing table of contents...')
-    
+
     def replace_toc(match):
         print('  ⭮  Removed table of contents section')
         return ''
-    
+
     return re.sub(
         r'## Contents\n\n<!-- toc -->[\s\S]*?<!-- tocstop -->',
         replace_toc,
@@ -101,7 +101,7 @@ def add_github_header(content: str) -> str:
 
     print('\n󰋼  Adding GitHub header...')
     print('  ⭮  Adding GitHub header')
-    
+
     return re.sub(
         r'(#\s+[^\n]*\n)(\n?)',
         r'\1\n<GitHubHeader repoUrl="https://github.com/apify/actor-whitepaper" />\n\n',
@@ -114,12 +114,12 @@ def remove_bold_formatting(content: str) -> str:
     """Remove bold formatting from lines that are entirely bold."""
 
     print('\n󰋼  Removing bold formatting...')
-    
+
     def replace_bold(match):
         text = match.group(1)
         print(f'  ⭮  {text[:120]}')
         return text
-    
+
     return re.sub(
         r'^\*\*(.*?)\*\*$',
         replace_bold,
@@ -132,12 +132,12 @@ def remove_picture_components(content: str) -> str:
     """Remove Picture components that aren't preceded by ASTRO comments."""
 
     print('\n󰋼  Removing Picture components...')
-    
+
     def replace_picture(match):
         picture = re.sub(r'\s+', ' ', match.group(0))
         print(f'  ⭮  {picture[:120]}')
         return ''
-    
+
     return re.sub(
         r'(?<!<!-- ASTRO: )<Picture[\s\S]*?/>',
         replace_picture,
@@ -148,18 +148,18 @@ def remove_picture_components(content: str) -> str:
 
 def transform_astro_blocks(content: str) -> str:
     """Transform ASTRO comments into component tags.
-    
+
     This function processes:
     1. CodeSwitcher and CodeExample components, removing redundant titles.
     2. Illustration, Diagram and Picture components.
     """
 
     print('\n󰋼  Transforming ASTRO blocks...')
-    
+
     def replace_astro_block(match):
         # Get the component definition but preserve internal whitespace.
         component = match.group(1).strip()
-        
+
         # Handle CodeSwitcher tags.
         if component == '<CodeSwitcher>':
             print('  ⭮  Adding CodeSwitcher opening tag')
@@ -167,9 +167,10 @@ def transform_astro_blocks(content: str) -> str:
         elif component == '</CodeSwitcher>':
             print('  ⭮  Adding CodeSwitcher closing tag')
             return '</CodeSwitcher>'
-            
+
         # Handle CodeExample tags with titles.
         code_example_match = re.match(r'<CodeExample\s+title="([^"]+)">', component)
+
         if code_example_match:
             title = code_example_match.group(1)
             print(f'  ⭮  Adding CodeExample tag with title: {title}')
@@ -177,17 +178,17 @@ def transform_astro_blocks(content: str) -> str:
         elif component == '</CodeExample>':
             print('  ⭮  Adding CodeExample closing tag')
             return '</CodeExample>'
-            
-        if (component.startswith('<Illustration') or 
-            component.startswith('<Diagram') or 
+
         # Handle media components (Illustration, Diagram, Picture).
+        if (component.startswith('<Illustration') or
+            component.startswith('<Diagram') or
             component.startswith('<Picture')):
             print(f'  ⭮  {component[:120]}')
             return component
-            
+
         # Return unchanged if not a matching component.
         return f'<!-- ASTRO: {match.group(1)} -->'
-    
+
     # First transform all ASTRO comments to their respective components.
     content = re.sub(
         r'<!--\s*ASTRO:\s*(.*?)\s*-->',
@@ -195,27 +196,28 @@ def transform_astro_blocks(content: str) -> str:
         content,
         flags=re.MULTILINE | re.DOTALL
     )
-    
+
     # Then remove redundant h3/h4 titles that appear right after CodeExample tags.
     def remove_redundant_titles(match):
         block = match.group(0)
+
         # Match any h3 or h4 heading after the opening tag, including across newlines.
         block = re.sub(
             r'(<CodeExample[^>]+>)(\s*\n)*\s*#{3,4}[^\n]+\n',
             lambda m: print(f'  ⭮  Removing heading after CodeExample') or m.group(1) + '\n',
             block,
-            count=1
             count=1  # Only remove the first heading found
         )
+
         return block
-    
+
     # Process each CodeExample block to remove redundant titles.
     content = re.sub(
         r'<CodeExample[^>]+>[\s\S]+?</CodeExample>',
         remove_redundant_titles,
         content
     )
-    
+
     return content
 
 
@@ -223,25 +225,25 @@ def transform_schema_links(content: str) -> str:
     """Transform schema file links to their proper paths."""
 
     print('\n󰋼  Transforming schema links...')
-    
+
     def replace_link(match, suffix_lower):
         text, path = match.groups()
         new_path = f'/{path.lower().replace("_", "-")}-{suffix_lower}'
         print(f'  ⭮  {text} →  {new_path}')
         return f'[{text}]({new_path})'
-    
+
     # Define patterns for both schema and file links.
     replacements = {
-        r'\[([^]]+)\]\(./pages/([^)]+)_SCHEMA\.md\)': 
+        r'\[([^]]+)\]\(./pages/([^)]+)_SCHEMA\.md\)':
             lambda m: replace_link(m, 'schema'),
-        r'\[([^]]+)\]\(./pages/([^)]+)_FILE\.md\)': 
+        r'\[([^]]+)\]\(./pages/([^)]+)_FILE\.md\)':
             lambda m: replace_link(m, 'file')
     }
-    
+
     # Apply each replacement pattern.
     for pattern, replacement in replacements.items():
         content = re.sub(pattern, replacement, content)
-    
+
     return content
 
 
@@ -285,9 +287,9 @@ def process_files():
 
         print('\n󰋼  Formatting MDX file...')
         os.system('npm run format-sync')
-        
+
         print('\n  Done')
-        
+
     except Exception as error:
         print('\n❌ Error processing files:', str(error))
         sys.exit(1)
