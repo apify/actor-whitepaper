@@ -13,7 +13,7 @@ echo -e "\n
 if [ ! -d "source" ]; then
     echo -e "\n󰋼  Copying source files..."
     mkdir source
-    cp -r ../{img,*.md,requirements.txt,scripts} source/
+    cp -r ../{img,pages,*.md,requirements.txt,scripts} source/
     echo -e "\n  Source files copied"
 else
     echo -e "\n󰋼  Using existing source directory"

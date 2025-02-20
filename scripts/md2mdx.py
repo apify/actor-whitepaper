@@ -34,6 +34,7 @@ import sys
 from pathlib import Path
 import frontmatter
 import re
+import glob
 
 # Get the project root - need to handle both direct run and test-sync run.
 SCRIPT_PATH = Path(__file__).resolve()
@@ -41,9 +42,13 @@ SCRIPT_PATH = Path(__file__).resolve()
 if 'test-sync/source' in str(SCRIPT_PATH):
     # Running from test-sync/source/scripts/md2mdx.py.
     PROJECT_ROOT = SCRIPT_PATH.parent.parent.parent.parent
+    SOURCE_ROOT = SCRIPT_PATH.parent.parent
+    TARGET_ROOT = Path(PROJECT_ROOT) / 'test-sync/target'
 else:
     # Running directly from scripts/md2mdx.py.
     PROJECT_ROOT = SCRIPT_PATH.parent.parent
+    SOURCE_ROOT = PROJECT_ROOT
+    TARGET_ROOT = PROJECT_ROOT / 'test-sync/target'
 
 SOURCE_FILE = str(PROJECT_ROOT / 'README.md')
 TARGET_FILE = str(PROJECT_ROOT / 'test-sync/target/src/content/pages/index.mdx')
@@ -309,30 +314,66 @@ def transform_markdown_to_mdx(content: str) -> str:
     return f'{ASTRO_IMPORTS}\n\n{transformed}'
 
 
+def get_target_path(source_path: Path) -> Path:
+    """Convert source path to target path using the required transformations."""
+    
+    # Get relative path from source root.
+    rel_path = source_path.relative_to(SOURCE_ROOT)
+    
+    # Transform filename.
+    stem = rel_path.stem.lower().replace('_', '-')
+    new_name = f"{stem}.mdx"
+    
+    # Construct target path.
+    if source_path.name == 'README.md':
+        # Special case for README.md -> index.mdx.
+        return TARGET_ROOT / 'src/content/pages/index.mdx'
+    else:
+        # For files in pages directory.
+        return TARGET_ROOT / 'src/content/pages' / new_name
+
+
 def process_files():
-    """Main function to process the markdown file and output MDX."""
-
+    """Main function to process all markdown files."""
+    
     try:
-        print('\n󰋼  Reading source file...')
-        with open(SOURCE_FILE, 'r', encoding='utf-8') as f:
-            content = f.read()
-        print(f'  Source file size: {len(content)} bytes')
-
-        print('\n󰋼  Transforming content...')
-        transformed_content = transform_markdown_to_mdx(content)
-        print(f'  ⭮  {len(transformed_content)} bytes')
-
-        print('\n󰋼  Writing target file...')
-        os.makedirs(os.path.dirname(TARGET_FILE), exist_ok=True)
-        with open(TARGET_FILE, 'w', encoding='utf-8') as f:
-            f.write(transformed_content)
-        print(f'  ⭮  {SOURCE_FILE} →  {TARGET_FILE}')
-
-        print('\n󰋼  Formatting MDX file...')
+        # Find all markdown files to process.
+        source_files = [
+            Path(p) for p in [
+                *glob.glob(str(SOURCE_ROOT / '*.md')),  # root md files
+                *glob.glob(str(SOURCE_ROOT / 'pages/*.md'))  # files in pages directory
+            ]
+        ]
+        
+        print(f'\n󰋼  Found {len(source_files)} markdown files to process')
+        
+        for source_file in source_files:
+            target_file = get_target_path(source_file)
+            print(f'\n󰋼  Processing: {source_file.name} → {target_file.name}')
+            
+            # Read source content.
+            print(f'  Reading source file: {source_file}')
+            with open(source_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+            print(f'  Source file size: {len(content)} bytes')
+            
+            # Transform content.
+            print('\n󰋼  Transforming content...')
+            transformed_content = transform_markdown_to_mdx(content)
+            print(f'  ⭮  {len(transformed_content)} bytes')
+            
+            # Write target file.
+            print(f'\n󰋼  Writing target file: {target_file}')
+            os.makedirs(target_file.parent, exist_ok=True)
+            with open(target_file, 'w', encoding='utf-8') as f:
+                f.write(transformed_content)
+            print(f'  ⭮  {source_file.name} → {target_file.name}')
+        
+        print('\n󰋼  Formatting MDX files...')
         os.system('npm run format-sync')
-
-        print('\n  Done')
-
+        
+        print('\n  Done')
+        
     except Exception as error:
         print('\n❌ Error processing files:', str(error))
         sys.exit(1)
