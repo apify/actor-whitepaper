@@ -422,10 +422,11 @@ def transform_inline_references(content: str) -> str:
         content
     )
 
-    # Transform TODO references.
+    # Transform TODO references using a separate pattern.
+    pattern = r"([A-Z_]+\.md)"
     content = re.sub(
         r'Move to ([A-Z_]+\.md)',
-        lambda m: f'Move to {replace_reference(re.match(r"([A-Z_]+\.md)", m.group(1)))}',
+        lambda m: f'Move to {replace_reference(re.match(pattern, m.group(1)))}',
         content
     )
 
