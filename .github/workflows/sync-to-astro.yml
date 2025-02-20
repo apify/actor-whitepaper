@@ -47,6 +47,8 @@ jobs:
           ls -la target/src || echo "No src directory!"
           echo "\nTarget content directory (if exists):"
           ls -la target/src/content || echo "No content directory!"
+          echo "\nPages content directory (if exists):"
+          ls -la target/src/content/pages || echo "No content directory!"
           echo "\nGit status of target:"
           cd target && git status
 
