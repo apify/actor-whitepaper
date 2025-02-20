@@ -56,8 +56,7 @@ jobs:
       # Step 5: Run the MD to MDX conversion script.
       - name: Run sync script
         run: |
-          cd source
-          python scripts/md2mdx.py
+          python source/scripts/md2mdx.py
 
       # Step 6: Create or update PR with changes.
       - name: Create Pull Request
