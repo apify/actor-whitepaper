@@ -142,12 +142,14 @@ def transform_image_references(content: str) -> str:
     )
 
 
-def add_github_header(content: str) -> str:
-    """Add GitHub header component after the first heading."""
+def add_github_header(content: str, is_readme: bool) -> str:
+    """Add GitHub header component after the first heading, but only for README.md."""
+    
+    if not is_readme:
+        return content
 
     print('\n󰋼  Adding GitHub header...')
     print('  ⭮  Adding GitHub header')
-
     return re.sub(
         r'(#\s+[^\n]*\n)(\n?)',
         r'\1\n<GitHubHeader repoUrl="https://github.com/apify/actor-whitepaper" />\n\n',
@@ -313,15 +315,18 @@ def remove_html_comments(content: str) -> str:
 
 def transform_markdown_to_mdx(content: str) -> str:
     """Main transformation pipeline to convert markdown to MDX format."""
+    
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
+    
+    is_readme = source_file.name.lower() == 'readme.md'
 
     # Apply transformations in sequence.
     transformed = remove_table_of_contents(post.content)
     transformed = transform_image_references(transformed)
     transformed = remove_picture_components(transformed)
     transformed = transform_astro_blocks(transformed)
-    transformed = add_github_header(transformed)
+    transformed = add_github_header(transformed, is_readme)
     transformed = remove_bold_formatting(transformed)
     transformed = transform_schema_links(transformed)
     transformed = remove_html_comments(transformed)  # Added as final cleanup step
