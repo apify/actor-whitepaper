@@ -36,7 +36,7 @@ jobs:
         with:
           repository: ${{ env.TARGET_REPO }}
           path: target
-          token: ${{ secrets.SYNC_TOKEN }}
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
 
       # Step 3: Setup Python environment.
       - name: Setup Python
@@ -62,7 +62,7 @@ jobs:
       # Step 6: Create or update PR with changes.
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
         run: |
           cd target
           git config user.name "github-actions[bot]"
