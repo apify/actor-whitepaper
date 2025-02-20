@@ -272,9 +272,26 @@ def transform_schema_links(content: str) -> str:
     return content
 
 
+def remove_html_comments(content: str) -> str:
+    """Remove all HTML comments from the content."""
+
+    print('\n󰋼  Removing HTML comments...')
+
+    def replace_comment(match):
+        comment = match.group(0)
+        print(f'  ⭮  Removing comment: {comment[:120]}')
+        return ''
+
+    return re.sub(
+        r'<!--[\s\S]*?-->',
+        replace_comment,
+        content,
+        flags=re.MULTILINE | re.DOTALL
+    )
+
+
 def transform_markdown_to_mdx(content: str) -> str:
     """Main transformation pipeline to convert markdown to MDX format."""
-
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
 
@@ -286,6 +303,7 @@ def transform_markdown_to_mdx(content: str) -> str:
     transformed = add_github_header(transformed)
     transformed = remove_bold_formatting(transformed)
     transformed = transform_schema_links(transformed)
+    transformed = remove_html_comments(transformed)  # Added as final cleanup step
 
     print('\n󰋼  Combining with Astro imports...')
     return f'{ASTRO_IMPORTS}\n\n{transformed}'
