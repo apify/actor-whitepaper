@@ -72,6 +72,7 @@ jobs:
           ls -la target/src/content/pages || echo "No content directory!"
           echo "\nGit status of target:"
           cd target && git status
+          pwd
 
       # Step 6: Create or update PR with changes.
       - name: Create Pull Request
