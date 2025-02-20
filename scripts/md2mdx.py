@@ -55,11 +55,36 @@ print(f'  Target file: {TARGET_FILE}')
 
 # Required imports for the MDX file.
 ASTRO_IMPORTS = '''import { Picture } from 'astro:assets';
-
 import CodeExample from '../../components/CodeExample.astro';
 import CodeSwitcher from '../../components/CodeSwitcher.astro';
 import Diagram from '../../components/Diagram.astro';
-import GitHubHeader from '../../components/GitHubHeader.astro';'''
+import GitHubHeader from '../../components/GitHubHeader.astro';
+import illuApifyStore from './illu-apify-store@2x.png';
+import illuAPIGetInput from './illu-get-input@2x.png';
+import illuAPIKeyValueStoreAccess from './illu-api-key-value-store-access@2x.png';
+import illuAPIMetamorph from './illu-api-metamorph@2x.gif';
+import illuAPIPush from './illu-api-push@2x.gif';
+import illuAPIReboot from './illu-api-reboot@2x.png';
+import illuAPIStartAnother from './illu-api-start-another@2x.png';
+import illuAPIWebServer from './illu-api-webserver@2x.gif';
+import illuBasicConceptsInput from './illu-basic-concepts-input@2x.gif';
+import illuBasicConceptsIntegrations from './illu-basic-concepts-integrations@2x.png';
+import illuBasicConceptsOutput from './illu-basic-concepts-output@2x.gif';
+import illuBasicConceptsRunEnvironment from './illu-basic-concepts-docker@2x.gif';
+import illuBasicConceptsStorage from './illu-basic-concepts-storage@2x.png';
+import illuBasicConceptsStorageDataset from './illu-basic-concepts-storage-dataset@2x.png';
+import illuBasicConceptsStorageKeyValueStore from './illu-basic-concepts-storage-key-value-store@2x.png';
+import illuDefinitionFilesInputSchemaFile from './illu-definition-files-input-schema-file@2x.png';
+import illuDefinitionFilesOutputSchemaFile from './illu-definition-files-output-schema-file@2x.png';
+import illuDevelopmentDeployment from './illu-development-deployment@2x.png';
+import illuDevelopmentLocal from './illu-development-local@2x.png';
+import illuDiagramHoriz from './illu-diagram-horiz@2x.png';
+import illuDiagramVert from './illu-diagram-vert@2x.png';
+import illuPhilosophyWhyTheName from './illu-philosophy-why-the-name@2x.png';
+import illuSharingChargingMoney from './illu-sharing-charging-money@2x.gif';
+import illuSharingMonetization from './illu-sharing-monetization@2x.png';
+import Illustration from '../../components/Illustration.astro';
+import illuTakerInput from './illu-taker-input@2x.png';'''
 
 
 def remove_table_of_contents(content: str) -> str:
