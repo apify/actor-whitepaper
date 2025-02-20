@@ -24,6 +24,7 @@ echo -e "\n
 if [ ! -d "target" ]; then
     echo -e "\n󰋼  Cloning target repository..."
     git clone https://github.com/apify/actor-whitepaper-web target
+    git checkout feat/gh-57-content-sync # REMOVE THIS LINE
     echo -e "\n  Target repository cloned"
 else
     echo -e "\n󰋼  Using existing target directory"
