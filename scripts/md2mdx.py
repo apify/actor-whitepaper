@@ -1,5 +1,34 @@
 #!/usr/bin/env python3
 
+"""
+Markdown to MDX Transformer
+---------------------------
+
+This script transforms a standard Markdown file into an MDX file for use with Astro.
+It performs several transformations:
+
+1. Processes ASTRO comments into component tags:
+   - CodeSwitcher and CodeExample components.
+   - Illustration, Diagram, and Picture components.
+   - Removes redundant titles in code blocks.
+2. Transforms image references to Astro Picture components
+3. Removes table of contents (The Astro site has its own table of contents).
+4. Adds GitHub header.
+5. Removes bold formatting from fully bold lines.
+6. Transforms schema file links to proper paths.
+
+Usage:
+    The script reads from README.md in the project root and outputs to:
+    test-sync/target/src/content/pages/index.mdx
+
+    $ python3 scripts/md2mdx.py
+
+Dependencies:
+    - python-frontmatter
+    - pathlib
+    - re (regex)
+"""
+
 import os
 import sys
 from pathlib import Path
@@ -24,6 +53,7 @@ print(f'  Project root: {PROJECT_ROOT}')
 print(f'  Source file: {SOURCE_FILE}')
 print(f'  Target file: {TARGET_FILE}')
 
+# Required imports for the MDX file.
 ASTRO_IMPORTS = '''import { Picture } from 'astro:assets';
 
 import CodeExample from '../../components/CodeExample.astro';
@@ -33,6 +63,8 @@ import GitHubHeader from '../../components/GitHubHeader.astro';'''
 
 
 def remove_table_of_contents(content: str) -> str:
+    """Remove the table of contents section from the markdown content."""
+
     print('\n󰋼  Removing table of contents...')
     
     def replace_toc(match):
@@ -47,6 +79,8 @@ def remove_table_of_contents(content: str) -> str:
 
 
 def transform_image_references(content: str) -> str:
+    """Transform markdown image references to Astro Picture components."""
+
     print('\n󰋼  Transforming image references...')
 
     def replace_image(match):
@@ -63,6 +97,8 @@ def transform_image_references(content: str) -> str:
 
 
 def add_github_header(content: str) -> str:
+    """Add GitHub header component after the first heading."""
+
     print('\n󰋼  Adding GitHub header...')
     print('  ⭮  Adding GitHub header')
     
@@ -75,6 +111,8 @@ def add_github_header(content: str) -> str:
 
 
 def remove_bold_formatting(content: str) -> str:
+    """Remove bold formatting from lines that are entirely bold."""
+
     print('\n󰋼  Removing bold formatting...')
     
     def replace_bold(match):
@@ -91,6 +129,8 @@ def remove_bold_formatting(content: str) -> str:
 
 
 def remove_picture_components(content: str) -> str:
+    """Remove Picture components that aren't preceded by ASTRO comments."""
+
     print('\n󰋼  Removing Picture components...')
     
     def replace_picture(match):
@@ -110,22 +150,17 @@ def transform_astro_blocks(content: str) -> str:
     """Transform ASTRO comments into component tags.
     
     This function processes:
-    1. CodeSwitcher and CodeExample components, removing redundant titles
-    2. Illustration, Diagram and Picture components
-    
-    Args:
-        content: The source Markdown content
-        
-    Returns:
-        Content with ASTRO comments converted to component tags
+    1. CodeSwitcher and CodeExample components, removing redundant titles.
+    2. Illustration, Diagram and Picture components.
     """
+
     print('\n󰋼  Transforming ASTRO blocks...')
     
     def replace_astro_block(match):
-        # Get the component definition but preserve internal whitespace
+        # Get the component definition but preserve internal whitespace.
         component = match.group(1).strip()
         
-        # Handle CodeSwitcher
+        # Handle CodeSwitcher tags.
         if component == '<CodeSwitcher>':
             print('  ⭮  Adding CodeSwitcher opening tag')
             return '<CodeSwitcher>'
@@ -133,7 +168,7 @@ def transform_astro_blocks(content: str) -> str:
             print('  ⭮  Adding CodeSwitcher closing tag')
             return '</CodeSwitcher>'
             
-        # Handle CodeExample
+        # Handle CodeExample tags with titles.
         code_example_match = re.match(r'<CodeExample\s+title="([^"]+)">', component)
         if code_example_match:
             title = code_example_match.group(1)
@@ -143,17 +178,17 @@ def transform_astro_blocks(content: str) -> str:
             print('  ⭮  Adding CodeExample closing tag')
             return '</CodeExample>'
             
-        # Handle Illustration, Diagram, and Picture
         if (component.startswith('<Illustration') or 
             component.startswith('<Diagram') or 
+        # Handle media components (Illustration, Diagram, Picture).
             component.startswith('<Picture')):
             print(f'  ⭮  {component[:120]}')
             return component
             
-        # Return unchanged if not a matching component
+        # Return unchanged if not a matching component.
         return f'<!-- ASTRO: {match.group(1)} -->'
     
-    # First transform all ASTRO comments to components
+    # First transform all ASTRO comments to their respective components.
     content = re.sub(
         r'<!--\s*ASTRO:\s*(.*?)\s*-->',
         replace_astro_block,
@@ -161,18 +196,20 @@ def transform_astro_blocks(content: str) -> str:
         flags=re.MULTILINE | re.DOTALL
     )
     
-    # Then remove redundant titles inside CodeExample blocks
+    # Then remove redundant h3/h4 titles that appear right after CodeExample tags.
     def remove_redundant_titles(match):
         block = match.group(0)
-        # Remove any heading that appears right after the CodeExample opening tag
+        # Match any h3 or h4 heading after the opening tag, including across newlines.
         block = re.sub(
             r'(<CodeExample[^>]+>)(\s*\n)*\s*#{3,4}[^\n]+\n',
             lambda m: print(f'  ⭮  Removing heading after CodeExample') or m.group(1) + '\n',
             block,
             count=1
+            count=1  # Only remove the first heading found
         )
         return block
     
+    # Process each CodeExample block to remove redundant titles.
     content = re.sub(
         r'<CodeExample[^>]+>[\s\S]+?</CodeExample>',
         remove_redundant_titles,
@@ -183,6 +220,8 @@ def transform_astro_blocks(content: str) -> str:
 
 
 def transform_schema_links(content: str) -> str:
+    """Transform schema file links to their proper paths."""
+
     print('\n󰋼  Transforming schema links...')
     
     def replace_link(match, suffix_lower):
@@ -191,6 +230,7 @@ def transform_schema_links(content: str) -> str:
         print(f'  ⭮  {text} →  {new_path}')
         return f'[{text}]({new_path})'
     
+    # Define patterns for both schema and file links.
     replacements = {
         r'\[([^]]+)\]\(./pages/([^)]+)_SCHEMA\.md\)': 
             lambda m: replace_link(m, 'schema'),
@@ -198,6 +238,7 @@ def transform_schema_links(content: str) -> str:
             lambda m: replace_link(m, 'file')
     }
     
+    # Apply each replacement pattern.
     for pattern, replacement in replacements.items():
         content = re.sub(pattern, replacement, content)
     
@@ -205,9 +246,12 @@ def transform_schema_links(content: str) -> str:
 
 
 def transform_markdown_to_mdx(content: str) -> str:
+    """Main transformation pipeline to convert markdown to MDX format."""
+
     print('\n󰋼  Parsing frontmatter...')
     post = frontmatter.loads(content)
 
+    # Apply transformations in sequence.
     transformed = remove_table_of_contents(post.content)
     transformed = transform_image_references(transformed)
     transformed = remove_picture_components(transformed)
@@ -221,6 +265,8 @@ def transform_markdown_to_mdx(content: str) -> str:
 
 
 def process_files():
+    """Main function to process the markdown file and output MDX."""
+
     try:
         print('\n󰋼  Reading source file...')
         with open(SOURCE_FILE, 'r', encoding='utf-8') as f:
