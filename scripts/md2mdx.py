@@ -38,25 +38,25 @@ import glob
 
 # Get the project root - need to handle both direct run and test-sync run.
 SCRIPT_PATH = Path(__file__).resolve()
+CURRENT_DIR = Path.cwd()
 
-if 'test-sync/source' in str(SCRIPT_PATH):
-    # Running from test-sync/source/scripts/md2mdx.py.
-    PROJECT_ROOT = SCRIPT_PATH.parent.parent.parent.parent
-    SOURCE_ROOT = SCRIPT_PATH.parent.parent
-    TARGET_ROOT = Path(PROJECT_ROOT) / 'test-sync/target'
+if 'source' in str(CURRENT_DIR):
+    # Running from source directory (GitHub Actions).
+    print('************************* Running from source directory')
+    PROJECT_ROOT = CURRENT_DIR.parent
+    SOURCE_ROOT = CURRENT_DIR
+    TARGET_ROOT = PROJECT_ROOT / 'target'
 else:
-    # Running directly from scripts/md2mdx.py.
+    # Running directly from project root.
+    print('************************* Running from project root')
     PROJECT_ROOT = SCRIPT_PATH.parent.parent
     SOURCE_ROOT = PROJECT_ROOT
-    TARGET_ROOT = PROJECT_ROOT / 'test-sync/target'
-
-SOURCE_FILE = str(PROJECT_ROOT / 'README.md')
-TARGET_FILE = str(PROJECT_ROOT / 'test-sync/target/src/content/pages/index.mdx')
+    TARGET_ROOT = PROJECT_ROOT / '../target'
 
 print(f'  Script location: {__file__}')
 print(f'  Project root: {PROJECT_ROOT}')
-print(f'  Source file: {SOURCE_FILE}')
-print(f'  Target file: {TARGET_FILE}')
+print(f'  Source root: {SOURCE_ROOT}')
+print(f'  Target root: {TARGET_ROOT}')
 
 # Required imports for the MDX file.
 ASTRO_IMPORTS = '''import { Picture } from 'astro:assets';
