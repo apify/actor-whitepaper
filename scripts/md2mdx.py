@@ -40,9 +40,9 @@ import glob
 SCRIPT_PATH = Path(__file__).resolve()
 CURRENT_DIR = Path.cwd()
 
-PROJECT_ROOT = SCRIPT_PATH.parent
-SOURCE_ROOT = PROJECT_ROOT / 'source'
-TARGET_ROOT = PROJECT_ROOT / 'target'
+PROJECT_ROOT = SCRIPT_PATH.parent.parent
+SOURCE_ROOT = PROJECT_ROOT / 'test-sync/source'
+TARGET_ROOT = PROJECT_ROOT / 'test-sync/target'
 
 print(f'  Script location: {__file__}')
 print(f'  Project root: {PROJECT_ROOT}')
