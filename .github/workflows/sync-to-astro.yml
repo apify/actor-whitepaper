@@ -58,6 +58,7 @@ jobs:
       # Step 5: Run the MD to MDX conversion script.
       - name: Run sync script
         run: |
+          echo "Current directory: $(pwd)"
           python source/scripts/md2mdx.py
 
       # Step 6: Create or update PR with changes.
