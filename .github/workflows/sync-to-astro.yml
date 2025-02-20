@@ -10,6 +10,7 @@ on:
       - '*.md'
       - 'pages/**/*.md'
       - '.github/workflows/sync-to-astro.yml'
+      - 'scripts/**/*.py'
   workflow_dispatch:  # also allows manual trigger from GitHub UI
 
 env:
