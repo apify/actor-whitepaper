@@ -9,7 +9,7 @@ on:
       - '*.md'
       - 'pages/**/*.md'
       - '.github/workflows/sync-to-astro.yml'
-  workflow_dispatch:  # also allows manual trigger from GitHub UI.
+  workflow_dispatch:  # also allows manual trigger from GitHub UI
 
 env:
   TARGET_REPO: "apify/actor-whitepaper-web"
