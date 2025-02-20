@@ -38,6 +38,18 @@ jobs:
           path: target
           token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
 
+      # Debug: Check target repo structure
+      - name: Debug target repo
+        run: |
+          echo "Target repo contents:"
+          ls -la target/
+          echo "\nTarget src contents:"
+          ls -la target/src || echo "No src directory!"
+          echo "\nTarget content directory (if exists):"
+          ls -la target/src/content || echo "No content directory!"
+          echo "\nGit status of target:"
+          cd target && git status
+
       # Step 3: Setup Python environment.
       - name: Setup Python
         uses: actions/setup-python@v4
