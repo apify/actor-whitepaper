@@ -91,6 +91,21 @@ import illuSharingMonetization from './illu-sharing-monetization@2x.png';
 import Illustration from '../../components/Illustration.astro';
 import illuTakerInput from './illu-taker-input@2x.png';'''
 
+IGNORED_FILES = {
+    'license.md',  # ignore case-insensitive
+    # Add more files here as needed, e.g.:
+    # 'contributing.md',
+    # 'changelog.md',
+}
+
+def should_process_file(path: Path) -> bool:
+    """Determine if a file should be processed based on ignore rules."""
+    
+    # Case-insensitive filename check.
+    if path.name.lower() in IGNORED_FILES:
+        print(f'\n󰋼  Skipping ignored file: {path.name}')
+        return False
+    return True
 
 def remove_table_of_contents(content: str) -> str:
     """Remove the table of contents section from the markdown content."""
@@ -343,6 +358,8 @@ def process_files():
                 *glob.glob(str(SOURCE_ROOT / '*.md')),  # root md files
                 *glob.glob(str(SOURCE_ROOT / 'pages/*.md'))  # files in pages directory
             ]
+            
+            if should_process_file(Path(p))  # filter out ignored files
         ]
         
         print(f'\n󰋼  Found {len(source_files)} markdown files to process')
