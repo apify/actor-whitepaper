@@ -190,7 +190,7 @@ def remove_picture_components(content: str) -> str:
         return ''
 
     return re.sub(
-        r'(?<!<!-- ASTRO: )<Picture[\s\S]*?/>',
+        r'(?<!<!-- ASTRO: )<Picture.*?/>',
         replace_picture,
         content,
         flags=re.MULTILINE | re.DOTALL
@@ -255,7 +255,7 @@ def transform_astro_blocks(content: str) -> str:
         # Match any h3 or h4 heading after the opening tag, including across newlines.
         block = re.sub(
             r'(<CodeExample[^>]+>)(\s*\n)*\s*#{3,4}[^\n]+\n',
-            lambda m: print(f'  ⭮  Removing heading after CodeExample') or m.group(1) + '\n',
+            lambda m: print('  ⭮  Removing heading after CodeExample') or m.group(1) + '\n',
             block,
             count=1  # Only remove the first heading found
         )
@@ -309,7 +309,7 @@ def remove_html_comments(content: str) -> str:
         return ''
 
     return re.sub(
-        r'<!--[\s\S]*?-->',
+        r'<!--.*?-->',
         replace_comment,
         content,
         flags=re.MULTILINE | re.DOTALL
