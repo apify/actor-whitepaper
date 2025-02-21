@@ -50,7 +50,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Metamorph](#metamorph)
   * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
   * [Abort another Actor](#abort-another-actor)
-  * [Reboot the Actor](#reboot-the-actor)
+  * [Reboot an Actor](#reboot-an-actor)
   * [Actor web server](#actor-web-server)
   * [Standby mode](#standby-mode)
   * [Migration to another server](#migration-to-another-server)
@@ -71,6 +71,7 @@ By [Jan Čurn](https://apify.com/jancurn),
 - [Sharing and publishing](#sharing-and-publishing)
   * [Monetization](#monetization)
 - [Future work](#future-work)
+- [Links](#links)
 
 <!-- tocstop -->
 
@@ -94,7 +95,7 @@ well beyond the domain of web scraping.
 
 Building on this experience,
 we're releasing this whitepaper to introduce the philosophy of Actors
-to the public and receive your feedback on it.
+to other developers to receive your feedback on it.
 We aim to establish the Actor programming model as an open standard,
 which will help the community to more effectively
 build and ship reusable software automation tools,
@@ -1803,18 +1804,18 @@ For more details, read our essay [Make passive income developing web automation 
 
 ## Future work
 
-The goal of this whitepaper is to introduce the Actor philosophy and programming model to the public,
+The goal of this whitepaper is to introduce the Actor philosophy and programming model to other developers,
 to receive feedback, and to open the way to making Actors an open standard.
-To create an open standard, however, there is more work, including:
+To create an open standard, we need to:
 
-- Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
-- Clearly separate what is the part of the standard and what is up to the discretion of the implementations.
 - Define a standardized low-level HTTP REST API interface for the Actor system,
   to separate "frontend" and "backend" Actor programming model implementations.
   For example, if somebody wants to build support for the Actor programming model in Rust,
   they should just need to write a Rust "frontend" translating the commands to HTTP API calls,
   rather than having to implement the entire system. And equally, if one decides
   to develop a new Actor "backend", all existing client libraries for Rust or other languages should work with it.
+- Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
+- Clearly separate what is the part of the standard and what is up to the discretion of the implementations.
 
 
 ## Links
