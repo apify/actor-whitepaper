@@ -7,9 +7,9 @@ for programs running in the cloud.**
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team.
+[Ondra Urban](https://apify.com/mnmkng), and the entire Apify team.
 
-**Version 0.99 (September 2024)**
+**Version 0.999 (February 2025)**
 
 ## Contents
 
@@ -173,7 +173,7 @@ Each Actor accepts an **input object**, which tells it what it should do.
 The object is passed in JSON format, and its properties have
 a similar role as command-line arguments when running a program in a UNIX-like operating system.
 
-For example, an input object for an Actor `bob/screenshot-taker` can look like this:
+For example, an input object for an Actor `bob/screenshoter` can look like this:
 
 ```json
 {
@@ -237,7 +237,7 @@ This is useful to automatically generate UI previews of the results, API example
 and integrations.
 
 The output object is similar to the input object, as it contains properties and values.
-For example, for the `bob/screenshot-taker` Actor, the output object can look like this:
+For example, for the `bob/screenshoter` Actor, the output object can look like this:
 
 ```jsonc
 {
@@ -1547,7 +1547,7 @@ The input schema file defines properties accepted by Actor on input. It is used 
 
 For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
 
-This is an example of the input schema file for the `bob/screenshot-taker` Actor::
+This is an example of the input schema file for the `bob/screenshoter` Actor::
 
 ```json
 {
@@ -1594,7 +1594,7 @@ The output schema describes how the Actor stores its results, and it is used by 
 
 For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
 
-This is an example of the output schema file for the `bob/screenshot-taker` Actor:
+This is an example of the output schema file for the `bob/screenshoter` Actor:
 
 ```json
 {
@@ -1766,7 +1766,7 @@ Once an Actor is developed, the Actor platform lets you share it with other spec
 and decide whether you want to make its source code open or closed.
 
 You can also publish the Actor for anyone to use on a marketplace like [Apify Store](https://apify.com/store).
-The Actor will get a public landing page like `https://apify.com/bob/screenshot-taker`,
+The Actor will get a public landing page like `https://apify.com/bob/screenshoter`,
 showing its README, description of inputs, outputs, API examples, etc.
 Once published, your Actor is automatically exposed to organic traffic of users and potential customers.
 
@@ -1819,4 +1819,5 @@ To create an open standard, however, there is more work, including:
 
 ## Links
 
+- [Apify Store](https://apify.com/store)
 - [Open-source Actors on GitHub](https://github.com/search?q=path%3A.actor%2Factor.json+&type=code)
