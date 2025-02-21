@@ -115,7 +115,7 @@ and a [command-line interface (CLI)](https://docs.apify.com/cli).
 Beware that the frameworks might not yet implement all the features of the Actor programming model
 described in this whitepaper.
 
-This is currently work in progress.
+This is a work in progress.
 
 ### Overview
 
