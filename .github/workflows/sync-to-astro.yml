@@ -57,7 +57,7 @@ jobs:
 
       # Step 5: Run the MD to MDX conversion script.
       - name: Run sync script
-        run: cd sync/source && python scripts/md2mdx.py
+        run: python sync/source/scripts/md2mdx.py --source sync/source --target sync/target
 
       # Step 6: Create or update PR with changes.
       # - name: Create Pull Request
@@ -65,35 +65,35 @@ jobs:
       #     GH_TOKEN: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
       #   run: |
       #     cd sync/target
-          
+
       #     # Debug: Show current directory and its contents
       #     echo "Current directory: $(pwd)"
       #     echo "Directory contents:"
       #     ls -la
-          
+
       #     # Debug: Show git status in detail
       #     echo "Git status:"
       #     git status
-          
+
       #     # Debug: Show any differences
       #     echo "Git diff:"
       #     git diff
-          
+
       #     git config user.name "github-actions[bot]"
       #     git config user.email "github-actions[bot]@users.noreply.github.com"
 
       #     # Create new branch (with error handling).
       #     git checkout -b ${{ env.TARGET_BRANCH }} || git checkout ${{ env.TARGET_BRANCH }}
-          
+
       #     # Debug: Show branch status
       #     echo "Current branch:"
       #     git branch --show-current
-          
+
       #     # Only create PR if there are changes.
       #     if [[ -n "$(git status --porcelain)" ]]; then
       #       echo "Changes detected:"
       #       git status --porcelain
-            
+
       #       git add .
       #       git commit -m "sync: Update MDX content from whitepaper"
 

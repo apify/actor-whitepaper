@@ -51,7 +51,7 @@ echo -e "\n  Python dependencies installed"
 
 echo -e "\n\n"
 echo "Current path: $(pwd)"
-python3 scripts/md2mdx.py
+python3 scripts/md2mdx.py --source $WORK_DIR/source --target $WORK_DIR/target
 echo -e "\n  MD to MDX conversion completed"
 
 echo -e "\n\n"
