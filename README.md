@@ -173,7 +173,7 @@ Each Actor accepts an **input object**, which tells it what it should do.
 The object is passed in JSON format, and its properties have
 a similar role as command-line arguments when running a program in a UNIX-like operating system.
 
-For example, an input object for an Actor `bob/screenshotter` can look like this:
+For example, an input object for an Actor `bob/screenshotter` could look like this:
 
 ```json
 {
@@ -237,7 +237,7 @@ This is useful to automatically generate UI previews of the results, API example
 and integrations.
 
 The output object is similar to the input object, as it contains properties and values.
-For example, for the `bob/screenshotter` Actor, the output object can look like this:
+For example, for the `bob/screenshotter` Actor, the output object could look like this:
 
 ```jsonc
 {
