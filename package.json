@@ -16,9 +16,8 @@
   },
   "scripts": {
     "build-toc": "./node_modules/.bin/markdown-toc README.md -i --maxdepth 3 && ./node_modules/.bin/markdown-link-check README.md",
-    "setup": "chmod +x scripts/*.sh && ./scripts/setup.sh",
     "test-sync": "chmod +x scripts/*.sh && ./scripts/test-sync.sh",
-    "format-sync": "prettier --write --config test-sync/target/.prettierrc.cjs --ignore-path false --plugin=prettier-plugin-astro --plugin=prettier-plugin-organize-imports --plugin=prettier-plugin-organize-attributes --plugin=prettier-plugin-astro-organize-imports --plugin=prettier-plugin-css-order --plugin=prettier-plugin-tailwindcss --plugin=prettier-plugin-jsdoc \"./test-sync/target/src/content/pages/**/*.mdx\""
+    "format-sync": "prettier --write --config sync/target/.prettierrc.cjs --ignore-path false --plugin=prettier-plugin-astro --plugin=prettier-plugin-organize-imports --plugin=prettier-plugin-organize-attributes --plugin=prettier-plugin-astro-organize-imports --plugin=prettier-plugin-css-order --plugin=prettier-plugin-tailwindcss --plugin=prettier-plugin-jsdoc \"./sync/target/src/content/pages/**/*.mdx\""
   },
   "repository": {
     "type": "git",

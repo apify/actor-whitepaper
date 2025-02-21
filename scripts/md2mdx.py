@@ -19,7 +19,7 @@ It performs several transformations:
 
 Usage:
     The script reads from README.md in the project root and outputs to:
-    test-sync/target/src/content/pages/index.mdx
+    sync/target/src/content/pages/index.mdx
 
     $ python3 scripts/md2mdx.py
 
@@ -41,13 +41,13 @@ SCRIPT_PATH = Path(__file__).resolve()
 CURRENT_DIR = Path.cwd()
 
 PROJECT_ROOT = SCRIPT_PATH.parent.parent
-SOURCE_ROOT = PROJECT_ROOT / 'test-sync/source'
-TARGET_ROOT = PROJECT_ROOT / 'test-sync/target'
+SOURCE_ROOT = PROJECT_ROOT / 'sync/source'
+TARGET_ROOT = PROJECT_ROOT / 'sync/target'
 
-print(f'  Script location: {__file__}')
-print(f'  Project root: {PROJECT_ROOT}')
-print(f'  Source root: {SOURCE_ROOT}')
-print(f'  Target root: {TARGET_ROOT}')
+print(f'Script location: {__file__}')
+print(f'Project root: {PROJECT_ROOT}')
+print(f'Source root: {SOURCE_ROOT}')
+print(f'Target root: {TARGET_ROOT}')
 
 # Required imports for the MDX file.
 ASTRO_IMPORTS = '''import { Picture } from 'astro:assets';
@@ -271,7 +271,7 @@ def transform_schema_links(content: str) -> str:
     def replace_link(match, suffix_lower):
         text, path = match.groups()
         new_path = f'/{path.lower().replace("_", "-")}-{suffix_lower}'
-        print(f'  ⭮  {text} →  {new_path}')
+        print(f'  ⭮  {text} → {new_path}')
         return f'[{text}]({new_path})'
 
     # Define patterns for both schema and file links.
