@@ -78,17 +78,17 @@ By [Jan Čurn](https://apify.com/jancurn),
 ## Introduction
 
 This whitepaper introduces **Actors**,
-a new kind of serverless programs for general-purpose
-language-agnostic computing and automation jobs (also known as agents, functions, or apps).
+a new language-agnostic way to ship general-purpose
+web computing and automation programs (also known as agents, functions, or apps).
 The main goal for Actors is to make it easy for developers to build and ship reusable
-software tools, which are also easy to run
-and integrate by others. For example, Actors are useful for building
+software tools, which are easy to try, integrate, and build upon.
+Actors are useful for building
 web scrapers, crawlers, automations, and AI agents.
 
 ### Background
 
 Actors were first introduced by [Apify](https://apify.com/) in late 2017,
-as a way to easily build, package, and ship web scraping and web automation tools to customers.
+as a way to easily build, package, and ship web scraping and web automation jobs to customers.
 Over the years, Apify has continued to develop the concept and applied
 it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
@@ -101,15 +101,21 @@ which will help the community to more effectively
 build and ship reusable software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
-The goal of this whitepaper is to be the north star that shows what the
-Actor programming model is and what its implementations should support.
+The goal of this whitepaper is to be the North star that shows what the
+Actor programming model is and what operations it should support.
+**But this document is not an official specification.**
+The specification will be OpenAPI schema of the Actor system interface,
+to enable new independent implementations of both the client libraries and backend systems.
+
 Currently, the most complete implementation of the Actor model is provided
 by the Apify platform, with SDKs for
 [Node.js](https://sdk.apify.com/) and
 [Python](https://pypi.org/project/apify/),
 and a [command-line interface (CLI)](https://docs.apify.com/cli).
 Beware that the frameworks might not yet implement all the features of the Actor programming model
-described in this whitepaper. This is a work in progress.
+described in this whitepaper.
+
+This is currently work in progress.
 
 ### Overview
 
