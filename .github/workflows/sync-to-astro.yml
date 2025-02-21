@@ -42,11 +42,15 @@ jobs:
 
       # Step 3: Setup Python environment.
       - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: requirements.txt
+        run: |
+          echo "Current working directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+        # uses: actions/setup-python@v4
+        # with:
+        #   python-version: '3.11'
+        #   cache: 'pip'
+        #   cache-dependency-path: requirements.txt
 
       # Step 4: Install dependencies.
       - name: Install dependencies
