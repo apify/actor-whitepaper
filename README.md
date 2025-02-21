@@ -180,7 +180,7 @@ Each Actor accepts an **input object**, which tells it what it should do.
 The object is passed in JSON format, and its properties have
 a similar role as command-line arguments when running a program in a UNIX-like operating system.
 
-For example, an input object for an Actor `bob/screenshoter` can look like this:
+For example, an input object for an Actor `bob/screenshotter` can look like this:
 
 ```json
 {
@@ -244,7 +244,7 @@ This is useful to automatically generate UI previews of the results, API example
 and integrations.
 
 The output object is similar to the input object, as it contains properties and values.
-For example, for the `bob/screenshoter` Actor, the output object can look like this:
+For example, for the `bob/screenshotter` Actor, the output object can look like this:
 
 ```jsonc
 {
@@ -1554,7 +1554,7 @@ The input schema file defines properties accepted by Actor on input. It is used 
 
 For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
 
-This is an example of the input schema file for the `bob/screenshoter` Actor::
+This is an example of the input schema file for the `bob/screenshotter` Actor::
 
 ```json
 {
@@ -1601,7 +1601,7 @@ The output schema describes how the Actor stores its results, and it is used by 
 
 For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
 
-This is an example of the output schema file for the `bob/screenshoter` Actor:
+This is an example of the output schema file for the `bob/screenshotter` Actor:
 
 ```json
 {
@@ -1773,7 +1773,7 @@ Once an Actor is developed, the Actor platform lets you share it with other spec
 and decide whether you want to make its source code open or closed.
 
 You can also publish the Actor for anyone to use on a marketplace like [Apify Store](https://apify.com/store).
-The Actor will get a public landing page like `https://apify.com/bob/screenshoter`,
+The Actor will get a public landing page like `https://apify.com/bob/screenshotter`,
 showing its README, description of inputs, outputs, API examples, etc.
 Once published, your Actor is automatically exposed to organic traffic of users and potential customers.
 
