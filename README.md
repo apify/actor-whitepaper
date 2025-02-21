@@ -173,7 +173,7 @@ Each Actor accepts an **input object**, which tells it what it should do.
 The object is passed in JSON format, and its properties have
 a similar role as command-line arguments when running a program in a UNIX-like operating system.
 
-For example, an input object for an Actor `bob/screenshot-taker` can look like this:
+For example, an input object for an Actor `bob/screenshotter` can look like this:
 
 ```json
 {
@@ -194,7 +194,7 @@ and simplify integration with external systems.
 
 #### Example of auto-generated Actor input UI
 
-![Screenshot Taker Input UI](./img/screenshot-taker-input.png)
+![Screenshotter Input UI](./img/screenshot-taker-input.png)
 
 ### Run environment
 
@@ -237,14 +237,14 @@ This is useful to automatically generate UI previews of the results, API example
 and integrations.
 
 The output object is similar to the input object, as it contains properties and values.
-For example, for the `bob/screenshot-taker` Actor, the output object can look like this:
+For example, for the `bob/screenshotter` Actor, the output object can look like this:
 
 ```jsonc
 {
   "screenshotUrl": "https://api.apify.com/v2/key-value-stores/skgGkFLQpax59AsFD/records/screenshot.jpg",
   "productImages": "https://api.apify.com/v2/key-value-stores/skgGkFLQpax59AsFD/records/product*.jpg",
   "productDetails": "https://api.apify.com/datasets/9dFknjkxxGkspwWd/records?fields=url,name",
-  "productExplorer": "https://bob--screenshot.apify.actor/product-explorer",
+  "productExplorer": "https://bob-screenshotter.apify.com/product-explorer",
   // or this with live view
   "productExplorer": "https://13413434.runs.apify.net/product-explorer"
 }
@@ -1281,7 +1281,7 @@ and will automatically start or abort an Actor run as needed by the volume of HT
 The external Standby public URL might look like this:
 
 ```
-https://bob--screenshot-taker.apify.actor
+https://bob-screenshotter.apify.com
 ```
 
 Unlike the live view URL reported in the `ACTOR_WEB_SERVER_URL` environment variable,
@@ -1433,8 +1433,8 @@ For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
 ```json
 {
   "actorSpecification": 1,
-  "name": "screenshot-taker",
-  "title": "Screenshot Taker",
+  "name": "screenshotter",
+  "title": "Screenshotter",
   "description": "Take a screenshot of any URL",
   "version": "0.0",
   "input": "./input_schema.json",
@@ -1547,12 +1547,12 @@ The input schema file defines properties accepted by Actor on input. It is used 
 
 For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
 
-This is an example of the input schema file for the `bob/screenshot-taker` Actor::
+This is an example of the input schema file for the `bob/screenshotter` Actor::
 
 ```json
 {
   "actorInputSchemaVersion": 1,
-  "title": "Input schema for Screenshot Taker Actor",
+  "title": "Input schema for Screenshotter Actor",
   "description": "Enter a web page URL and it will take its screenshot with a specific width",
   "type": "object",
   "properties": {
@@ -1594,12 +1594,12 @@ The output schema describes how the Actor stores its results, and it is used by 
 
 For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
 
-This is an example of the output schema file for the `bob/screenshot-taker` Actor:
+This is an example of the output schema file for the `bob/screenshotter` Actor:
 
 ```json
 {
   "actorOutputSchemaVersion": 1,
-  "title": "Output schema for Screenshot Taker Actor",
+  "title": "Output schema for Screenshotter Actor",
   "description": "The URL to the resulting screenshot",
   "properties": {
 
@@ -1766,7 +1766,7 @@ Once an Actor is developed, the Actor platform lets you share it with other spec
 and decide whether you want to make its source code open or closed.
 
 You can also publish the Actor for anyone to use on a marketplace like [Apify Store](https://apify.com/store).
-The Actor will get a public landing page like `https://apify.com/bob/screenshot-taker`,
+The Actor will get a public landing page like `https://apify.com/bob/screenshotter`,
 showing its README, description of inputs, outputs, API examples, etc.
 Once published, your Actor is automatically exposed to organic traffic of users and potential customers.
 
