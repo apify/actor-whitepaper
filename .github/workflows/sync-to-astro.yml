@@ -26,18 +26,18 @@ jobs:
       pull-requests: write # needed for creating PRs
 
     steps:
-      # Step 1: Clone the source repo (this repo) into ./source directory.
+      # Step 1: Clone the source repo (this repo)
       - name: Checkout source repo
         uses: actions/checkout@v4
         with:
-          path: source
+          path: sync/source
 
-      # Step 2: Clone the target repo (Astro site) into ./target directory
+      # Step 2: Clone the target repo (Astro site)
       - name: Checkout target repo
         uses: actions/checkout@v4
         with:
           repository: ${{ env.TARGET_REPO }}
-          path: target
+          path: sync/target
           token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
 
       # Step 3: Setup Python environment.
@@ -46,26 +46,25 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-          cache-dependency-path: source/requirements.txt
+          cache-dependency-path: requirements.txt
 
       # Step 4: Install dependencies.
       - name: Install dependencies
         run: |
-          cd source
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
       # Step 5: Run the MD to MDX conversion script.
       - name: Run sync script
         run: |
-          python source/scripts/md2mdx.py
+          python scripts/md2mdx.py
 
       # Step 6: Create or update PR with changes.
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
         run: |
-          cd target
+          cd sync/target
           
           # Debug: Show current directory and its contents
           echo "Current directory: $(pwd)"
