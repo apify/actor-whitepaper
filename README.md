@@ -50,7 +50,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Metamorph](#metamorph)
   * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
   * [Abort another Actor](#abort-another-actor)
-  * [Reboot the Actor](#reboot-the-actor)
+  * [Reboot an Actor](#reboot-an-actor)
   * [Actor web server](#actor-web-server)
   * [Standby mode](#standby-mode)
   * [Migration to another server](#migration-to-another-server)
@@ -71,6 +71,7 @@ By [Jan Čurn](https://apify.com/jancurn),
 - [Sharing and publishing](#sharing-and-publishing)
   * [Monetization](#monetization)
 - [Future work](#future-work)
+- [Links](#links)
 
 <!-- tocstop -->
 
@@ -2251,7 +2252,3 @@ To create an open standard, however, there is more work, including:
 ## Links
 
 - [Open-source Actors on GitHub](https://github.com/search?q=path%3A.actor%2Factor.json+&type=code)
-
-# Test block
-
-Will remove
