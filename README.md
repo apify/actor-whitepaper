@@ -1,6 +1,6 @@
-# The Web Actor Programming Model Whitepaper [DRAFT]
+# The Web Actor Programming Model Whitepaper
 
-**This whitepaper describes a new concept for building serverless microapps called _Actors_,
+**This whitepaper describes a new concept for building serverless microapps called **_Actors_**,
 which are easy to develop, share, integrate, and build upon.
 Actors are a reincarnation of the UNIX philosophy
 for programs running in the cloud.**
@@ -50,7 +50,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Metamorph](#metamorph)
   * [Attach webhook to an Actor run](#attach-webhook-to-an-actor-run)
   * [Abort another Actor](#abort-another-actor)
-  * [Reboot the Actor](#reboot-the-actor)
+  * [Reboot an Actor](#reboot-an-actor)
   * [Actor web server](#actor-web-server)
   * [Standby mode](#standby-mode)
   * [Migration to another server](#migration-to-another-server)
@@ -71,12 +71,13 @@ By [Jan Čurn](https://apify.com/jancurn),
 - [Sharing and publishing](#sharing-and-publishing)
   * [Monetization](#monetization)
 - [Future work](#future-work)
+- [Links](#links)
 
 <!-- tocstop -->
 
 ## Introduction
 
-This whitepaper introduces **Actors**,
+This whitepaper introduces **_Actors_**,
 a new kind of serverless programs for general-purpose
 language-agnostic computing and automation jobs (also known as agents, functions, or apps).
 The main goal for Actors is to make it easy for developers to build and ship reusable
@@ -140,6 +141,8 @@ and integrate the results of the Actor into their other workflows.
 Actors can easily call and interact with each other, enabling the building of more complex
 systems on top of simple ones.
 
+<!-- ASTRO: <Diagram horizontal={illuDiagramHoriz} vertical={illuDiagramVert} alt="Actor drawing" /> -->
+
 ![Apify Actor diagram](./img/apify-actor-drawing.png)
 
 <!-- Image source: https://docs.google.com/presentation/d/1nDgrI0p2r8ouP_t_Wn02aTllP8_Std-kRuIbO8QLE7M/edit -->
@@ -169,6 +172,15 @@ and how Actors differ from other serverless computing systems.
 
 ### Input
 
+<!-- ASTRO:
+<Illustration
+    description="Each Actor accepts an input object, which tells it what it should do."
+    position="content"
+    image={illuBasicConceptsInput}
+    noCaption
+/>
+-->
+
 Each Actor accepts an **input object**, which tells it what it should do.
 The object is passed in JSON format, and its properties have
 a similar role as command-line arguments when running a program in a UNIX-like operating system.
@@ -196,7 +208,17 @@ and simplify integration with external systems.
 
 ![Screenshot Taker Input UI](./img/screenshot-taker-input.png)
 
+<!-- ASTRO: <Picture src={illuTakerInput} alt="Taker input" formats={['avif', 'webp']} /> -->
+
 ### Run environment
+
+<!-- ASTRO:
+<Illustration
+    description="The Actors run within an isolated Docker container"
+    position="right"
+    image={illuBasicConceptsRunEnvironment}
+/>
+-->
 
 Actors run within an isolated Docker container with access to local file system and network,
 and they can perform arbitrary computing activity or call external APIs.
@@ -217,6 +239,14 @@ from which they can be easily exported using API or integrated in other Actors.
 
 ### Output
 
+<!-- ASTRO:
+<Illustration
+    description="The Actors can generate an output object, which is a standardized way to display, consume, and integrate Actors' results."
+    position="right"
+    image={illuBasicConceptsOutput}
+/>
+-->
+
 While the input object provides a standardized way to invoke Actors,
 Actors can also generate an **output object**, which is a standardized way to display, consume, and integrate
 Actors' results.
@@ -236,6 +266,8 @@ the Actor is started, without the need to wait for it to finish or generate the 
 This is useful to automatically generate UI previews of the results, API examples,
 and integrations.
 
+<div class="clear-both" />
+
 The output object is similar to the input object, as it contains properties and values.
 For example, for the `bob/screenshot-taker` Actor, the output object can look like this:
 
@@ -252,6 +284,15 @@ For example, for the `bob/screenshot-taker` Actor, the output object can look li
 ```
 
 ### Storage
+
+<!-- ASTRO:
+<Illustration
+    description="The Actor system provides two specialized storages that can be used by Actors for storing files and results: Key-value store and Dataset"
+    position="content"
+    image={illuBasicConceptsStorage}
+    noCaption
+/>
+-->
 
 The Actor system provides two specialized storages that can be used by Actors for storing files and results:
 **key-value store** and **dataset**, respectively. For each Actor run,
@@ -275,6 +316,14 @@ an SQL database or a vector database.
 
 #### Key-value store
 
+<!-- ASTRO:
+<Illustration
+    description="The key-value store is a simple data storage that is used for saving and reading files or data records"
+    position="right"
+    image={illuBasicConceptsStorageKeyValueStore}
+/>
+-->
+
 The key-value store is a simple data storage that is used for saving and reading
 files or data records. The records are represented by a unique text key and the data associated with a MIME content type.
 Key-value stores are ideal for saving things like screenshots, web pages, PDFs, or to persist the state of Actors e.g. as a JSON file.
@@ -293,6 +342,14 @@ For details, see [Storage schema files](#storage-schema-files).
 
 #### Dataset
 
+<!-- ASTRO:
+<Illustration
+    description="The dataset is an append-only storage that allows you to store a series of data objects such as results from web scraping, crawling, or data processing jobs."
+    position="right"
+    image={illuBasicConceptsStorageDataset}
+/>
+-->
+
 The dataset is an append-only storage that allows you to store a series of data objects
 such as results from web scraping, crawling, or data processing jobs.
 You or your users can then export the dataset to formats such as JSON, CSV, XML, RSS, Excel, or HTML.
@@ -307,6 +364,15 @@ An Actor can define a schema for the Dataset to ensure objects stored in it conf
 For details, see [Storage schema files](#storage-schema-files).
 
 ### Integrations
+
+<!-- ASTRO:
+<Illustration
+    description="Actors are designed for interoperability. Thanks to the input and output schemas, it's easy to connect Actors with external systems, be it directly via REST API, Node.js or Python clients, CLI, or no-code automations."
+    position="content"
+    image={illuBasicConceptsIntegrations}
+    noCaption
+/>
+-->
 
 **Actors are designed for interoperability.** Thanks to the input and output
 schemas, it easy to connect Actors with external systems,
@@ -430,6 +496,8 @@ They work well with Puppeteers and Playwrights.
 
 To make it clear that Actors are not people, the letter "A" is capitalized.
 
+<!-- ASTRO: <Illustration description="Actors" position="content" image={illuPhilosophyWhyTheName} noCaption /> -->
+
 ## Installation and setup
 
 Below are the steps to start building Actors in various languages and environments.
@@ -439,6 +507,9 @@ Below are the steps to start building Actors in various languages and environmen
 You can develop and run Actors in [Apify Console](https://console.apify.com/actors) without
 installing any software locally. Just create a free Apify account, and start building Actors
 in an online IDE.
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 ### Node.js
 
@@ -451,6 +522,9 @@ You can install it to your Node.js project by running:
 $ npm install apify
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 ### Python
 
 To build Actors in Python, simply install the Apify SDK for Python,
@@ -460,6 +534,9 @@ into your project:
 ```bash
 $ pip3 install apify
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 ### Command-line interface (CLI)
 
@@ -476,6 +553,9 @@ or via the [apify-cli](https://www.npmjs.com/package/apify-cli) Node.js package:
 ```bash
 $ npm install -g apify-cli
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 You can confirm the installation succeeded and log in to the Apify platform by running:
 
@@ -512,6 +592,11 @@ The SDKs provide convenience methods to initialize the Actor and handle its resu
 During initialization, the SDK loads environment variables, checks the configuration, prepares to receive system events,
 and optionally purges previous state from local storage.
 
+<div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 In Node.js the Actor is initialized by calling the `init()` method. It should be paired with an `exit()` method
@@ -540,6 +625,9 @@ Actor.main(async () => {
 });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -554,6 +642,9 @@ async def main():
 asyncio.run(main())
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 No initialization needed, the process exit terminates the Actor, with the process status code
@@ -564,6 +655,9 @@ $ actor set-status-message "My work is done, friend"
 $ exit 0
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```c
@@ -572,7 +666,19 @@ int main (int argc, char *argv[]) {
 }
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Get input
+
+<!-- ASTRO:
+<Illustration
+    description="The input object is passed by the user and stored in the Actor's default key-value store. The input is an object with properties. If the Actor defines the input schema, the input object is guaranteed to conform to it."
+    position="right"
+    image={illuAPIGetInput}
+    noCaption
+/>
+-->
 
 Get access to the Actor input object passed by the user.
 It is parsed from a JSON file, which is stored by the system in the Actor's default key-value store,
@@ -581,6 +687,11 @@ Usually the file is called `INPUT`, but the exact key is defined in the `ACTOR_I
 The input is an object with properties.
 If the Actor defines the input schema, the input object is guaranteed to conform to it.
 For details, see [Input](#input).
+
+<div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -591,12 +702,18 @@ console.log(input);
 // prints: { "option1": "aaa", "option2": 456 }
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
 input = Actor.get_input()
 print(input)
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -606,6 +723,9 @@ $ actor get-input | jq
 
 > { "option1": "aaa", "option2": 456 }
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
 
 #### UNIX equivalent
 
@@ -617,7 +737,19 @@ $ command --option1=aaa --option2=bbb
 int main (int argc, char *argv[]) {}
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Key-value store access
+
+<!-- ASTRO:
+<Illustration
+    description="Write and read arbitrary files using a storage called Key-value store. When an Actor starts, by default it is associated with a newly-created key-value store, which only contains one file with input of the Actor."
+    position="right"
+    image={illuAPIKeyValueStoreAccess}
+    noCaption
+/>
+-->
 
 Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
@@ -626,6 +758,11 @@ which only contains one file with the input of the Actor (see [Get input](#get-i
 
 The user can override this behavior and specify another key-value store or input key
 when running the Actor.
+
+<div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -642,6 +779,9 @@ const store = await Actor.openKeyValueStore('screenshots-store');
 const imageBuffer = await store.getValue('screenshot.png');
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -655,6 +795,9 @@ await Actor.set_value('screenshot', buffer, content_type='image/png')
 state = await Actor.get_value('my-state')
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX"> -->
+
 #### UNIX
 
 ```bash
@@ -662,7 +805,19 @@ $ echo "hello world" > file.txt
 $ cat file.txt
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Push results to dataset
+
+<!-- ASTRO:
+<Illustration
+    description="Larger results can be saved to append-only object storage called Dataset. When an Actor starts, by default it is associated with a newly-created empty default dataset. The Actor can create additional datasets or access existing datasets created by other Actors, and use those as needed."
+    position="right"
+    image={illuAPIPush}
+    noCaption
+/>
+-->
 
 Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
 When an Actor starts, by default it is associated with a newly-created empty default dataset.
@@ -671,6 +826,11 @@ and use those as needed.
 
 Note that datasets can optionally be equipped with schema that ensures only certain kinds
 of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.md) for more details.
+
+<div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -685,6 +845,9 @@ const dataset = await Actor.openDataset('bob/poll-results-2019');
 await dataset.pushData({ someResult: 123 });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -695,6 +858,9 @@ await Actor.push_data({ 'some_result': 123 })
 dataset = await Actor.open_dataset('bob/poll-results-2019')
 await dataset.push_data({ 'some_result': 123 })
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -715,11 +881,17 @@ $ actor push-data --dataset=bob/election-data someResult=123
 $ actor push-data --dataset=./my_dataset someResult=123
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```c
 printf("Hello world\tColum 2\tColumn 3");
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Exit Actor
 
@@ -744,6 +916,9 @@ shown below. This has several advantages:
   event handlers to complete before closing the process, using the `timeoutSecs` option.
   For details, see [System Events](#system-events).
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -766,6 +941,9 @@ Actor.on('exit', ({ statusMessage, exitCode, timeoutSecs }) => {
 })
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -778,6 +956,9 @@ await Actor.exit('Could not finish the crawl, try increasing memory', exit_code=
 await Actor.fail('Could not finish the crawl, try increasing memory');
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
@@ -789,11 +970,17 @@ $ actor exit --message "Email sent"
 $ actor exit --code=1 --message "Couldn't fetch the URL"
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```c
 exit(1);
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Environment variables
 
@@ -833,6 +1020,9 @@ The environment variables can be set as secure in order to protect sensitive dat
 The value of a secure environment variable is encrypted and can only be retrieved by the Actors during their run,
 but not outside runs. Furthermore, values of secure environment variables are omitted from the log.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 For convenience, rather than using environment vars directly, we provide a `Configuration` class
@@ -845,12 +1035,17 @@ const token = Actor.config.get('token');
 Actor.config.set('token', 's0m3n3wt0k3n')
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
 $ echo "$ACTOR_RUN_ID started at $ACTOR_STARTED_AT"
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
 
 #### UNIX equivalent
 
@@ -858,10 +1053,15 @@ $ echo "$ACTOR_RUN_ID started at $ACTOR_STARTED_AT"
 $ echo $ACTOR_RUN_ID
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Actor status
 
 Each Actor run has a status (the `status` field), which indicates its stage in the Actor's lifecycle.
 The status can be one of the following values:
+
+<div class="clear-both" />
 
 |Status|Type| Description                                 |
 |--- |--- |---------------------------------------------|
@@ -885,6 +1085,9 @@ When the Actor is running, it should periodically update the status message as f
 to keep users informed and happy. The function can be called as often as necessary,
 the SDK only invokes API if status changed. This is to simplify usage.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -894,11 +1097,17 @@ await Actor.setStatusMessage('Crawled 45 of 100 pages');
 await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
 await Actor.set_status_message('Crawled 45 of 100 pages')
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -909,6 +1118,9 @@ $ actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 
 Convention: The end user of an Actor should never need to look into the log to understand what happened,
 e.g. why the Actor failed. All necessary information must be set by the Actor in the status message.
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### System events
 
@@ -947,6 +1159,9 @@ The system sends messages in JSON format in the following structure:
 Note that some events (e.g. `persistState`) are not sent by the system via the web socket,
 but generated virtually on the Actor SDK level.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -962,6 +1177,9 @@ Actor.off('systemInfo');
 // Remove a specific event handler
 Actor.off('systemInfo', handler);
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
 
 #### Python
 
@@ -982,11 +1200,17 @@ Actor.off(Event.SYSTEM_INFO);
 Actor.off(Event.SYSTEM_INFO, handler);
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```c
 signal(SIGINT, handle_sigint);
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Get memory information
 
@@ -994,11 +1218,17 @@ Get information about the total and available memory of the Actor’s container 
 This is useful to, for example, auto-scale a pool
 of workers used for crawling large websites.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
-```
+```js
 const memoryInfo = await Actor.getMemoryInfo();
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
 
 #### UNIX equivalent
 
@@ -1007,7 +1237,19 @@ const memoryInfo = await Actor.getMemoryInfo();
 $ ps -a
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Start another Actor
+
+<!-- ASTRO:
+<Illustration
+    description="Actor can start other Actors, if they have permission. It can override the default dataset or key-value store, and e.g. forwarding the data to another named dataset, that will be consumed by the other Actor."
+    position="content"
+    image={illuAPIStartAnother}
+    noCaption
+/>
+-->
 
 Actor can start other Actors, if they have permission.
 
@@ -1016,6 +1258,9 @@ and, e.g. forward the data to another named dataset that will be consumed by the
 
 The `call` operation waits for the other Actor to finish, the `start` operation
 returns immediately.
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -1034,6 +1279,9 @@ const run2 = await Actor.call(
   { memory: 2048 },
 );
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -1054,6 +1302,9 @@ $ cat input.json | actor call apify/google-search-scraper --json
 $ apify call file:../some-dir someInput='xxx'
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Slack"> -->
+
 #### Slack
 
 It will also be possible to run Actors from the Slack app.
@@ -1062,6 +1313,9 @@ The following command starts the Actor, and then prints the messages to a Slack 
 ```
 /apify start bob/google-search-scraper startUrl=afff
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
 #### API
 
@@ -1073,6 +1327,9 @@ The following command starts the Actor, and then prints the messages to a Slack 
   outputRecordKey=OUTPUT
   returnDataset=true
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
 
 #### UNIX equivalent
 
@@ -1086,7 +1343,19 @@ $ command <arg1>, <arg2>, … &
 posix_spawn();
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Metamorph
+
+<!-- ASTRO:
+<Illustration
+    description="Metamorph is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor, similarly to UNIX `exec` command. It is used for building new Actors on top of existing ones. You simply define input schema and write README for a specific use case, and then delegate the work to another Actor."
+    position="content"
+    image={illuAPIMetamorph}
+    noCaption
+/>
+-->
 
 This is the most magical Actor operation. It replaces a running Actor’s Docker image with another Actor,
 similarly to UNIX `exec` command.
@@ -1103,6 +1372,9 @@ An Actor can metamorph only to Actors that have compatible output schema as the 
 in order to ensure logical and consistent outcomes for users.
 If the output schema of the target Actor is not compatible, the system should throw an error.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -1113,6 +1385,9 @@ await Actor.metamorph(
 );
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
@@ -1121,15 +1396,26 @@ $ actor metamorph --input=@input.json --json --memory=4096 \
   bob/web-scraper
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```bash
 $ exec /bin/bash
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Attach webhook to an Actor run
 
 Run another Actor or an external HTTP API endpoint after an Actor run finishes or fails.
+
+<div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -1146,6 +1432,9 @@ await Actor.addWebhook({
     }`,
 });
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
 
 #### CLI
 
@@ -1164,6 +1453,9 @@ $ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
 $ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+
 #### UNIX equivalent
 
 ```bash
@@ -1173,10 +1465,18 @@ $ command1 && command2  # ("andf" symbol)
 $ command1 || command2  # ("orf" symbol)
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Abort another Actor
 
 Abort itself or another Actor running on the Apify platform.
 Aborting an Actor changes its [status](#actor-status) to `ABORTED`.
+
+<div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -1184,11 +1484,17 @@ Aborting an Actor changes its [status](#actor-status) to `ABORTED`.
 await Actor.abort({ statusMessage: 'Your job is done, friend.', actorRunId: 'RUN_ID' });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
 $ actor abort --run-id RUN_ID 
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
 
 #### UNIX equivalent
 
@@ -1197,7 +1503,19 @@ $ actor abort --run-id RUN_ID
 $ kill <PID>
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
 ### Reboot an Actor
+
+<!-- ASTRO:
+<Illustration
+    description="Sometimes, an Actor might get into some error state from which it's not safe or possible to recover, e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job, the Actor can reboot its own Docker container and continue work from its previously persisted state."
+    position="right"
+    image={illuAPIReboot}
+    noCaption
+/>
+-->
 
 Sometimes, an Actor might get into some error state from which it's not safe or possible to recover,
 e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job,
@@ -1209,11 +1527,19 @@ might completely [abort](#actor-status) the Actor run.
 The reboot operation can be used by the Actor developer to indicate that
 this is a controlled operation, and not to be considered by the system as a crash.
 
+<div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
 await Actor.reboot();
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
 
 #### Python
 
@@ -1221,11 +1547,17 @@ await Actor.reboot();
 await Actor.reboot()
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 
 ```bash
 $ actor reboot 
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Actor web server
 
@@ -1248,6 +1580,20 @@ The live view URL has a unique hostname, which is practically impossible to gues
 This lets you keep the web server hidden from the public yet accessible from the external internet by any parties
 with whom you share the URL.
 
+<!-- ASTRO:
+<Illustration
+    description="An Actor can launch an HTTP web server that is exposed to the outside world to handle requests. This enables Actors to provide a custom HTTP API to integrate with other systems, to provide a web application for human users, to show Actor run details, diagnostics, charts, or to run an arbitrary web app."
+    position="left"
+    image={illuAPIWebServer}
+    noCaption
+/>
+-->
+
+<div class="clear-both" />
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -1262,6 +1608,9 @@ app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
   console.log(`Example live view web server running at ${process.env.ACTOR_WEB_SERVER_URL}`)
 })
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 ### Standby mode
 
@@ -1301,6 +1650,15 @@ After migration, the Actor is restarted on a new host. It can restore its custom
 
 ### Charging money
 
+<!-- ASTRO:
+<Illustration
+    description="To run an Actor on the Apify platform or another cloud platform, a user typically needs to pay to cover the computing costs. Additionally, the platforms are free to introduce other monetization mechanisms, such as charging the users a fixed monthly fee for 'renting' the Actor, or a variable fee for the number of results produced by the Actor. These charging mechanisms are beyond the scope of this whitepaper."
+    position="right"
+    image={illuSharingChargingMoney}
+    noCaption
+/>
+-->
+
 To run an Actor on the Apify platform or another cloud platform,
 a user typically needs to pay to cover the computing costs.
 Additionally, the platforms are free to introduce other [monetization](#monetization)
@@ -1329,6 +1687,9 @@ to perform parts of the job.
 
 An Actor developer can also charge the current user of an Actor a specific amount of USD.
 
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
 #### Node.js
 
 ```js
@@ -1339,6 +1700,9 @@ const chargeInfo = await Actor.charge({
 });
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 ```python
 charge_info = await Actor.charge(
@@ -1348,6 +1712,9 @@ charge_info = await Actor.charge(
 )
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 ```bash
 $ actor charge gpt-4o-token \
@@ -1355,8 +1722,13 @@ $ actor charge gpt-4o-token \
   --chargePerEventUsd=0.0001
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 An Actor user can specify the maximum amount they are willing to pay when starting an Actor.
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
 
 #### Node.js
 
@@ -1371,6 +1743,9 @@ const run = await Actor.call(
 );
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="Python"> -->
+
 #### Python
 
 ```python
@@ -1381,12 +1756,18 @@ run = await Actor.call(
 )
 ```
 
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="CLI"> -->
+
 #### CLI
 ```bash
 $ actor call bob/analyse-images \
   --input='{"imageUrls": ["https://www.example.com/image.png"]}'
   --max-total-charge-usd=5
 ```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
 #### Rules for building Actors with variable charging
 
@@ -1530,6 +1911,15 @@ Good documentation makes good Actors.
 
 ### Input schema file
 
+<!-- ASTRO:
+<Illustration
+    description="Actors accept an input JSON object on start, whose schema can be defined by the input schema file. This file is referenced in the Actor file as the `input` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/input_schema.json."
+    position="right"
+    image={illuDefinitionFilesInputSchemaFile}
+    noCaption
+/>
+-->
+
 Actors accept an [input](#input) JSON object on start, whose schema can be defined
 by the input schema file. This file is referenced in the Actor file (`.actor/actor.json`) file
 as the `input` property.
@@ -1546,6 +1936,8 @@ The input schema file defines properties accepted by Actor on input. It is used 
   that smartly pre-populate and link Actor input properties.
 
 For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
+
+<div class="clear-both" />
 
 This is an example of the input schema file for the `bob/screenshot-taker` Actor::
 
@@ -1579,6 +1971,15 @@ This is an example of the input schema file for the `bob/screenshot-taker` Actor
 
 ### Output schema file
 
+<!-- ASTRO:
+<Illustration
+    description="Similarly to input, Actors can generate an output JSON object, which links to their results. The Actor output schema file defines how such output object looks like, including types of its properties and description. This file is referenced in the Actor file as the `output` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/output_schema.json."
+    position="right"
+    image={illuDefinitionFilesOutputSchemaFile}
+    noCaption
+/>
+-->
+
 Similarly to input, Actors can generate an [output](#output) JSON object, which links to their results.
 The Actor output schema file defines how such output object looks like,
 including types of its properties and description.
@@ -1593,6 +1994,8 @@ The output schema describes how the Actor stores its results, and it is used by 
 - Enable integrating Actors with external systems and automated workflows.
 
 For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
+
+<div class="clear-both" />
 
 This is an example of the output schema file for the `bob/screenshot-taker` Actor:
 
@@ -1659,6 +2062,15 @@ The SDK is currently available for Node.js, Python, and CLI.
 
 ### Local development
 
+<!-- ASTRO:
+<Illustration
+    description="The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages."
+    position="right"
+    image={illuDevelopmentLocal}
+    noCaption
+/>
+-->
+
 The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages. 
 
 Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) provides [convenient templates](https://apify.com/templates) to bootstrap an Actor in Python, JavaScript, and TypeScript.
@@ -1720,7 +2132,16 @@ $ apify login
 ? Choose how you want to log in to Apify (Use arrow keys)
 ❯ Through Apify Console in your default browser
 $ apify push
-````
+```
+
+<!-- ASTRO:
+<Illustration
+    description="The `apify push` CLI command takes information from the `.actor` directory and builds an Actor on the Apify platform, so that you can run it remotely."
+    position="left"
+    image={illuDevelopmentDeployment}
+    noCaption
+/>
+-->
 
 ### Continuous integration and delivery
 
@@ -1754,7 +2175,7 @@ COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
 RUN npm -g install apify-cli
 
 CMD curl $(actor get-input) | actor set-value example-com --contentType text/html
-````
+```
 
 Actorization of existing code gives developers an easy way to give their code
 a presence in the cloud in the form of an Actor, so that the users can easily try it without
@@ -1772,7 +2193,18 @@ Once published, your Actor is automatically exposed to organic traffic of users 
 
 ![Apify Actor Store](./img/apify-store.png)
 
+<!-- ASTRO: <Picture src={illuApifyStore} alt="Apify Store" formats={['avif', 'webp']} /> -->
+
 ### Monetization
+
+<!-- ASTRO:
+<Illustration
+    description="The monetization options for Actors include fixed rental fee, payment per result, or payment per event."
+    position="right"
+    image={illuSharingMonetization}
+    noCaption
+/>
+-->
 
 To build a SaaS product, you usually need to:
 

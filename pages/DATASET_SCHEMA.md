@@ -17,6 +17,8 @@ Dataset can be assigned a schema which describes:
 
 <img src="https://user-images.githubusercontent.com/594801/147474979-a224008c-8cba-43a6-8d2e-c24f6b0d5b37.png" width="500">
 
+<!-- ASTRO: <Picture src={illuDatasetSchema} alt="Dataset schema" formats={['avif', 'webp']} /> -->
+
 ## Basic properties
 
 - Storage is immutable. I.e., if you want to change the structure, then you need to create a new dataset.
