@@ -1,0 +1,103 @@
+name: Sync Whitepaper to Astro (PR flow)
+
+# Triggers on push to main when MD files or related assets change.
+on:
+  push:
+    branches:
+      - main
+      - feat/gh-57-content-sync
+    paths:
+      - '*.md'
+      - 'pages/**/*.md'
+      - '.github/workflows/sync-to-astro.yml'
+      - 'scripts/**/*.py'
+  workflow_dispatch:  # also allows manual trigger from GitHub UI
+
+env:
+  TARGET_REPO: "apify/actor-whitepaper-web"
+  TARGET_BRANCH: "sync/whitepaper-updates"
+
+jobs:
+  sync:
+    name: Sync Whitepaper to Astro (PR flow)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # needed for pushing changes
+      pull-requests: write # needed for creating PRs
+
+    steps:
+      # Step 1: Clone the source repo (this repo).
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          path: sync/source
+
+      # Step 2: Clone the target repo (Astro site).
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.TARGET_REPO }}
+          path: sync/target
+          token: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+
+      # Step 3: Setup Python environment.
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: sync/source/requirements.txt
+
+      # Step 4: Install dependencies.
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r sync/source/requirements.txt
+          cp sync/source/package.json . && npm install
+
+      # Step 5: Run the MD to MDX conversion script.
+      - name: Run sync script
+        run: python sync/source/scripts/md2mdx.py --source sync/source --target sync/target
+
+      # Step 6: Create or update PR with changes.
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.APIFY_SERVICE_ACCOUNT_GITHUB_TOKEN }}
+        run: |
+          cd sync/target
+          git status
+
+          # Create a unique branch name with timestamp.
+          BRANCH_NAME="sync/whitepaper-updates-$(date +%Y%m%d-%H%M%S)"
+          echo "Using branch: $BRANCH_NAME"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH_NAME"
+
+          # Only create PR if there are changes.
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "Changes detected:"
+            git status --porcelain
+
+            git add .
+            git commit -m "sync: Update MDX content from Whitepaper"
+            if ! git push -f origin "$BRANCH_NAME"; then
+              echo "Failed to push changes"
+              exit 1
+            fi
+
+            # Create the PR using GitHub CLI.
+            gh pr create \
+              --title "sync: Update MDX content from Whitepaper" \
+              --body-file ../source/sync-pr-template.txt \
+              --base main \
+              --head "$BRANCH_NAME" \
+              --label "sync" \
+              --assignee ${{ github.actor }}
+          else
+            echo "No changes detected in git status --porcelain"
+            echo "Full directory contents of src/content/pages:"
+            ls -la src/content/pages/
+          fi

@@ -1,3 +1,14 @@
 .idea
 node_modules
 package-lock.json
+sync
+
+# Python
+.venv
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
