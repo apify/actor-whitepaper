@@ -81,7 +81,7 @@ This whitepaper introduces **_Actors_**,
 a new language-agnostic model for building general-purpose
 web computing and automation programs (also known as agents, functions, or apps).
 The main goal for Actors is to make it easy for developers to build and ship reusable
-software tools, which are easy to try, integrate, and build upon.
+software tools, which are easy to run, integrate, and build upon.
 Actors are useful for building
 web scrapers, crawlers, automations, and AI agents.
 
@@ -95,7 +95,7 @@ well beyond the domain of web scraping.
 
 Building on this experience,
 we're releasing this whitepaper to introduce the philosophy of Actors
-to other developers to receive your feedback on it.
+to other developers and receive your feedback on it.
 We aim to establish the Actor programming model as an open standard,
 which will help the community to more effectively
 build and ship reusable software automation tools,
@@ -104,8 +104,8 @@ as well as encourage new implementations of the model in other programming langu
 The goal of this whitepaper is to be the North star that shows what the
 Actor programming model is and what operations it should support.
 **But this document is not an official specification.**
-The specification will be OpenAPI schema of the Actor system interface,
-to enable new independent implementations of both the client libraries and backend systems.
+The specification will be an OpenAPI schema of the Actor system interface,
+to enable new independent implementations of both the client libraries and backend systems. This is currently work in progress.
 
 Currently, the most complete implementation of the Actor model is provided
 by the Apify platform, with SDKs for
@@ -114,8 +114,6 @@ by the Apify platform, with SDKs for
 and a [command-line interface (CLI)](https://docs.apify.com/cli).
 Beware that the frameworks might not yet implement all the features of the Actor programming model
 described in this whitepaper.
-
-This is a work in progress.
 
 ### Overview
 
@@ -2258,4 +2256,5 @@ To create an open standard, we need to:
 ## Links
 
 - [Apify Store](https://apify.com/store)
+- [Monetize your Actor on Apify](https://apify.com/partners/actor-developers)
 - [Open-source Actors on GitHub](https://github.com/search?q=path%3A.actor%2Factor.json+&type=code)
