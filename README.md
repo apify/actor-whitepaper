@@ -244,7 +244,7 @@ For example, for the `bob/screenshotter` Actor, the output object could look lik
   "screenshotUrl": "https://api.apify.com/v2/key-value-stores/skgGkFLQpax59AsFD/records/screenshot.jpg",
   "productImages": "https://api.apify.com/v2/key-value-stores/skgGkFLQpax59AsFD/records/product*.jpg",
   "productDetails": "https://api.apify.com/datasets/9dFknjkxxGkspwWd/records?fields=url,name",
-  "productExplorer": "https://bob-screenshotter.apify.com/product-explorer",
+  "productExplorer": "https://bob--screenshotter.apify.actor/product-explorer",
   // or this with live view
   "productExplorer": "https://13413434.runs.apify.net/product-explorer"
 }
@@ -1281,7 +1281,7 @@ and will automatically start or abort an Actor run as needed by the volume of HT
 The external Standby public URL might look like this:
 
 ```
-https://bob-screenshotter.apify.com
+https://bob--screenshotter.apify.actor
 ```
 
 Unlike the live view URL reported in the `ACTOR_WEB_SERVER_URL` environment variable,
