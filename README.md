@@ -7,9 +7,9 @@ for programs running in the cloud.**
 
 By [Jan Čurn](https://apify.com/jancurn),
 [Marek Trunkát](https://apify.com/mtrunkat),
-[Ondra Urban](https://apify.com/mnmkng), and the [Apify](https://apify.com/store) team.
+[Ondra Urban](https://apify.com/mnmkng), and the entire Apify team.
 
-**Version 0.99 (September 2024)**
+**Version 0.999 (February 2025)**
 
 ## Contents
 
@@ -78,38 +78,42 @@ By [Jan Čurn](https://apify.com/jancurn),
 ## Introduction
 
 This whitepaper introduces **_Actors_**,
-a new kind of serverless programs for general-purpose
-language-agnostic computing and automation jobs (also known as agents, functions, or apps).
+a new language-agnostic model for building general-purpose
+web computing and automation programs (also known as agents, functions, or apps).
 The main goal for Actors is to make it easy for developers to build and ship reusable
-software tools, which are also easy to run
-and integrate by others. For example, Actors are useful for building
+software tools, which are easy to run, integrate, and build upon.
+Actors are useful for building
 web scrapers, crawlers, automations, and AI agents.
 
 ### Background
 
 Actors were first introduced by [Apify](https://apify.com/) in late 2017,
-as a way to easily build, package, and ship web scraping and web automation tools to customers.
+as a way to easily build, package, and ship web scraping and web automation jobs to customers.
 Over the years, Apify has continued to develop the concept and applied
 it successfully to thousands of real-world use cases in many business areas,
 well beyond the domain of web scraping.
 
 Building on this experience,
 we're releasing this whitepaper to introduce the philosophy of Actors
-to the public and receive your feedback on it.
+to other developers and receive your feedback on it.
 We aim to establish the Actor programming model as an open standard,
 which will help the community to more effectively
 build and ship reusable software automation tools,
 as well as encourage new implementations of the model in other programming languages.
 
-The goal of this whitepaper is to be the north star that shows what the
-Actor programming model is and what its implementations should support.
+The goal of this whitepaper is to be the North star that shows what the
+Actor programming model is and what operations it should support.
+**But this document is not an official specification.**
+The specification will be an OpenAPI schema of the Actor system interface,
+to enable new independent implementations of both the client libraries and backend systems. This is currently work in progress.
+
 Currently, the most complete implementation of the Actor model is provided
 by the Apify platform, with SDKs for
 [Node.js](https://sdk.apify.com/) and
 [Python](https://pypi.org/project/apify/),
 and a [command-line interface (CLI)](https://docs.apify.com/cli).
 Beware that the frameworks might not yet implement all the features of the Actor programming model
-described in this whitepaper. This is a work in progress.
+described in this whitepaper.
 
 ### Overview
 
@@ -185,7 +189,7 @@ Each Actor accepts an **input object**, which tells it what it should do.
 The object is passed in JSON format, and its properties have
 a similar role as command-line arguments when running a program in a UNIX-like operating system.
 
-For example, an input object for an Actor `bob/screenshot-taker` can look like this:
+For example, an input object for an Actor `bob/screenshotter` can look like this:
 
 ```json
 {
@@ -269,7 +273,7 @@ and integrations.
 <div class="clear-both" />
 
 The output object is similar to the input object, as it contains properties and values.
-For example, for the `bob/screenshot-taker` Actor, the output object can look like this:
+For example, for the `bob/screenshotter` Actor, the output object can look like this:
 
 ```jsonc
 {
@@ -1939,7 +1943,7 @@ For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md
 
 <div class="clear-both" />
 
-This is an example of the input schema file for the `bob/screenshot-taker` Actor::
+This is an example of the input schema file for the `bob/screenshotter` Actor:
 
 ```json
 {
@@ -1997,7 +2001,7 @@ For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.
 
 <div class="clear-both" />
 
-This is an example of the output schema file for the `bob/screenshot-taker` Actor:
+This is an example of the output schema file for the `bob/screenshotter` Actor:
 
 ```json
 {
@@ -2187,7 +2191,7 @@ Once an Actor is developed, the Actor platform lets you share it with other spec
 and decide whether you want to make its source code open or closed.
 
 You can also publish the Actor for anyone to use on a marketplace like [Apify Store](https://apify.com/store).
-The Actor will get a public landing page like `https://apify.com/bob/screenshot-taker`,
+The Actor will get a public landing page like `https://apify.com/bob/screenshotter`,
 showing its README, description of inputs, outputs, API examples, etc.
 Once published, your Actor is automatically exposed to organic traffic of users and potential customers.
 
@@ -2235,20 +2239,22 @@ For more details, read our essay [Make passive income developing web automation 
 
 ## Future work
 
-The goal of this whitepaper is to introduce the Actor philosophy and programming model to the public,
+The goal of this whitepaper is to introduce the Actor philosophy and programming model to other developers,
 to receive feedback, and to open the way to making Actors an open standard.
-To create an open standard, however, there is more work, including:
+To create an open standard, we need to:
 
-- Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
-- Clearly separate what is the part of the standard and what is up to the discretion of the implementations.
 - Define a standardized low-level HTTP REST API interface for the Actor system,
   to separate "frontend" and "backend" Actor programming model implementations.
   For example, if somebody wants to build support for the Actor programming model in Rust,
   they should just need to write a Rust "frontend" translating the commands to HTTP API calls,
   rather than having to implement the entire system. And equally, if one decides
   to develop a new Actor "backend", all existing client libraries for Rust or other languages should work with it.
+- Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
+- Clearly separate what is the part of the standard and what is up to the discretion of the implementations.
 
 
 ## Links
 
+- [Apify Store](https://apify.com/store)
+- [Monetize your Actor on Apify](https://apify.com/partners/actor-developers)
 - [Open-source Actors on GitHub](https://github.com/search?q=path%3A.actor%2Factor.json+&type=code)
