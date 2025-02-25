@@ -149,7 +149,11 @@ systems on top of simple ones.
 
 ![Apify Actor diagram](./img/apify-actor-drawing.png)
 
-<!-- Image source: https://docs.google.com/presentation/d/1nDgrI0p2r8ouP_t_Wn02aTllP8_Std-kRuIbO8QLE7M/edit -->
+<!-- Image sources: 
+  https://docs.google.com/presentation/d/1nDgrI0p2r8ouP_t_Wn02aTllP8_Std-kRuIbO8QLE7M/edit
+  https://www.figma.com/design/6vbmKvB6oY3b3mTN0oAscE/Actor-Whitepaper-Diagrams-and-Presentations?node-id=0-1&p=f&t=JwAJfru2GjdQBpBV-11
+-->
+
 ### Apify platform
 
 Actors can be published
