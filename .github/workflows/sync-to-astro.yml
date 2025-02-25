@@ -4,8 +4,7 @@ name: Sync Whitepaper to Astro (PR flow)
 on:
   push:
     branches:
-      - main
-      - feat/gh-57-content-sync
+      - master
     paths:
       - '*.md'
       - 'pages/**/*.md'
