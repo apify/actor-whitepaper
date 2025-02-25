@@ -280,7 +280,7 @@ For example, for the `bob/screenshotter` Actor, the output object can look like 
   "screenshotUrl": "https://api.apify.com/v2/key-value-stores/skgGkFLQpax59AsFD/records/screenshot.jpg",
   "productImages": "https://api.apify.com/v2/key-value-stores/skgGkFLQpax59AsFD/records/product*.jpg",
   "productDetails": "https://api.apify.com/datasets/9dFknjkxxGkspwWd/records?fields=url,name",
-  "productExplorer": "https://bob--screenshot.apify.actor/product-explorer",
+  "productExplorer": "https://bob--screenshotter.apify.actor/product-explorer",
   // or this with live view
   "productExplorer": "https://13413434.runs.apify.net/product-explorer"
 }
@@ -1634,7 +1634,7 @@ and will automatically start or abort an Actor run as needed by the volume of HT
 The external Standby public URL might look like this:
 
 ```
-https://bob--screenshot-taker.apify.actor
+https://bob--screenshotter.apify.actor
 ```
 
 Unlike the live view URL reported in the `ACTOR_WEB_SERVER_URL` environment variable,
@@ -1818,8 +1818,8 @@ For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
 ```json
 {
   "actorSpecification": 1,
-  "name": "screenshot-taker",
-  "title": "Screenshot Taker",
+  "name": "screenshotter",
+  "title": "Screenshotter",
   "description": "Take a screenshot of any URL",
   "version": "0.0",
   "input": "./input_schema.json",
@@ -1948,7 +1948,7 @@ This is an example of the input schema file for the `bob/screenshotter` Actor:
 ```json
 {
   "actorInputSchemaVersion": 1,
-  "title": "Input schema for Screenshot Taker Actor",
+  "title": "Input schema for Screenshotter Actor",
   "description": "Enter a web page URL and it will take its screenshot with a specific width",
   "type": "object",
   "properties": {
@@ -2006,7 +2006,7 @@ This is an example of the output schema file for the `bob/screenshotter` Actor:
 ```json
 {
   "actorOutputSchemaVersion": 1,
-  "title": "Output schema for Screenshot Taker Actor",
+  "title": "Output schema for Screenshotter Actor",
   "description": "The URL to the resulting screenshot",
   "properties": {
 
