@@ -24,7 +24,7 @@ The file has the following structure:
   // to get started and be kept alive by the system to handle incoming HTTP REST requests by the Actor's web server.
   "usesStandbyMode": true,
  
-  // A meta object enabling impelemtations to pass arbitrary additional properties
+  // A meta object enabling implementations to pass arbitrary additional properties
   "meta": {
     "something": "bla bla"
   },
@@ -32,13 +32,13 @@ The file has the following structure:
   // Optional min and max memory for running this Actor (TODO: shouldn't this also be in "meta"?)
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
-  
+
   // Used when user doesn't specify memory, the 𝔸ctor run will start with this amount.
   // It might be a basic arithemtic expression referencing ${variables} from Actor input.
   // This right value can optimize user experience vs. compute costs.
   "defaultMemoryMbytes": "${maxCrawlPages} * 256 + 128",
   
-  // Links to other Actor defintion files
+  // Links to other Actor definition files
   "dockerfile": "./Dockerfile", // If omitted, the system looks for "./Dockerfile" and "../Dockerfile"
   "readme": "./README.md", // If omitted, the system looks for "./ACTOR.md" and "../README.md"
   "changelog": "../../../shared/CHANGELOG.md",

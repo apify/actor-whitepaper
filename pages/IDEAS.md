@@ -7,7 +7,7 @@ Here you can find random ideas and notes, in no particular order, relevance, or 
 
 
 - Add ideas for the permission system
-  - Note from Marek regarding permissision:
+  - Note from Marek regarding permission:
   - Just a note on this, I was thinking about how this could be done systematically, so dropping the notes here:
   - By default, the Actor should have following permissions that the user would accept when running the Actor for the first time:
       - Write to all the default + named storages linked in the output schema

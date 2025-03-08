@@ -17,6 +17,8 @@ Dataset can be assigned a schema which describes:
 
 <img src="https://user-images.githubusercontent.com/594801/147474979-a224008c-8cba-43a6-8d2e-c24f6b0d5b37.png" width="500">
 
+<!-- ASTRO: <Picture src={illuDatasetSchema} alt="Dataset schema" formats={['avif', 'webp']} /> -->
+
 ## Basic properties
 
 - Storage is immutable. I.e., if you want to change the structure, then you need to create a new dataset.
@@ -44,7 +46,7 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
 ```jsonc
 {
     "actorDatasetSchemaVersion": 1,
-    "title": "Eshop products",
+    "title": "E-shop products",
     "description": "Dataset containing the whole product catalog including prices and stock availability.",
 
     // A JSON schema object describing the dataset fields, with our extensions: the "title", "description", and "example" properties.
@@ -98,7 +100,7 @@ Uncaught Error: Dataset schema is not compatible with the provided schema
                     },                           
                     "imageUrl": {
                         "label": "Image",
-                        "format": "image" // optional, in this case the format is overriden to show "image" instead of image link "text". "image" format only works with .jpeg, .png or other image format urls.
+                        "format": "image" // optional, in this case the format is overridden to show "image" instead of image link "text". "image" format only works with .jpeg, .png or other image format urls.
                     },
                     "stockInfo.availability": {
                         "label": "Availability"
