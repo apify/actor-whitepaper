@@ -57,9 +57,6 @@ The file has the following structure:
    
   // Link to OpenAPI schema file for the Standby web server API
   "webServer": "./web_server_openapi.json",
-  // TODO: I'd use just above, instead of extra line with a second server:
-  // "standbyServer": "./standby_openapi.json",
-  // See https://github.com/apify/actor-specs/issues/40
 
   // Scripts that might be used by the CLI to ease the local Actor development.
   "scripts": {
@@ -92,7 +89,7 @@ Here are the notes comparing the format to the previous version:
   Note that `apify push` has option `--target=eva/my-actor:0.0` that allows
   deployment of the Actor under a different user account, using permissions
   and personal API token of the current user.
-  We should also add options to override only parts of this, 
+  We should also add options to override only parts of this,
   like `--target-user` (ID or username), `--name`, `--build-tag` and `--version`,
   it would be useful e.g. in CI for beta versions etc.
 - Note that `version` and `buildTag` are shared across Actor deployments to
