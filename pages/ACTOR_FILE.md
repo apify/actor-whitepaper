@@ -29,7 +29,7 @@ The file has the following structure:
     "something": "bla bla"
   },
   
-  // Optional min and max memory for running this Actor (TODO: shouldn't this also be in "meta"?)
+  // Optional min and max memory for running this Actor
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
 
@@ -66,20 +66,8 @@ The file has the following structure:
 }
 ```
 
-## Random notes
+## Notes
 
-The `.actor/actor.json` replaces the legacy `apify.json` file.
-Here are the notes comparing the format to the previous version:
-
-- We removed the `template` property as it's not needed for anything, it only stored the original template
-- There's a new `title` field for a human-readable name of the Actor.
-  We're moving towards having human-readable names shown for Actors everywhere,
-  so it makes sense to define `title` directly in the source code.
-- Similarly, we added `description` for the short description of what the Actor does.
-- When calling `actor push` and the `title` or `description` are already set
-  on the Actor (maybe SEO-optimized versions from copywriter),
-  by default we do not overwrite them
-  unless `apify push` is called with options `--force-title` or `--force-description`.
 - The `name` doesn't contain username, so that the Actor can be easily deployed
   to any user account. This is useful for tutorials and examples, as well as
   pull requests done externally to create Actors from existing source code files
@@ -102,8 +90,23 @@ Here are the notes comparing the format to the previous version:
   other Dockerfile in the top-level directory, to separate Actor Docker image from the
   other one. Note that paths in Dockerfile are ALWAYS relative to the Dockerfile's location.
   When calling `apify run`, the system runs the Actor using the Dockerfile.
+- When calling `actor push` and the `title` or `description` are already set
+  on the Actor (maybe SEO-optimized versions from copywriter),
+  by default we do not overwrite them
+  unless `apify push` is called with options `--force-title` or `--force-description`.
+
+
+## Changes from legacy `apify.json` file
+
+The `.actor/actor.json` replaces the legacy `apify.json` file. Here are main changes from the previous version:
+
+- We removed the `template` property as it's not needed for anything, it only stored the original template
+- There's a new `title` field for a human-readable name of the Actor.
+  We're moving towards having human-readable names shown for Actors everywhere,
+  so it makes sense to define `title` directly in the source code.
+- Similarly, we added `description` for the short description of what the Actor does.
 - `env` was renamed to `environmentVariables` for more clarity. `apify build` or `apify run`
   could have an option `--apply-env-vars-to-build` like we have it on platform.
 - The `dockerfile` and `readme` directives are optional, the system falls back to reasonable
   defaults, first in `.actor` directory and then in the top-level directory.
-- "scripts" section added, see https://apify.slack.com/archives/C04HB9V90DT/p1672826248186569
+- `scripts` section was added, see https://apify.slack.com/archives/C04HB9V90DT/p1672826248186569
