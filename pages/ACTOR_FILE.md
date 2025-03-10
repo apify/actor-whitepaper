@@ -36,6 +36,8 @@ The file has the following structure:
   // Used when user doesn't specify memory, the 𝔸ctor run will start with this amount.
   // It might be a basic arithemtic expression referencing ${variables} from Actor input.
   // This right value can optimize user experience vs. compute costs.
+  // If the variable is undefined or empty, the behavior is undefined
+  // and the system will select memory arbitrarily. In the future, we might change this behavior.
   "defaultMemoryMbytes": "${maxCrawlPages} * 256 + 128",
   
   // Links to other Actor definition files
