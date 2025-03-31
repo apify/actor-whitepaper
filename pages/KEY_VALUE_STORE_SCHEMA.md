@@ -53,6 +53,7 @@ Contrary to dataset schema, the record in key-value store represents output that
             "name": "Monitoring report data",
             "description": "JSON containing the report data",
             "key": "report-data.json",
+            "contentTypes": ["application/json"],
             "jsonSchema": {
                 "$schema": "http://json-schema.org/draft-07/schema#",
                 "type": "object",
@@ -60,7 +61,7 @@ Contrary to dataset schema, the record in key-value store represents output that
                     "summary": { "type": "string" },
                     "totalResults": { "type": "number" }
                 }
-            } // alternatively "schema": "./report-schema.json" can be used
+            } // alternatively "jsonSchema": "./report-schema.json" can be used
         }
     }
 }
