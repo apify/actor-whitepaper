@@ -43,8 +43,29 @@ like to embed to run view for the user once the monitoring is finished.
 }
 ```
 
-For more information on how to create a key-value store with a schema, see [DATASET_SCHEMA.json](./DATASET_SCHEMA.md)
-as the implementation and API will be the same.
+3. Some Actors store a record that has a specific structure. The structure can be specified using [JSON schema](https://json-schema.org/draft-07).
+Contrary to dataset schema, the record in key-value store represents output that is a single item, instead of a sequence of items. But both approaches use JSON schema to describe the structure.
+
+```jsonc
+{
+    "collections": {
+        "monitoringReportData": {
+            "name": "Monitoring report data",
+            "description": "JSON containing the report data",
+            "key": "report-data.json",
+            "contentTypes": ["application/json"],
+            "jsonSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                    "summary": { "type": "string" },
+                    "totalResults": { "type": "number" }
+                }
+            } // alternatively "jsonSchema": "./report-schema.json" can be used
+        }
+    }
+}
+```
 
 ## Structure
 
