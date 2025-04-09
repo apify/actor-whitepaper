@@ -70,7 +70,7 @@ The file has the following structure:
   "webServerOpenapi": "./web_server_openapi.json",
   
   // Optional URL path to the Model Context Protocol (MCP) server exposed on the Actor web server.
-  "webServerMcpPath": "./web_server_openapi.json",
+  "webServerMcpPath": "/mcp",
 
   // Scripts that might be used by the CLI tools to simplify the local Actor development.
   "scripts": {
