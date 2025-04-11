@@ -54,17 +54,16 @@ The file has the following structure:
   "changelog": "../../../shared/CHANGELOG.md",
   
   // Links to input/output extened JSON schema files or inlined objects.
-  // TODO: This should have been inputSchema and outputSchema for more clarity
-  "input": "./input_schema.json",
-  "output": "./output_schema.json",
+  // COMPATIBILITY: This used to be called "input", all implementations should support it
+  "inputSchema": "./input_schema.json",
+  "outputSchema": "./output_schema.json",
   
   // Links to storages schema files, or inlined schema objects.
   // These aren't standard JSON schema files, but our own format. See ./DATASET_SCHEMA.md
-  "storages": {
-    "keyValueStore": "./key_value_store_schema.json",
-    "dataset": "../shared_schemas/generic_dataset_schema.json",
-    "requestQueue": "./request_queue_schema.json"
-  },
+  // COMPATIBILITY: This used to be "storages.keyValueStore", all implementations should support it
+  "datasetSchema": "../shared_schemas/generic_dataset_schema.json"
+  
+  "keyValueStoreSchema": "./key_value_store_schema.json",
    
   // Optional link to an OpenAPI definition file or inlined object describing the Actor web server API
   "webServerOpenapi": "./web_server_openapi.json",
