@@ -1826,7 +1826,8 @@ For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
   "title": "Screenshotter",
   "description": "Take a screenshot of any URL",
   "version": "0.0",
-  "input": "./input_schema.json",
+  "inputSchema": "./input_schema.json",
+  "outputSchema": "./output_schema.json",
   "dockerfile": "./Dockerfile"
 }
 ```
@@ -2015,7 +2016,7 @@ This is an example of the output schema file for the `bob/screenshotter` Actor:
   "properties": {
 
     "currentProducts": {
-      "type": "$defaultDataset",
+      "type": "$defaultDataset", // TODO: fix this
       "views": ["productVariants"]
     },
     

@@ -54,13 +54,13 @@ The file has the following structure:
   "changelog": "../../../shared/CHANGELOG.md",
   
   // Links to input/output extened JSON schema files or inlined objects.
-  // COMPATIBILITY: This used to be called "input", all implementations should support it
+  // BACKWARDS COMPATIBILITY: This used to be called "input", all implementations should support it
   "inputSchema": "./input_schema.json",
   "outputSchema": "./output_schema.json",
   
   // Links to storages schema files, or inlined schema objects.
   // These aren't standard JSON schema files, but our own format. See ./DATASET_SCHEMA.md
-  // COMPATIBILITY: This used to be "storages.keyValueStore", all implementations should support it
+  // BACKWARDS COMPATIBILITY: This used to be "storages.keyValueStore" sub-object, all implementations should support it
   "datasetSchema": "../shared_schemas/generic_dataset_schema.json"
   
   "keyValueStoreSchema": "./key_value_store_schema.json",
@@ -74,6 +74,7 @@ The file has the following structure:
   "webServerMcpPath": "/mcp?someVar=1",
 
   // Scripts that might be used by the CLI tools to simplify the local Actor development.
+  // They are to be executed from the main directory of the Actor, i.e. one level up. 
   "scripts": {
     "post-create": "npm install",
     "run": "npm start"
