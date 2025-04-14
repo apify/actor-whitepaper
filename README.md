@@ -2016,8 +2016,14 @@ This is an example of the output schema file for the `bob/screenshotter` Actor:
   "properties": {
 
     "currentProducts": {
-      "type": "$defaultDataset", // TODO: fix this
-      "views": ["productVariants"]
+      "type": "string",
+      "resourceType": "dataset",
+      "title": "Current products",  
+      "source": "${actor.dataset}",
+      "options": {
+        "format": "json",
+        "view": "product_details"
+      }
     },
     
     "screenshotUrl": {

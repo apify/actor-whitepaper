@@ -28,32 +28,31 @@ The output schema is also used by the system to generate the user interface, API
   
   "properties": {
   
-    // This property in output object will contains a URL to a dataset containing Actor results.
-    // It might look like: https://api.apify.com/v2/datasets/XYZabc/items?format=json&view=product_details
+    // This property in output object will contain a URL to the dataset containing Actor results,
+    // for example: https://api.apify.com/v2/datasets/XYZabc/items?format=json&view=product_details
     "currentProducts": {
-      // Type is always string, because the value is a URL
+      // Type is string, because the value in output object is a URL
       "type": "string",
       
-      // Identifies what object is refereced by this output property.
+      // Identifies what kind of object is refereced by this output property.
       // This is equivalent to "resourceType" in input schema.
-      "resourceType": "dataset"
+      "resourceType": "dataset",
       
       "title": "Current products",
       "description": "Yaddada",
       
-      // Define how the URL is created, in this case it will link to the default Actor key-value store  
+      // Define how the dataset URL is created, in this case it will link to the default Actor key-value store  
       "source": "${actor.dataset}",
+      
+      // Or reference a property from input object, the linkage will be checked for type compatibility
+      // "source": "${input.myProductsDatasetId}",
       
       // Optional link to schema describing the dataset, key-value store, or web server (TODO?).
       // If not present but "source" links to Actor's default storage or web server, the schema is implied.
       "schema": "./dataset_schema.json",
-      
-      // Or reference a property from input object,
-      // the linkage will be checked for type compatibility
-      // "source": "${input.myProductsDatasetId}",
 
-      // Optional, specify Dataset options
-      "datasetOptions": {
+      // Optionally, specify default Dataset view options
+      "options": {
         "format": "json",
         "view": "product_details"
       }
@@ -74,7 +73,7 @@ The output schema is also used by the system to generate the user interface, API
       "schema": "./key_value_store_schema.json", 
       
       // optionally, you can specify which files to display in UI for key-value stores
-      "keyValueStoreOptions": {
+      "options": {
         "collection": "screenshots",
       }
     },

@@ -11,6 +11,7 @@ and its properties, including documentation, default value, and user interface d
 **For full reference, see [Input schema specification](https://docs.apify.com/platform/actors/development/actor-definition/input-schema/specification/v1) in Apify documentation.**
 
 <!-- TODO: Move the full specs including JSON meta schema to this repo -->
+<!-- TODO: Consider renaming "editor" values to camelCase, for consistency -->
 
 ## Example Actor input schema
 
@@ -46,6 +47,14 @@ and its properties, including documentation, default value, and user interface d
       "title": "Screenshots to process",
       "type": "string",
       "resourceType": "keyValueStore",
+      "description": "Screenshots to be compressed",
+      "schema": "./input_key_value_store_schema.json"
+    },
+    
+    "singleFileUrl": {
+      "title": "Some file",
+      "type": "string",
+      "editor": "fileupload",
       "description": "Screenshots to be compressed",
       "schema": "./input_key_value_store_schema.json"
     },
