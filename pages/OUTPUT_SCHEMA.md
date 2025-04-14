@@ -42,20 +42,13 @@ The output schema is also used by the system to generate the user interface, API
       "description": "Yaddada",
       
       // Define how the dataset URL is created, in this case it will link to the default Actor key-value store  
-      "source": "${actor.dataset}",
+      "source": "{{actorRun.defaultDatasetUrl}}?format=json&view=product_details",
       
       // Or reference a property from input object, the linkage will be checked for type compatibility
-      // "source": "${input.myProductsDatasetId}",
+      // "source": "{{actorInput.myProductsDatasetId}}",
       
-      // Optional link to schema describing the dataset, key-value store, or web server (TODO?).
-      // If not present but "source" links to Actor's default storage or web server, the schema is implied.
-      "schema": "./dataset_schema.json",
-
-      // Optionally, specify default Dataset view options
-      "options": {
-        "format": "json",
-        "view": "product_details"
-      }
+      // Optional link to schema describing the dataset, key-value store, or web server.
+      "schema": "./dataset_schema.json"
     },
 
     // Selects a specific group of records with a certain prefix. In UI, this can be shown
@@ -67,29 +60,31 @@ The output schema is also used by the system to generate the user interface, API
       "title": "Product screenshots",  
 
       // Define how the URL is created, in this case it will link to the default Actor key-value store
-      "source": "${actor.keyValueStore}",
+      "source": "{{actorRun.defaultKeyValueStoreUrl}}?collection=screenshots",
       
       // Optional
-      "schema": "./key_value_store_schema.json", 
-      
-      // optionally, you can specify which files to display in UI for key-value stores
-      "options": {
-        "collection": "screenshots",
-      }
+      "schema": "./key_value_store_schema.json",
+    },
+    
+    // Example of reference to a file stored in Actor's default key-value store.
+    // In UI can be rendered as a file download.
+    "mainScreenshotFileUrl": {
+      "type": "string",
+      "title": "Main screenshot",
+      "description": "URL to an image with main product screenshot.",
+      "source": "{{actorRun.defaultKeyValueStoreUrl}}/screenshot.png",
     },
 
     // Live view web server for to the Actor
     // In the "output" view, this page is rendered in an IFRAME
-    "productExplorer": {
+    "productExplorerWebUrl": {
       "type": "string",
       "resourceType": "webServer",
       
-      // Reference an OpenAPI schema of the web server
-      "type": "./web_server_openapi.json"
-      
-      "source": "${actor.webServer}", 
+      // TODO: maybe this should be called actorRun.webServerUrl, but we'd need to change ActorRun everywhere
+      "source": "{{actorRun.containerUrl}}", 
 
-      "title": "API server",
+      "title": "Live product explorer app",
       
       "description": "API documentation is available in swagger.com/api/xxxx", // optional
       

@@ -2019,7 +2019,7 @@ This is an example of the output schema file for the `bob/screenshotter` Actor:
       "type": "string",
       "resourceType": "dataset",
       "title": "Current products",  
-      "source": "${actor.dataset}",
+      "source": "{{actorRun.defaultDatasetUrl}}",
       "options": {
         "format": "json",
         "view": "product_details"
