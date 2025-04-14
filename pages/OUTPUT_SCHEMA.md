@@ -4,6 +4,8 @@ This JSON file defines the schema of the [output](../README.md#output) object pr
 The file is referenced from the main [Actor file](./ACTOR_FILE.md) using the `output` property,
 and it is typically stored in `.actor/output_schema.json`.
 
+The format is a JSON Schema with our extensions, describing a single object.
+
 The output schema is used by the system to generate the
 output JSON object,
 whose fields corresponding to `properties`, where values are URLs linking to actual Actor results in a dataset, key-value store files, or live view web server.
@@ -14,10 +16,6 @@ to see format of its results as it's predefined by the output schema.
 
 The output schema is also used by the system to generate the user interface, API examples, integrations, etc.
 
-The file format is a JSON Schema with our extensions.
-
-<!-- TODO: Provide a list of our JSON schema extensions -->
-
 ## Structure
 
 ```jsonc
@@ -27,8 +25,9 @@ The file format is a JSON Schema with our extensions.
   "title": "Some title",
   "description": "This text is shown in the Output UI",
   "type": "object",
+  
   "properties": {
-     
+  
     // This property in output object will contains a URL to a dataset containing Actor results.
     // It might look like: https://api.apify.com/v2/datasets/XYZabc/items?format=json&view=product_details
     "currentProducts": {
