@@ -2016,16 +2016,9 @@ This is an example of the output schema file for the `bob/screenshotter` Actor:
   "properties": {
     "screenshotUrl": {
       "type": "string",
-      "title": "Page screenshot",
+      "title": "Web page screenshot",
       "resourceType": "file",
-      "template": "{{actorRun.defaultDatasetUrl}}?format=json&view=product_details"
-    },
-
-    "viewerWebUrl": {
-      "type": "string",
-      "title": "Page screenshot",
-      "resourceType": "webServer",
-      "template": "{{actorRun.containerUrl}}/viewer"
+      "template": "{{actorRun.defaultKeyValueStoreUrl}}/screenshot.png"
     }
   }
 }
