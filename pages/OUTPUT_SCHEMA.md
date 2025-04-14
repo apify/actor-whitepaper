@@ -30,22 +30,21 @@ The output schema is also used by the system to generate the user interface, API
   
     // This property in output object will contain a URL to the dataset containing Actor results,
     // for example: https://api.apify.com/v2/datasets/XYZabc/items?format=json&view=product_details
-    "currentProducts": {
+    "currentProductsDatasetUrl": {
       // Type is string, because the value in output object is a URL
       "type": "string",
-      
-      // Identifies what kind of object is refereced by this output property.
-      // This is equivalent to "resourceType" in input schema.
-      "resourceType": "dataset",
-      
       "title": "Current products",
       "description": "Yaddada",
       
-      // Define how the dataset URL is created, in this case it will link to the default Actor key-value store  
-      "source": "{{actorRun.defaultDatasetUrl}}?format=json&view=product_details",
+      // Identifies what kind of object is refereced by this output property (same syntax as "resourceType" in input schema).
+      // If used, the system will interepret the "source" and render the dataset in UI special way.
+      "resourceType": "dataset",
+      
+      // Defines how the output value is created, using text format where {{x}} denote variables (same syntax as webhook templates)
+      "template": "{{actorRun.defaultDatasetUrl}}?format=json&view=product_details",
       
       // Or reference a property from input object, the linkage will be checked for type compatibility
-      // "source": "{{actorInput.myProductsDatasetId}}",
+      // "template": "{{actorInput.myProductsDatasetId}}",
       
       // Optional link to schema describing the dataset, key-value store, or web server.
       "schema": "./dataset_schema.json"
@@ -53,14 +52,14 @@ The output schema is also used by the system to generate the user interface, API
 
     // Selects a specific group of records with a certain prefix. In UI, this can be shown
     // as a list of images. In the output object, this will be a link to a API with "prefix" param.
-    "productImages": {
+    "productImagesUrl": {
       "type": "string",
-      "resourceType": "keyValueStore", 
+      "title": "Product screenshots",
       
-      "title": "Product screenshots",  
+      "resourceType": "keyValueStore",
 
       // Define how the URL is created, in this case it will link to the default Actor key-value store
-      "source": "{{actorRun.defaultKeyValueStoreUrl}}?collection=screenshots",
+      "template": "{{actorRun.defaultKeyValueStoreUrl}}?collection=screenshots",
       
       // Optional
       "schema": "./key_value_store_schema.json",
@@ -72,7 +71,7 @@ The output schema is also used by the system to generate the user interface, API
       "type": "string",
       "title": "Main screenshot",
       "description": "URL to an image with main product screenshot.",
-      "source": "{{actorRun.defaultKeyValueStoreUrl}}/screenshot.png",
+      "template": "{{actorRun.defaultKeyValueStoreUrl}}/screenshot.png",
     },
 
     // Live view web server for to the Actor
@@ -80,16 +79,11 @@ The output schema is also used by the system to generate the user interface, API
     "productExplorerWebUrl": {
       "type": "string",
       "resourceType": "webServer",
-      
-      // TODO: maybe this should be called actorRun.webServerUrl, but we'd need to change ActorRun everywhere
-      "source": "{{actorRun.containerUrl}}", 
-
       "title": "Live product explorer app",
-      
       "description": "API documentation is available in swagger.com/api/xxxx", // optional
       
-      // specify a path to open?
-      "viewPath": "/nice-report?query=123",
+      // TODO: ideally this should be named {{actorRun.webServerUrl}} for consistency, but we'd need to change ActorRun everywhere
+      "template": "{{actorRun.containerUrl}}/product-explorer/", 
     }
   }
 }

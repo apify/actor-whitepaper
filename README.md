@@ -2014,27 +2014,18 @@ This is an example of the output schema file for the `bob/screenshotter` Actor:
   "title": "Output schema for Screenshotter Actor",
   "description": "The URL to the resulting screenshot",
   "properties": {
-
-    "currentProducts": {
-      "type": "string",
-      "resourceType": "dataset",
-      "title": "Current products",  
-      "source": "{{actorRun.defaultDatasetUrl}}",
-      "options": {
-        "format": "json",
-        "view": "product_details"
-      }
-    },
-    
     "screenshotUrl": {
-      "type": "$defaultKeyValueStore",
-      "keys": ["screenshot.png"],
-      "title": "Product page screenshot"
+      "type": "string",
+      "title": "Page screenshot",
+      "resourceType": "file",
+      "template": "{{actorRun.defaultDatasetUrl}}?format=json&view=product_details"
     },
 
-    "productExplorer": {
-      "type": "$defaultWebServer",
-      "title": "API server"
+    "viewerWebUrl": {
+      "type": "string",
+      "title": "Page screenshot",
+      "resourceType": "webServer",
+      "template": "{{actorRun.containerUrl}}/viewer"
     }
   }
 }
