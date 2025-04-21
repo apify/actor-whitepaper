@@ -61,7 +61,7 @@ The file has the following structure:
   // Links to storages schema files, or inlined schema objects.
   // These aren't standard JSON schema files, but our own format. See ./DATASET_SCHEMA.md
   // COMPATIBILITY: This used to be "storages.keyValueStore", all implementations should support it
-  "datasetSchema": "../shared_schemas/generic_dataset_schema.json"
+  "datasetSchema": "../shared_schemas/generic_dataset_schema.json",
   
   "keyValueStoreSchema": "./key_value_store_schema.json",
    
