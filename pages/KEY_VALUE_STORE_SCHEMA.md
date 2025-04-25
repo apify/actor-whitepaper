@@ -19,7 +19,7 @@ UI and API.
    "collections": {
       "screenshots": {
             "name": "Post images",
-            "keyPrefixes": ["images-"],
+            "keyPrefix": "images-",
             "contentTypes": ["image/jpeg", "image/png"]
        }
    }
