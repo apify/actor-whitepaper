@@ -58,7 +58,7 @@ The file format is a JSON Schema with our extensions.
       "description": "Yaddada", // optional
       
       // optionally, you can specify which files to display in UI for key-value stores
-      "keyPrefixes": ["images-"],
+      "keyPrefix": "images-",
       "collection": "screenshots",
     },
 
