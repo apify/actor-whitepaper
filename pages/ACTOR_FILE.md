@@ -39,10 +39,18 @@ The file has the following structure:
   "labels": {
     "something": "bla bla"
   },
-  
+
   // Optional minimum and maximum memory for running the Actor.
+
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
+
+  // Used when user doesn't specify memory, the 𝔸ctor run will start with this amount.
+  // It might be a basic arithemtic expression referencing ${variables} from Actor input.
+  // This right value can optimize user experience vs. compute costs.
+  // If the variable is undefined or empty, the behavior is undefined
+  // and the system will select memory arbitrarily. In the future, we might change this behavior.
+  "defaultMemoryMbytes": "${maxCrawlPages} * 256 + 128",
   
   // Link to the Actor Dockerfile. If omitted, the system looks for "./Dockerfile" or "../Dockerfile"
   "dockerfile": "./Dockerfile",
@@ -64,7 +72,7 @@ The file has the following structure:
   "datasetSchema": "../shared_schemas/generic_dataset_schema.json",
   
   "keyValueStoreSchema": "./key_value_store_schema.json",
-   
+
   // Optional link to an OpenAPI definition file or inlined object describing the Actor web server API
   "webServerOpenapi": "./web_server_openapi.json",
   
