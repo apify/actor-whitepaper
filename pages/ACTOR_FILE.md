@@ -8,21 +8,21 @@ The file has the following structure:
 {
   // Required, indicates that this is an Actor definition file and the specific version of the Actor specification.
   "actorSpecification": 1,
-  
+
   // Required "technical" name of the Actor, must be a DNS-friendly text
   "name": "google-search-scraper",
 
   // Human-friendly name and description of the Actor
   "title": "Google Search Scraper",
   "description": "A 200-char description",
-  
+
   // Required, indicates the version of the Actor. Since actor.json file is commited to Git, you can have different Actor
   // versions in different branches.
   "version": "0.0",
-  
+
   // Optional tag that is applied to the builds of this Actor. If omitted, it defaults to "latest".
   "buildTag": "latest",
-  
+
   // An object with environment variables expected by the Actor.
   // Secret values are prefixed by @ and their actual values need to be registered with the CLI, for example:
   // $ apify secrets add mySecretPassword pwd1234
@@ -30,52 +30,61 @@ The file has the following structure:
     "MYSQL_USER": "my_username",
     "MYSQL_PASSWORD": "@mySecretPassword"
   },
-  
+
   // If true, the Actor indicates it can be run in the Standby mode,
   // to get started and be kept alive by the system to handle incoming HTTP REST requests by the Actor's web server.
   "usesStandbyMode": true,
- 
+
   // A metadata object enabling implementations to pass arbitrary additional properties.
   "labels": {
     "something": "bla bla"
   },
-  
+
   // Optional minimum and maximum memory for running the Actor.
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
-  
+
   // Link to the Actor Dockerfile. If omitted, the system looks for "./Dockerfile" or "../Dockerfile"
   "dockerfile": "./Dockerfile",
-  
+
   // Link to the Actor README file in Markdown format. If omitted, the system looks for "./ACTOR.md" and "../README.md"
   "readme": "./README.md",
-  
+
   // Optional link to the Actor changelog file in Markdown format.
   "changelog": "../../../shared/CHANGELOG.md",
-  
+
   // Links to input/output extened JSON schema files or inlined objects.
   // COMPATIBILITY: This used to be called "input", all implementations should support it
   "inputSchema": "./input_schema.json",
   "outputSchema": "./output_schema.json",
-  
+
   // Links to storages schema files, or inlined schema objects.
   // These aren't standard JSON schema files, but our own format. See ./DATASET_SCHEMA.md
   // COMPATIBILITY: This used to be "storages.keyValueStore", all implementations should support it
   "datasetSchema": "../shared_schemas/generic_dataset_schema.json",
-  
+
   "keyValueStoreSchema": "./key_value_store_schema.json",
-   
+
   // Optional link to an OpenAPI definition file or inlined object describing the Actor web server API
   "webServerOpenapi": "./web_server_openapi.json",
-  
+
   // Optional URL path to the Model Context Protocol (MCP) server exposed on the Actor web server.
   // If present, the system knows the Actor provides an MCP server, which can be used by the platform
   // and integrations to integrate the Actor from AI/LLM systems.
   "webServerMcpPath": "/mcp?someVar=1",
 
-  // Scripts that might be used by the CLI tools to simplify the local Actor development.
+  // Scripts can be used by tools like the CLI to do certain actions based on the commands you run.
+  // The presence of this object in your Actor config is optional, but we recommend always defining at least the `run` key.
   "scripts": {
-    "post-create": "npm install",
+    // The `run` script is special - it defines *the* way to run your Actor locally. While tools can decide
+    // to implement mechanisms to detect what type of project your Actor is, and how to run it, you can choose to
+    // define this as the source of truth.
+    //
+    // This should be the same command you run as if you were at the root of your Actor when you start it locally.
+    // This can be anything from an npm script, as shown below, to a full chain of commands (ex.: `cargo test && cargo run --release`).
+    //
+    // CLIs may opt to also request this command when initializing a new Actor, or to automatically migrate and add it in the first time
+    // you start the Actor locally.
     "run": "npm start"
   }
 }
@@ -109,7 +118,6 @@ The file has the following structure:
   on the Actor (maybe SEO-optimized versions from copywriter),
   by default we do not overwrite them
   unless `apify push` is called with options `--force-title` or `--force-description`.
-
 
 ## Changes from the legacy `apify.json` file
 
