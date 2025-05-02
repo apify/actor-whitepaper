@@ -28,7 +28,7 @@ The file has the following structure:
   // $ apify secrets add mySecretPassword pwd1234
   "environmentVariables": {
     "MYSQL_USER": "my_username",
-    "MYSQL_PASSWORD": "@mySecretPassword",
+    "MYSQL_PASSWORD": "@mySecretPassword"
   },
 
   // If true, the Actor indicates it can be run in the Standby mode,
@@ -37,7 +37,7 @@ The file has the following structure:
 
   // A metadata object enabling implementations to pass arbitrary additional properties.
   "labels": {
-    "something": "bla bla",
+    "something": "bla bla"
   },
 
   // Optional minimum and maximum memory for running the Actor.
@@ -85,8 +85,8 @@ The file has the following structure:
     //
     // CLIs may opt to also request this command when initializing a new Actor, or to automatically migrate and add it in the first time
     // you start the Actor locally.
-    "run": "npm start",
-  },
+    "run": "npm start"
+  }
 }
 ```
 
