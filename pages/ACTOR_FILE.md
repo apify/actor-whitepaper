@@ -2,17 +2,17 @@
 
 This JSON file must be present at `.actor/actor.json` and defines core properties of a single web Actor.
 
-The file has the following structure:
+The file contains a single JSON object with the following properties:
 
 ```jsonc
 {
-  // Required, indicates that this is an Actor definition file and the specific version of the Actor specification.
+  // Required field, indicates that this is an Actor definition file and the specific version of the Actor specification.
   "actorSpecification": 1,
-
-  // Required "technical" name of the Actor, must be a DNS-friendly text
+  
+  // Required "technical" name of the Actor, must be a DNS hostname-friendly text.
   "name": "google-search-scraper",
 
-  // Human-friendly name and description of the Actor
+  // Human-friendly name and description of the Actor.
   "title": "Google Search Scraper",
   "description": "A 200-char description",
 
@@ -22,20 +22,21 @@ The file has the following structure:
 
   // Optional tag that is applied to the builds of this Actor. If omitted, it defaults to "latest".
   "buildTag": "latest",
-
-  // An object with environment variables expected by the Actor.
+  
+  // An optional object with environment variables expected by the Actor.
   // Secret values are prefixed by @ and their actual values need to be registered with the CLI, for example:
   // $ apify secrets add mySecretPassword pwd1234
   "environmentVariables": {
     "MYSQL_USER": "my_username",
     "MYSQL_PASSWORD": "@mySecretPassword"
   },
-
-  // If true, the Actor indicates it can be run in the Standby mode,
+  
+  // Optional field. If true, the Actor indicates it can be run in the Standby mode,
   // to get started and be kept alive by the system to handle incoming HTTP REST requests by the Actor's web server.
   "usesStandbyMode": true,
-
-  // A metadata object enabling implementations to pass arbitrary additional properties.
+ 
+  // An optional metadata object enabling implementations to pass arbitrary additional properties.
+  // The properties and their values must be strings.
   "labels": {
     "something": "bla bla"
   },
@@ -43,35 +44,37 @@ The file has the following structure:
   // Optional minimum and maximum memory for running the Actor.
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
-
-  // Link to the Actor Dockerfile. If omitted, the system looks for "./Dockerfile" or "../Dockerfile"
+  
+  // Optional link to the Actor Dockerfile.
+  // If omitted, the system looks for "./Dockerfile" or "../Dockerfile"
   "dockerfile": "./Dockerfile",
-
-  // Link to the Actor README file in Markdown format. If omitted, the system looks for "./ACTOR.md" and "../README.md"
+  
+  // Optional link to the Actor README file in Markdown format.
+  // If omitted, the system looks for "./ACTOR.md" and "../README.md"
   "readme": "./README.md",
 
   // Optional link to the Actor changelog file in Markdown format.
   "changelog": "../../../shared/CHANGELOG.md",
-
-  // Links to input/output extened JSON schema files or inlined objects.
-  // COMPATIBILITY: This used to be called "input", all implementations should support it
+  
+  // Optional link to Actor input or output schema file, or inlined schema object,
+  // which is a JSON schema with our extensions. For details see ./INPUT_SCHEMA.md or ./OUTPUT_SCHEMA.md, respectively.
+  // BACKWARDS COMPATIBILITY: "inputSchema" used to be called "input", all implementations should support this.
   "inputSchema": "./input_schema.json",
   "outputSchema": "./output_schema.json",
-
-  // Links to storages schema files, or inlined schema objects.
-  // These aren't standard JSON schema files, but our own format. See ./DATASET_SCHEMA.md
-  // COMPATIBILITY: This used to be "storages.keyValueStore", all implementations should support it
+  
+  // Optional path to Dataset or Key-value Store schema file or inlined schema object for the Actor's default dataset or key-value store. 
+  // For detail, see ./DATASET_SCHEMA.md or ./KEY_VALUE_STORE_SCHEMA.md, respectively.
+  // BACKWARDS COMPATIBILITY: "datasetSchema" used to be "storages.keyValueStore" sub-object, all implementations should support this.
   "datasetSchema": "../shared_schemas/generic_dataset_schema.json",
-
   "keyValueStoreSchema": "./key_value_store_schema.json",
-
-  // Optional link to an OpenAPI definition file or inlined object describing the Actor web server API
-  "webServerOpenapi": "./web_server_openapi.json",
-
-  // Optional URL path to the Model Context Protocol (MCP) server exposed on the Actor web server.
+   
+  // Optional path or inlined schema object of the Actor's web server in OpenAPI formation.
+  "webServerSchema": "./web_server_openapi.json",
+  
+  // Optional URL path and query parameters to the Model Context Protocol (MCP) server exposed by the Actor web server.
   // If present, the system knows the Actor provides an MCP server, which can be used by the platform
-  // and integrations to integrate the Actor from AI/LLM systems.
-  "webServerMcpPath": "/mcp?someVar=1",
+  // and integrations to integrate the Actor with various AI/LLM systems.
+  "webServerMcpPath": "/mcp?version=2",
 
   // Scripts can be used by tools like the CLI to do certain actions based on the commands you run.
   // The presence of this object in your Actor config is optional, but we recommend always defining at least the `run` key.
