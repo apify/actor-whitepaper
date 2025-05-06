@@ -135,4 +135,4 @@ The `.actor/actor.json` replaces the legacy `apify.json` file. Here are main cha
   could have an option `--apply-env-vars-to-build` like we have it on platform.
 - The `dockerfile` and `readme` directives are optional, the system falls back to reasonable
   defaults, first in `.actor` directory and then in the top-level directory.
-- `scripts` section was added, see https://apify.slack.com/archives/C04HB9V90DT/p1672826248186569
+- `scripts` section was added
