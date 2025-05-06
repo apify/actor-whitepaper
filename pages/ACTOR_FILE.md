@@ -15,11 +15,11 @@ The file contains a single JSON object with the following properties:
   // Human-friendly name and description of the Actor.
   "title": "Google Search Scraper",
   "description": "A 200-char description",
-  
+
   // Required, indicates the version of the Actor. Since actor.json file is commited to Git, you can have different Actor
   // versions in different branches.
   "version": "0.0",
-  
+
   // Optional tag that is applied to the builds of this Actor. If omitted, it defaults to "latest".
   "buildTag": "latest",
   
@@ -40,7 +40,7 @@ The file contains a single JSON object with the following properties:
   "labels": {
     "something": "bla bla"
   },
-  
+
   // Optional minimum and maximum memory for running the Actor.
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
@@ -52,7 +52,7 @@ The file contains a single JSON object with the following properties:
   // Optional link to the Actor README file in Markdown format.
   // If omitted, the system looks for "./ACTOR.md" and "../README.md"
   "readme": "./README.md",
-  
+
   // Optional link to the Actor changelog file in Markdown format.
   "changelog": "../../../shared/CHANGELOG.md",
   
@@ -76,10 +76,18 @@ The file contains a single JSON object with the following properties:
   // and integrations to integrate the Actor with various AI/LLM systems.
   "webServerMcpPath": "/mcp?version=2",
 
-  // Scripts that might be used by the CLI tools to simplify the local Actor development.
-  // They are to be executed from the main directory of the Actor, i.e. one level up. 
+  // Scripts can be used by tools like the CLI to do certain actions based on the commands you run.
+  // The presence of this object in your Actor config is optional, but we recommend always defining at least the `run` key.
   "scripts": {
-    "post-create": "npm install",
+    // The `run` script is special - it defines *the* way to run your Actor locally. While tools can decide
+    // to implement mechanisms to detect what type of project your Actor is, and how to run it, you can choose to
+    // define this as the source of truth.
+    //
+    // This should be the same command you run as if you were at the root of your Actor when you start it locally.
+    // This can be anything from an npm script, as shown below, to a full chain of commands (ex.: `cargo test && cargo run --release`).
+    //
+    // CLIs may opt to also request this command when initializing a new Actor, or to automatically migrate and add it in the first time
+    // you start the Actor locally.
     "run": "npm start"
   }
 }
@@ -113,7 +121,6 @@ The file contains a single JSON object with the following properties:
   on the Actor (maybe SEO-optimized versions from copywriter),
   by default we do not overwrite them
   unless `apify push` is called with options `--force-title` or `--force-description`.
-
 
 ## Changes from the legacy `apify.json` file
 

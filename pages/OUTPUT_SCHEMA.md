@@ -44,10 +44,7 @@ The output schema is also used by the system to generate the user interface, API
       "template": "{{actorRun.defaultDatasetUrl}}?format=json&view=product_details",
       
       // Or reference a property from input object, the linkage will be checked for type compatibility
-      // "template": "{{actorInput.myProductsDatasetId}}",
-      
-      // Optional link to schema describing the dataset, key-value store, or web server.
-      "schema": "./dataset_schema.json"
+      // "template": "{{actorInput.myProductsDatasetId}}"
     },
 
     // Selects a specific group of records with a certain prefix. In UI, this can be shown
@@ -59,10 +56,7 @@ The output schema is also used by the system to generate the user interface, API
       "resourceType": "keyValueStore",
 
       // Define how the URL is created, in this case it will link to the default Actor key-value store
-      "template": "{{actorRun.defaultKeyValueStoreUrl}}?collection=screenshots",
-      
-      // Optional
-      "schema": "./key_value_store_schema.json",
+      "template": "{{actorRun.defaultKeyValueStoreUrl}}?collection=screenshots"
     },
     
     // Example of reference to a file stored in Actor's default key-value store.
