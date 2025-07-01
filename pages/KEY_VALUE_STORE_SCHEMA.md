@@ -11,7 +11,7 @@ Key-value store schema has two main use cases described in the following example
 
 1. Some Actors such as [Instagram scraper](https://apify.com/jaroslavhejlek/instagram-scraper)
 store multiple types of files into the key-value store. Let's say the scraper stores images and user pictures.
-So for each of these, we would define a prefix group and allow the user to list images from a single group in both the
+So for each of these, we would define a prefix group called collection and allow the user to list images from a single collection in both the
 UI and API.
 
 ```jsonc
@@ -19,7 +19,7 @@ UI and API.
    "collections": {
       "screenshots": {
             "name": "Post images",
-            "keyPrefixes": ["images-"],
+            "keyPrefix": "images-",
             "contentTypes": ["image/jpeg", "image/png"]
        }
    }
@@ -94,10 +94,10 @@ Contrary to dataset schema, the record in key-value store represents output that
 
 ## API implications
 
-Enable user to list keys for specific record group:
+Enable user to list keys for specific collection:
 
 ```
-https://api.apify.com/v2/key-value-stores/storeId/keys?recordGroup=postImages&exclusiveStartKey=xxx
+https://api.apify.com/v2/key-value-stores/storeId/keys?collection=postImages&exclusiveStartKey=xxx
 ```
 
 In addition to this user will be able to list by prefix directly:
