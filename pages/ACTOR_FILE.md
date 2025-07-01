@@ -42,16 +42,15 @@ The file contains a single JSON object with the following properties:
   },
 
   // Optional minimum and maximum memory for running the Actor.
-
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
 
-  // Used when user doesn't specify memory, the 𝔸ctor run will start with this amount.
-  // It might be a basic arithemtic expression referencing ${variables} from Actor input.
-  // This right value can optimize user experience vs. compute costs.
-  // If the variable is undefined or empty, the behavior is undefined
-  // and the system will select memory arbitrarily. In the future, we might change this behavior.
-  "defaultMemoryMbytes": "${maxCrawlPages} * 256 + 128",
+  // When user doesn't specify memory when starting an Actor run, the system will use this amount.
+  // The goal of this feature is to optimize user experience vs. compute costs.
+  // The value might contains {{actorInput.variables}} from input (similar to Output schema) and basic arithemtic expressions.
+  // If the variable is undefined or empty, the behavior is undefined and the system will select memory arbitrarily.
+  // In the future, we might change this behavior.
+  "defaultMemoryMbytes": "{{actorInput.maxCrawlPages}} * 256 + 128",
   
   // Optional link to the Actor Dockerfile.
   // If omitted, the system looks for "./Dockerfile" or "../Dockerfile"
