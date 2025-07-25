@@ -470,7 +470,7 @@ The following table shows the equivalents of key concepts of UNIX programs and A
 ### Relation to the Actor model
 
 Note that Actors are only loosely related to
-the **Actor model** in computer science.
+the **Actor model** in computer science introduced by the 1973 paper by Carl Hewitt.
 According to [Wikipedia](https://en.wikipedia.org/wiki/Actor_model):
 
 > The Actor model in computer science is a mathematical model of concurrent computation
