@@ -44,6 +44,15 @@ The file contains a single JSON object with the following properties:
   // Optional minimum and maximum memory for running the Actor.
   "minMemoryMbytes": 128,
   "maxMemoryMbytes": 4096,
+
+  // When user doesn't specify memory when starting an Actor run, the system will use this amount.
+  // The goal of this feature is to optimize user experience vs. compute costs.
+  // The value might reference properties of the Actor run object (e.g. `{{actorRun.options.maxTotalChargeUsd}}`)
+  // or Actor input (e.g. `{{actorRun.input}}`), similar to Output schema. It can also use basic arithmetic expressions.
+  // The value will be clamped between `minMemoryMbytes` and `maxMemoryMbytes` (if provided), and rounded up to the nearest higher power of 2.
+  // If the variable is undefined or empty, the behavior is undefined and the system will select memory arbitrarily.
+  // In the future, we might change this behavior.
+  "defaultMemoryMbytes": "{{actorRun.input.maxParallelRequests}} * 256 + 128",
   
   // Optional link to the Actor Dockerfile.
   // If omitted, the system looks for "./Dockerfile" or "../Dockerfile"
@@ -68,7 +77,7 @@ The file contains a single JSON object with the following properties:
   "datasetSchema": "../shared_schemas/generic_dataset_schema.json",
   "keyValueStoreSchema": "./key_value_store_schema.json",
    
-  // Optional path or inlined schema object of the Actor's web server in OpenAPI formation.
+  // Optional path or inlined schema object of the Actor's web server in OpenAPI format.
   "webServerSchema": "./web_server_openapi.json",
   
   // Optional URL path and query parameters to the Model Context Protocol (MCP) server exposed by the Actor web server.
