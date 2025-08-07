@@ -44,7 +44,7 @@ The output schema is also used by the system to generate the user interface, API
       "template": "{{actorRun.defaultDatasetUrl}}?format=json&view=product_details",
       
       // Or reference a property from input object, the linkage will be checked for type compatibility
-      // "template": "{{actorInput.myProductsDatasetId}}"
+      // "template": "{{actorRun.input.myProductsDatasetId}}"
     },
 
     // Selects a specific group of records with a certain prefix. In UI, this can be shown

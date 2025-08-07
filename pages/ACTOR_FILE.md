@@ -47,12 +47,12 @@ The file contains a single JSON object with the following properties:
 
   // When user doesn't specify memory when starting an Actor run, the system will use this amount.
   // The goal of this feature is to optimize user experience vs. compute costs.
-  // The value might contain references to variables from Actor input (e.g. `{{actorInput.variable}}`)
-  // or Actor run (e.g. `{{actorRun.options.maxTotalChargeUsd}}`) similar to Output schema. It can also use basic arithmetic expressions.
+  // The value might reference properties of the Actor run object (e.g. `{{actorRun.options.maxTotalChargeUsd}}`)
+  // or Actor input (e.g. `{{actorRun.input}}`), similar to Output schema. It can also use basic arithmetic expressions.
   // The value will be clamped between `minMemoryMbytes` and `maxMemoryMbytes` (if provided), and rounded up to the nearest higher power of 2.
   // If the variable is undefined or empty, the behavior is undefined and the system will select memory arbitrarily.
   // In the future, we might change this behavior.
-  "defaultMemoryMbytes": "{{actorInput.maxParallelRequests}} * 256 + 128",
+  "defaultMemoryMbytes": "{{actorRun.input.maxParallelRequests}} * 256 + 128",
   
   // Optional link to the Actor Dockerfile.
   // If omitted, the system looks for "./Dockerfile" or "../Dockerfile"
