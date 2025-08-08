@@ -488,7 +488,7 @@ implementation of a formal mathematical model.
 
 For example, our Actors
 do not provide any standard message passing mechanism, but they can communicate together
-directly via HTTP requests (see [live-view web server](#live-view-web-server)),
+directly via HTTP requests (see [Actor web server](#actor-web-server)),
 manipulate each other's operation via the Apify platform API (e.g. abort another Actor),
 or affect each other by sharing some internal state or storage.
 Actors do not have any formal restrictions,
@@ -1013,8 +1013,8 @@ about the execution context.
 | `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                                                               |
 | `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                                                                     |
 | `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for details.                                                                                                      |
-| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world, either as [Live view web server](#live-view-web-server) or in the [Standby mode](#standby-mode).                           |
-| `ACTOR_WEB_SERVER_URL`             | A unique hard-to-guess URL under which the current Actor run's web server is accessible from the outside world. See [Live view web server](#live-view-web-server) section for details.                                     |
+| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world, either as [Actor web server](#actor-web-server) or in the [Standby mode](#standby-mode).                           |
+| `ACTOR_WEB_SERVER_URL`             | A unique hard-to-guess URL under which the current Actor run's web server is accessible from the outside world. See [Actor web server](#actor-web-server) section for details.                                     |
 | `ACTOR_STANDBY_URL`                | A general public URL under which the Actor can be started and its web server accessed in the [Standby mode](#standby-mode).                                                                                                |
 | `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                                                                 |
 | `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                                                                        |
