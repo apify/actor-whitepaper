@@ -2101,6 +2101,8 @@ $ tree -a
 The command works on the best-effort basis,
 creating necessary configuration files for the specific programming language and libraries.
 
+Note: this command is not yet available and represents a future vision for the CLI.
+
 #### Add the Actor code
 ```
 $ cat << EOF > Dockerfile
