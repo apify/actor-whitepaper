@@ -36,9 +36,12 @@ The file contains a single JSON object with the following properties:
   "usesStandbyMode": true,
  
   // An optional metadata object enabling implementations to pass arbitrary additional properties.
-  // The properties and their values must be strings.
-  "labels": {
-    "something": "bla bla"
+  // The property values can be arbitrary objects.
+  "meta": {
+    "something": "bla bla",
+    "somethingElse": {
+      "subObject": "works"
+    }
   },
 
   // Optional minimum and maximum memory for running the Actor.
