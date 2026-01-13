@@ -74,11 +74,21 @@ The file contains a single JSON object with the following properties:
   "inputSchema": "./input_schema.json",
   "outputSchema": "./output_schema.json",
   
-  // Optional path to Dataset or Key-value Store schema file or inlined schema object for the Actor's default dataset or key-value store. 
-  // For detail, see ./DATASET_SCHEMA.md or ./KEY_VALUE_STORE_SCHEMA.md, respectively.
-  // BACKWARDS COMPATIBILITY: "datasetSchema" used to be "storages.keyValueStore" sub-object, all implementations should support this.
-  "datasetSchema": "../shared_schemas/generic_dataset_schema.json",
-  "keyValueStoreSchema": "./key_value_store_schema.json",
+  // Optional path to Dataset or Key-value Store schema files or inlined schema objects for the Actor's datasets or key-value stores. 
+  // Optional schema declaration for Actor's storages. The schema can be either a file reference or an inlined schema object.
+  // For information on the schema objects, see ./DATASET_SCHEMA.md or ./KEY_VALUE_STORE_SCHEMA.md
+  "storages": {
+    // Optional path to default Dataset schema
+    "dataset": "../shared_schemas/generic_dataset_schema.json",
+    // Optional path to multiple aliased Dataset schemas. At least one aliased schema is required.
+    // Cannot be present if "dataset" field is used.
+    "datasets": {
+      "firstDatasetAlias": "../shared_schemas/generic_dataset_schema.json",
+      "secondDatasetAlias": "../shared_schemas/generic_dataset_schema.json",
+      "nthDatasetAlias": "../shared_schemas/generic_dataset_schema.json"
+    },
+    "keyValueStore": "./key_value_store_schema.json"
+  }
    
   // Optional path or inlined schema object of the Actor's web server in OpenAPI format.
   "webServerSchema": "./web_server_openapi.json",

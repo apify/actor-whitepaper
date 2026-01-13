@@ -21,8 +21,8 @@ Dataset can be assigned a schema which describes:
 
 ## Basic properties
 
-- Storage is immutable. I.e., if you want to change the structure, then you need to create a new dataset.
-- Its schema is weak. I.e., you can always push their additional properties, but schema will ensure that all the listed once are there with a correct type. This is to make Actors more compatible, i.e., some Actor expects dataset to contain certain fields but does not care about the additional ones.
+- Storage schema is immutable. I.e., if you want to change the structure, then you need to create a new dataset.
+- Storage is append-only. I.e. you can only append new items to the dataset, but you cannot modify or delete items that are already present.
 
 There are two ways how to create a dataset with schema:
 1. User can start the Actor that has dataset schema linked from its
@@ -40,6 +40,20 @@ By opening an **existing** dataset with `schema` parameter, the system ensures t
 ```
 Uncaught Error: Dataset schema is not compatible with the provided schema
 ```
+
+### Extension: Multiple Datasets, Dataset Alias
+
+By default, the Actor run is assigned a single dataset. If needed it's possible to specify more datasets (see [actor.json](./ACTOR_FILE.md)) that can be used to store the results.
+
+The first of those specified datasets is treated as the "default" one when needed.
+
+Those datasets can then be accessed using their `alias` (specified in the schema).
+
+```js
+const dataset = await Apify.openDataset({ alias: 'firstDatasetAlias' });
+```
+
+The difference between Dataset `alias` and `name` is that `alias` is local in the context of Actor run, whereas the `name` is global (eg. exists in user's workspace).
 
 ## Structure
 
