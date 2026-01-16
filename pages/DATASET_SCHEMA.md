@@ -41,7 +41,7 @@ By opening an **existing** dataset with `schema` parameter, the system ensures t
 Uncaught Error: Dataset schema is not compatible with the provided schema
 ```
 
-### Extension: Multiple Datasets, Dataset Alias
+### Extension: multiple datasets, dataset alias
 
 By default, the Actor run is assigned a single dataset. If needed it's possible to specify more datasets (see [actor.json](./ACTOR_FILE.md)) that can be used to store the results.
 
