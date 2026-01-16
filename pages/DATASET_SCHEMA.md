@@ -53,7 +53,7 @@ Those datasets can then be accessed using their `alias` (specified in the schema
 const dataset = await Apify.openDataset({ alias: 'firstDatasetAlias' });
 ```
 
-The difference between Dataset `alias` and `name` is that `alias` is local in the context of Actor run, whereas the `name` is global (eg. exists in user's workspace).
+The difference between Dataset `alias` and `name` is that `alias` is local in the context of Actor run, whereas the `name` is global (exists in user's workspace).
 
 ## Structure
 
