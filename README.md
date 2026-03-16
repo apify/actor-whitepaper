@@ -746,6 +746,16 @@ int main (int argc, char *argv[]) {}
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+GET {ACTOR_API_BASE_URL}/key-value-stores/{ACTOR_DEFAULT_KEY_VALUE_STORE_ID}/records/{ACTOR_INPUT_KEY}
+Authorization: Bearer {APIFY_TOKEN}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Key-value store access
@@ -811,6 +821,39 @@ state = await Actor.get_value('my-state')
 ```bash
 $ echo "hello world" > file.txt
 $ cat file.txt
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+# Get a record
+GET {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
+Authorization: Bearer {APIFY_TOKEN}
+
+# Set a record (with Content-Type matching the data format)
+PUT {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "something": 123 }
+
+# Delete a record
+DELETE {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
+Authorization: Bearer {APIFY_TOKEN}
+
+# List keys in a store
+GET {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records?limit=100&prefix=screenshots
+Authorization: Bearer {APIFY_TOKEN}
+
+# Get or create a named key-value store
+POST {ACTOR_API_BASE_URL}/key-value-stores
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "name": "screenshots-store" }
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -896,6 +939,34 @@ $ actor push-data --dataset=./my_dataset someResult=123
 
 ```c
 printf("Hello world\tColum 2\tColumn 3");
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+# Push a single item to the default dataset
+POST {ACTOR_API_BASE_URL}/datasets/{ACTOR_DEFAULT_DATASET_ID}/items
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "someResult": 123 }
+
+# Push multiple items at once
+POST {ACTOR_API_BASE_URL}/datasets/{ACTOR_DEFAULT_DATASET_ID}/items
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+[{ "someResult": 123 }, { "someResult": 456 }]
+
+# Get or create a named dataset
+POST {ACTOR_API_BASE_URL}/datasets
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "name": "bob/poll-results-2019" }
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -988,6 +1059,30 @@ exit(1);
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+# Signal successful exit with a status message
+PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "status": "SUCCEEDED", "statusMessage": "Email sent", "exitCode": 0 }
+
+# Signal failure with an error message
+PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "status": "FAILED", "statusMessage": "Couldn't fetch the URL", "exitCode": 1 }
+```
+
+Note: This API call sets the exit metadata before the process exits.
+The actual container termination is triggered by the process exiting with the corresponding exit code.
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Environment variables
@@ -1018,6 +1113,7 @@ about the execution context.
 | `ACTOR_STANDBY_URL`                | A general public URL under which the Actor can be started and its web server accessed in the [Standby mode](#standby-mode).                                                                                                |
 | `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                                                                 |
 | `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                                                                        |
+| `ACTOR_API_BASE_URL`               | Base URL of the Actor Runtime API that the SDK uses to communicate with the runtime back-end (e.g. `https://api.apify.com/v2` on the Apify platform, or `http://localhost:3000` for local development). See [Actor Runtime API](./openapi/openapi.json) for the full OpenAPI specification. |
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in the local development environment or on the Apify platform.
@@ -1126,6 +1222,19 @@ $ actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 
 Convention: The end user of an Actor should never need to look into the log to understand what happened,
 e.g. why the Actor failed. All necessary information must be set by the Actor in the status message.
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "statusMessage": "Crawled 45 of 100 pages" }
+```
 
 <!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
@@ -1246,6 +1355,30 @@ $ ps -a
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+GET {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/memory
+Authorization: Bearer {APIFY_TOKEN}
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "totalBytes": 2147483648,
+    "freeBytes": 1073741824,
+    "usedBytes": 1073741824,
+    "mainProcessBytes": 536870912,
+    "childProcessesBytes": 536870912
+  }
+}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Start another Actor
@@ -1327,13 +1460,30 @@ The following command starts the Actor, and then prints the messages to a Slack 
 
 #### API
 
-```
-[POST] https://api.apify.com/v2/actors/apify~google-search-scraper/run
+```http
+POST {ACTOR_API_BASE_URL}/actors/apify~google-search-scraper/runs
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-[POST|GET] https://api.apify.com/v2/actors/apify~google-search-scraper/run-sync?
-  token=rWLaYmvZeK55uatRrZib4xbZs&
-  outputRecordKey=OUTPUT
-  returnDataset=true
+{
+  "input": { "queries": "test" },
+  "memory": 2048
+}
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "id": "HG7ML7M8z78YcAPEB",
+    "actorId": "HDSasDasz78YcAPEB",
+    "status": "READY",
+    "defaultKeyValueStoreId": "sfAJEHLkpnO89wbfF",
+    "defaultDatasetId": "3ZojQDdFTsyE7Moy4",
+    "startedAt": "2022-01-02T03:04:05.678Z"
+  }
+}
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1414,6 +1564,23 @@ $ exec /bin/bash
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/metamorph
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{
+  "targetActorId": "bob/web-scraper",
+  "input": { "startUrls": ["https://www.example.com"] },
+  "build": "latest"
+}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Attach webhook to an Actor run
@@ -1474,6 +1641,23 @@ $ command1 || command2  # ("orf" symbol)
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/webhooks
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{
+  "eventTypes": ["ACTOR.RUN.SUCCEEDED", "ACTOR.RUN.FAILED"],
+  "requestUrl": "http://api.example.com?something=123",
+  "payloadTemplate": "{\"userId\": {{userId}}, \"createdAt\": {{createdAt}}, \"eventType\": {{eventType}}, \"eventData\": {{eventData}}, \"resource\": {{resource}}}"
+}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Abort another Actor
@@ -1509,6 +1693,19 @@ $ actor abort --run-id RUN_ID
 ```bash
 # Terminate a program
 $ kill <PID>
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{runId}/abort
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "gracefully": true, "statusMessage": "Your job is done, friend." }
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1561,7 +1758,17 @@ await Actor.reboot()
 #### CLI
 
 ```bash
-$ actor reboot 
+$ actor reboot
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/reboot
+Authorization: Bearer {APIFY_TOKEN}
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1731,6 +1938,19 @@ $ actor charge gpt-4o-token \
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/charge
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "eventName": "gpt-4o-token", "count": 1000 }
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 An Actor user can specify the maximum amount they are willing to pay when starting an Actor.
@@ -1772,6 +1992,22 @@ run = await Actor.call(
 $ actor call bob/analyse-images \
   --input='{"imageUrls": ["https://www.example.com/image.png"]}'
   --max-total-charge-usd=5
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST {ACTOR_API_BASE_URL}/actors/bob~analyse-images/runs
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{
+  "input": { "imageUrls": ["https://www.example.com/image.png"] },
+  "maxTotalChargeUsd": 5
+}
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -2240,18 +2476,20 @@ The goal of this whitepaper is to introduce the Actor philosophy and programming
 to receive feedback, and to open the way to making Actors an open standard.
 To create an open standard, we need to:
 
-- Define a standardized low-level HTTP REST API interface for the Actor system,
-  to separate "frontend" and "backend" Actor programming model implementations.
+- ~~Define a standardized low-level HTTP REST API interface for the Actor system~~ — **Done!**
+  The [Actor Runtime API](./openapi/openapi.json) OpenAPI specification defines the HTTP REST API
+  that separates "frontend" SDK implementations from "backend" Actor runtime systems.
   For example, if somebody wants to build support for the Actor programming model in Rust,
-  they should just need to write a Rust "frontend" translating the commands to HTTP API calls,
-  rather than having to implement the entire system. And equally, if one decides
-  to develop a new Actor "backend", all existing client libraries for Rust or other languages should work with it.
+  they just need to write a Rust "frontend" translating the commands to HTTP API calls.
+  And equally, if one decides to develop a new Actor "backend", all existing client libraries
+  for Rust or other languages should work with it.
 - Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
 - Clearly separate what is the part of the standard and what is up to the discretion of the implementations.
 
 
 ## Links
 
+- [Actor Runtime API — OpenAPI specification](./openapi/openapi.json)
 - [Apify Store](https://apify.com/store)
 - [Monetize your Actor on Apify](https://apify.com/partners/actor-developers)
 - [Open-source Actors on GitHub](https://github.com/search?q=path%3A.actor%2Factor.json+&type=code)
