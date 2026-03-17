@@ -594,6 +594,13 @@ of a running Actor, both in local environment or on the Apify platform.
 The Actor runtime system passes the context via [environment variables](#environment-variables),
 such as `APIFY_TOKEN` or `ACTOR_RUN_ID`, which is used by the SDK or CLI to interact with the runtime.
 
+> **API tab conventions:** All HTTP API examples in this section use paths relative to
+> the `ACTOR_API_BASE_URL` [environment variable](#environment-variables)
+> (e.g. `https://api.apify.com/v2`).
+> Every request must include the `Authorization: Bearer {APIFY_TOKEN}` header.
+> Request bodies are JSON (`Content-Type: application/json`) unless noted otherwise.
+> See the [Actor Runtime API](./openapi/openapi.json) for the full OpenAPI specification.
+
 ### Initialization
 
 The SDKs provide convenience methods to initialize the Actor and handle its results.
@@ -751,8 +758,7 @@ int main (int argc, char *argv[]) {}
 #### API
 
 ```http
-GET {ACTOR_API_BASE_URL}/key-value-stores/{ACTOR_DEFAULT_KEY_VALUE_STORE_ID}/records/{ACTOR_INPUT_KEY}
-Authorization: Bearer {APIFY_TOKEN}
+GET /key-value-stores/{ACTOR_DEFAULT_KEY_VALUE_STORE_ID}/records/{ACTOR_INPUT_KEY}
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -830,28 +836,21 @@ $ cat file.txt
 
 ```http
 # Get a record
-GET {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
-Authorization: Bearer {APIFY_TOKEN}
+GET /key-value-stores/{storeId}/records/{key}
 
 # Set a record (with Content-Type matching the data format)
-PUT {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+PUT /key-value-stores/{storeId}/records/{key}
 
 { "something": 123 }
 
 # Delete a record
-DELETE {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
-Authorization: Bearer {APIFY_TOKEN}
+DELETE /key-value-stores/{storeId}/records/{key}
 
 # List keys in a store
-GET {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records?limit=100&prefix=screenshots
-Authorization: Bearer {APIFY_TOKEN}
+GET /key-value-stores/{storeId}/records?limit=100&prefix=screenshots
 
 # Get or create a named key-value store
-POST {ACTOR_API_BASE_URL}/key-value-stores
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /key-value-stores
 
 { "name": "screenshots-store" }
 ```
@@ -948,23 +947,17 @@ printf("Hello world\tColum 2\tColumn 3");
 
 ```http
 # Push a single item to the default dataset
-POST {ACTOR_API_BASE_URL}/datasets/{ACTOR_DEFAULT_DATASET_ID}/items
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /datasets/{ACTOR_DEFAULT_DATASET_ID}/items
 
 { "someResult": 123 }
 
 # Push multiple items at once
-POST {ACTOR_API_BASE_URL}/datasets/{ACTOR_DEFAULT_DATASET_ID}/items
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /datasets/{ACTOR_DEFAULT_DATASET_ID}/items
 
 [{ "someResult": 123 }, { "someResult": 456 }]
 
 # Get or create a named dataset
-POST {ACTOR_API_BASE_URL}/datasets
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /datasets
 
 { "name": "bob/poll-results-2019" }
 ```
@@ -1065,16 +1058,12 @@ exit(1);
 
 ```http
 # Signal successful exit with a status message
-PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+PUT /actor-runs/{ACTOR_RUN_ID}
 
 { "status": "SUCCEEDED", "statusMessage": "Email sent", "exitCode": 0 }
 
 # Signal failure with an error message
-PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+PUT /actor-runs/{ACTOR_RUN_ID}
 
 { "status": "FAILED", "statusMessage": "Couldn't fetch the URL", "exitCode": 1 }
 ```
@@ -1229,9 +1218,7 @@ e.g. why the Actor failed. All necessary information must be set by the Actor in
 #### API
 
 ```http
-PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+PUT /actor-runs/{ACTOR_RUN_ID}
 
 { "statusMessage": "Crawled 45 of 100 pages" }
 ```
@@ -1360,8 +1347,7 @@ $ ps -a
 #### API
 
 ```http
-GET {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/memory
-Authorization: Bearer {APIFY_TOKEN}
+GET /actor-runs/{ACTOR_RUN_ID}/memory
 ```
 
 Response:
@@ -1461,9 +1447,7 @@ The following command starts the Actor, and then prints the messages to a Slack 
 #### API
 
 ```http
-POST {ACTOR_API_BASE_URL}/actors/apify~google-search-scraper/runs
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /actors/apify~google-search-scraper/runs
 
 {
   "input": { "queries": "test" },
@@ -1569,9 +1553,7 @@ $ exec /bin/bash
 #### API
 
 ```http
-POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/metamorph
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /actor-runs/{ACTOR_RUN_ID}/metamorph
 
 {
   "targetActorId": "bob/web-scraper",
@@ -1646,9 +1628,7 @@ $ command1 || command2  # ("orf" symbol)
 #### API
 
 ```http
-POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/webhooks
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /actor-runs/{ACTOR_RUN_ID}/webhooks
 
 {
   "eventTypes": ["ACTOR.RUN.SUCCEEDED", "ACTOR.RUN.FAILED"],
@@ -1701,9 +1681,7 @@ $ kill <PID>
 #### API
 
 ```http
-POST {ACTOR_API_BASE_URL}/actor-runs/{runId}/abort
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /actor-runs/{runId}/abort
 
 { "gracefully": true, "statusMessage": "Your job is done, friend." }
 ```
@@ -1767,8 +1745,7 @@ $ actor reboot
 #### API
 
 ```http
-POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/reboot
-Authorization: Bearer {APIFY_TOKEN}
+POST /actor-runs/{ACTOR_RUN_ID}/reboot
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1943,9 +1920,7 @@ $ actor charge gpt-4o-token \
 #### API
 
 ```http
-POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/charge
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /actor-runs/{ACTOR_RUN_ID}/charge
 
 { "eventName": "gpt-4o-token", "count": 1000 }
 ```
@@ -2000,9 +1975,7 @@ $ actor call bob/analyse-images \
 #### API
 
 ```http
-POST {ACTOR_API_BASE_URL}/actors/bob~analyse-images/runs
-Content-Type: application/json
-Authorization: Bearer {APIFY_TOKEN}
+POST /actors/bob~analyse-images/runs
 
 {
   "input": { "imageUrls": ["https://www.example.com/image.png"] },
