@@ -104,8 +104,11 @@ as well as encourage new implementations of the model in other programming langu
 The goal of this whitepaper is to be the North Star that shows what the
 Actor programming model is and what operations it should support.
 **But this document is not an official specification.**
-The specification will be an OpenAPI schema of the Actor system interface,
-to enable new independent implementations of both the client libraries and backend systems. This is currently a work in progress.
+The formal specification is the [Actor Runtime API](./openapi/openapi.json) — an OpenAPI 3.1 schema
+that defines the HTTP REST interface between running Actors (front-end SDKs)
+and the Actor runtime system (back-end).
+This API enables thin, language-agnostic SDKs to be auto-generated for any programming language,
+and allows third-party implementations of the Actor runtime back-end.
 
 Currently, the most complete implementation of the Actor model is provided
 by the Apify platform, with SDKs for
@@ -594,12 +597,15 @@ of a running Actor, both in local environment or on the Apify platform.
 The Actor runtime system passes the context via [environment variables](#environment-variables),
 such as `APIFY_TOKEN` or `ACTOR_RUN_ID`, which is used by the SDK or CLI to interact with the runtime.
 
+Under the hood, each SDK operation maps to an HTTP REST API call defined in the
+[Actor Runtime API](./openapi/openapi.json) OpenAPI specification.
+The API examples shown below illustrate the underlying HTTP requests for each operation.
+
 > **API tab conventions:** All HTTP API examples in this section use paths relative to
 > the `ACTOR_API_BASE_URL` [environment variable](#environment-variables)
 > (e.g. `https://api.apify.com/v2`).
 > Every request must include the `Authorization: Bearer {APIFY_TOKEN}` header.
 > Request bodies are JSON (`Content-Type: application/json`) unless noted otherwise.
-> See the [Actor Runtime API](./openapi/openapi.json) for the full OpenAPI specification.
 
 ### Initialization
 
@@ -2450,12 +2456,18 @@ to receive feedback, and to open the way to making Actors an open standard.
 To create an open standard, we need to:
 
 - ~~Define a standardized low-level HTTP REST API interface for the Actor system~~ — **Done!**
-  The [Actor Runtime API](./openapi/openapi.json) OpenAPI specification defines the HTTP REST API
-  that separates "frontend" SDK implementations from "backend" Actor runtime systems.
-  For example, if somebody wants to build support for the Actor programming model in Rust,
-  they just need to write a Rust "frontend" translating the commands to HTTP API calls.
-  And equally, if one decides to develop a new Actor "backend", all existing client libraries
-  for Rust or other languages should work with it.
+  The [Actor Runtime API](./openapi/openapi.json) is an OpenAPI 3.1 specification
+  that defines the HTTP REST interface between running Actors and the runtime system, covering:
+  - Actor run management (status, status messages, abort, reboot, metamorph, charge)
+  - Key-value store operations (get/set/delete records, list keys, create named stores)
+  - Dataset operations (push/get items, create named datasets)
+  - Webhook attachment to Actor runs
+  - Memory information
+
+  This separation enables thin, language-agnostic SDKs to be auto-generated
+  for any programming language (e.g. a Rust SDK would simply translate calls to this HTTP API),
+  and allows third-party implementations of the Actor runtime back-end
+  (all existing SDKs would work against any conforming back-end).
 - Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
 - Clearly separate what is the part of the standard and what is up to the discretion of the implementations.
 
