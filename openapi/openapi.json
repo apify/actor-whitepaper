@@ -1,0 +1,1617 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Actor Runtime API",
+    "description": "The Actor Runtime API defines the HTTP REST interface between a running Actor (front-end SDK) and the Actor runtime system (back-end). This API enables thin, language-agnostic SDKs to be auto-generated for any programming language, and allows third-party implementations of the Actor runtime back-end.\n\nThe API base URL is provided to the Actor via the `ACTOR_API_BASE_URL` environment variable. Authentication is performed using a Bearer token passed in the `Authorization` header, with the token value from the `APIFY_TOKEN` environment variable.\n\nFor the full Actor specification, see the [Actor Programming Model Whitepaper](https://github.com/apify/actor-whitepaper).",
+    "version": "1.0.0",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "{baseUrl}",
+      "description": "Actor Runtime API base URL, provided via ACTOR_API_BASE_URL environment variable",
+      "variables": {
+        "baseUrl": {
+          "default": "https://api.apify.com/v2",
+          "description": "The base URL of the Actor Runtime API"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "apiTokenQuery": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Actor Runs",
+      "description": "Manage Actor runs — get status, update status message, abort, reboot, metamorph, and charge users. Run IDs are globally unique, so the actorId is not needed in the path."
+    },
+    {
+      "name": "Start Actor",
+      "description": "Start a new Actor run. Requires the Actor ID to identify which Actor to start."
+    },
+    {
+      "name": "Key-Value Stores",
+      "description": "Read, write, and delete records in key-value stores. Key-value stores hold arbitrary files (binary or JSON) identified by string keys. Each Actor run has a default key-value store that contains the Actor's input."
+    },
+    {
+      "name": "Datasets",
+      "description": "Append and read items from datasets. Datasets are append-only storage for structured JSON objects. Each Actor run has a default dataset for storing results."
+    }
+  ],
+  "paths": {
+    "/actor-runs/{runId}": {
+      "get": {
+        "tags": [
+          "Actor Runs"
+        ],
+        "operationId": "getActorRun",
+        "summary": "Get Actor run",
+        "description": "Returns details of an Actor run, including its status, default storage IDs, options, and timing information.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/runId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Actor run details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ActorRun"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Actor Runs"
+        ],
+        "operationId": "updateActorRun",
+        "summary": "Update Actor run",
+        "description": "Updates properties of an Actor run. Use this to set the status message (to inform users about progress) or to signal that the Actor is exiting with a specific status and message.\n\nWhen setting `status` to `SUCCEEDED` or `FAILED`, the runtime records the terminal state. The actual container termination is triggered by the process exiting — this API call sets the metadata before exit.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/runId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "statusMessage": {
+                    "type": "string",
+                    "description": "Human-readable message about the Actor's current state or final result.",
+                    "examples": [
+                      "Crawled 45 of 100 pages"
+                    ]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "READY",
+                      "RUNNING",
+                      "SUCCEEDED",
+                      "FAILED",
+                      "TIMING-OUT",
+                      "TIMED-OUT",
+                      "ABORTING",
+                      "ABORTED"
+                    ],
+                    "description": "The new status of the Actor run. Typically only `SUCCEEDED` or `FAILED` are set by the Actor itself."
+                  },
+                  "exitCode": {
+                    "type": "integer",
+                    "description": "The process exit code. 0 indicates success, non-zero indicates failure.",
+                    "examples": [
+                      0,
+                      1
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated Actor run details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ActorRun"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/actor-runs/{runId}/abort": {
+      "post": {
+        "tags": [
+          "Actor Runs"
+        ],
+        "operationId": "abortActorRun",
+        "summary": "Abort Actor run",
+        "description": "Aborts an Actor run. The run's status changes to `ABORTING` and then `ABORTED`. The system sends the `aborting` system event to the Actor before terminating it, giving it a chance to perform cleanup.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/runId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "gracefully": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, the Actor is given time to handle the `aborting` event before being terminated."
+                  },
+                  "statusMessage": {
+                    "type": "string",
+                    "description": "Optional message to set on the run before aborting."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The aborted Actor run",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ActorRun"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/actor-runs/{runId}/reboot": {
+      "post": {
+        "tags": [
+          "Actor Runs"
+        ],
+        "operationId": "rebootActorRun",
+        "summary": "Reboot Actor run",
+        "description": "Reboots the Actor's Docker container. This is a controlled restart — unlike a crash, the system will not count this against the Actor's crash limit. The Actor should persist its state to storage before calling this endpoint, and restore it after the reboot.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/runId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Actor run being rebooted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ActorRun"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/actor-runs/{runId}/metamorph": {
+      "post": {
+        "tags": [
+          "Actor Runs"
+        ],
+        "operationId": "metamorphActorRun",
+        "summary": "Metamorph Actor run",
+        "description": "Replaces the running Actor's Docker image with another Actor, similarly to the UNIX `exec` command. The target Actor inherits the default storages of the calling Actor. The target Actor's input is stored in the default key-value store under a new key (e.g., `INPUT-2`), communicated via the `ACTOR_INPUT_KEY` environment variable.\n\nThe target Actor must have a compatible output schema with the calling Actor.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/runId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetamorphRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The Actor run after metamorph was initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ActorRun"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/actor-runs/{runId}/charge": {
+      "post": {
+        "tags": [
+          "Actor Runs"
+        ],
+        "operationId": "chargeActorRun",
+        "summary": "Charge for Actor run usage",
+        "description": "Charges the user a specified amount for the Actor run. The charge is based on an event name and count. The total charge across all calls must not exceed the `maxTotalChargeUsd` limit set by the user when starting the run (available via the `ACTOR_MAX_TOTAL_CHARGE_USD` environment variable).\n\nIf the charge would exceed the limit, the endpoint returns an error. Actors must charge users only **after** incurring costs, not before.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/runId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChargeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Charge result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ChargeResult"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "402": {
+            "description": "Charge would exceed the user's `maxTotalChargeUsd` limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/actor-runs/{runId}/webhooks": {
+      "post": {
+        "tags": [
+          "Actor Runs"
+        ],
+        "operationId": "addActorRunWebhook",
+        "summary": "Attach webhook to Actor run",
+        "description": "Attaches a webhook to an Actor run. The webhook will be triggered when the specified events occur (e.g., run succeeds or fails). The webhook can call an external HTTP endpoint or start another Actor.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/runId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Webhook created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Webhook"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/actor-runs/{runId}/memory": {
+      "get": {
+        "tags": [
+          "Actor Runs"
+        ],
+        "operationId": "getActorRunMemory",
+        "summary": "Get memory information",
+        "description": "Returns information about total and available memory for the Actor run's container. Useful for auto-scaling workloads or deciding whether to add more work.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/runId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Memory information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/MemoryInfo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/actors/{actorId}/runs": {
+      "post": {
+        "tags": [
+          "Start Actor"
+        ],
+        "operationId": "startActorRun",
+        "summary": "Start Actor",
+        "description": "Starts execution of a specified Actor with the given input and configuration. Returns the newly created Actor run object.\n\nThe `actorId` can be either the Actor's unique ID or its full name in the format `owner/actor-name`.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/actorId"
+          }
+        ],
+        "requestBody": {
+          "description": "Actor run configuration and input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunStartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Actor run created and started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ActorRun"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/key-value-stores": {
+      "post": {
+        "tags": [
+          "Key-Value Stores"
+        ],
+        "operationId": "getOrCreateKeyValueStore",
+        "summary": "Get or create key-value store",
+        "description": "Gets an existing key-value store by name, or creates a new one if it doesn't exist. This supports the `Actor.openKeyValueStore('name')` SDK method.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the key-value store to get or create",
+                    "examples": [
+                      "my-screenshots"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Existing key-value store found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/KeyValueStore"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New key-value store created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/KeyValueStore"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/key-value-stores/{storeId}": {
+      "get": {
+        "tags": [
+          "Key-Value Stores"
+        ],
+        "operationId": "getKeyValueStore",
+        "summary": "Get key-value store",
+        "description": "Returns information about the specified key-value store.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/storeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Key-value store details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/KeyValueStore"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/key-value-stores/{storeId}/records": {
+      "get": {
+        "tags": [
+          "Key-Value Stores"
+        ],
+        "operationId": "listKeyValueStoreKeys",
+        "summary": "List keys",
+        "description": "Lists keys in the key-value store, with optional prefix filtering and pagination.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/storeId"
+          },
+          {
+            "name": "exclusiveStartKey",
+            "in": "query",
+            "description": "All returned keys will be greater than this key. Used for cursor-based pagination.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of keys to return.",
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "minimum": 1,
+              "maximum": 1000
+            }
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "description": "Only return keys with this prefix.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/KeyValueListResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/key-value-stores/{storeId}/records/{key}": {
+      "get": {
+        "tags": [
+          "Key-Value Stores"
+        ],
+        "operationId": "getKeyValueStoreRecord",
+        "summary": "Get record",
+        "description": "Returns the value of a record identified by its key. The response `Content-Type` header indicates the MIME type of the record (e.g., `application/json`, `image/png`).\n\nThis endpoint is also used to retrieve the Actor's input, by reading from the default key-value store with the key specified in the `ACTOR_INPUT_KEY` environment variable (usually `INPUT`).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/storeId"
+          },
+          {
+            "$ref": "#/components/parameters/recordKey"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record value. The Content-Type header indicates the MIME type of the data.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Key-Value Stores"
+        ],
+        "operationId": "setKeyValueStoreRecord",
+        "summary": "Set record",
+        "description": "Sets or overwrites a record in the key-value store. The `Content-Type` header of the request determines how the record is stored.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/storeId"
+          },
+          {
+            "$ref": "#/components/parameters/recordKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "The record value. Set the Content-Type header to match the data format (e.g., `application/json` for JSON, `image/png` for PNG images).",
+          "content": {
+            "application/json": {
+              "schema": {}
+            },
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "*/*": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Record created or updated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Key-Value Stores"
+        ],
+        "operationId": "deleteKeyValueStoreRecord",
+        "summary": "Delete record",
+        "description": "Deletes a record from the key-value store.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/storeId"
+          },
+          {
+            "$ref": "#/components/parameters/recordKey"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Record deleted"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/datasets": {
+      "post": {
+        "tags": [
+          "Datasets"
+        ],
+        "operationId": "getOrCreateDataset",
+        "summary": "Get or create dataset",
+        "description": "Gets an existing dataset by name, or creates a new one if it doesn't exist. This supports the `Actor.openDataset('name')` SDK method.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the dataset to get or create",
+                    "examples": [
+                      "poll-results-2024"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Existing dataset found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Dataset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New dataset created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Dataset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/datasets/{datasetId}": {
+      "get": {
+        "tags": [
+          "Datasets"
+        ],
+        "operationId": "getDataset",
+        "summary": "Get dataset",
+        "description": "Returns information about the specified dataset, including its name, item count, and creation time.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/datasetId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dataset details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Dataset"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/datasets/{datasetId}/items": {
+      "get": {
+        "tags": [
+          "Datasets"
+        ],
+        "operationId": "getDatasetItems",
+        "summary": "Get dataset items",
+        "description": "Returns items from the dataset. Supports pagination, field selection, and multiple output formats.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/datasetId"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of items to skip from the beginning.",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of items to return.",
+            "schema": {
+              "type": "integer",
+              "default": 100,
+              "minimum": 1,
+              "maximum": 1000
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Comma-separated list of fields to include in the results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "omit",
+            "in": "query",
+            "description": "Comma-separated list of fields to omit from the results.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Output format for the data.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "csv",
+                "xlsx",
+                "xml",
+                "rss",
+                "html"
+              ],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dataset items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          },
+                          "description": "Array of dataset items"
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of items in the dataset"
+                        },
+                        "offset": {
+                          "type": "integer",
+                          "description": "Number of items skipped"
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "description": "Maximum number of items returned"
+                        },
+                        "count": {
+                          "type": "integer",
+                          "description": "Number of items returned in this response"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Datasets"
+        ],
+        "operationId": "pushDatasetItems",
+        "summary": "Push items to dataset",
+        "description": "Appends one or more items to the dataset. Items are JSON objects. You can push a single object or an array of objects.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/datasetId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "A single item to push"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "description": "An array of items to push"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Items pushed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Bearer token authentication. The token is provided via the `APIFY_TOKEN` environment variable."
+      },
+      "apiTokenQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "token",
+        "description": "API token passed as a query parameter. Alternative to Bearer token authentication."
+      }
+    },
+    "parameters": {
+      "runId": {
+        "name": "runId",
+        "in": "path",
+        "required": true,
+        "description": "The globally unique ID of the Actor run. Available via the `ACTOR_RUN_ID` environment variable.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "actorId": {
+        "name": "actorId",
+        "in": "path",
+        "required": true,
+        "description": "The Actor's unique ID or full name in the format `owner/actor-name`.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "storeId": {
+        "name": "storeId",
+        "in": "path",
+        "required": true,
+        "description": "The unique ID of the key-value store. The default store ID is available via the `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` environment variable.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "recordKey": {
+        "name": "key",
+        "in": "path",
+        "required": true,
+        "description": "The key of the record. For Actor input, use the value from the `ACTOR_INPUT_KEY` environment variable (usually `INPUT`).",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "datasetId": {
+        "name": "datasetId",
+        "in": "path",
+        "required": true,
+        "description": "The unique ID of the dataset. The default dataset ID is available via the `ACTOR_DEFAULT_DATASET_ID` environment variable.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "schemas": {
+      "ActorRun": {
+        "type": "object",
+        "description": "Represents an Actor run with its status, configuration, and associated resources.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Globally unique identifier of the Actor run."
+          },
+          "actorId": {
+            "type": "string",
+            "description": "ID of the Actor that is running."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "READY",
+              "RUNNING",
+              "SUCCEEDED",
+              "FAILED",
+              "TIMING-OUT",
+              "TIMED-OUT",
+              "ABORTING",
+              "ABORTED"
+            ],
+            "description": "Current status of the Actor run."
+          },
+          "statusMessage": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Human-readable message about the current state of the run."
+          },
+          "exitCode": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Process exit code, set when the run finishes."
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the run started."
+          },
+          "finishedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the run finished, or null if still running."
+          },
+          "timeoutAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the run will time out."
+          },
+          "buildId": {
+            "type": "string",
+            "description": "ID of the Actor build used for this run."
+          },
+          "buildNumber": {
+            "type": "string",
+            "description": "Version string of the Actor build."
+          },
+          "defaultKeyValueStoreId": {
+            "type": "string",
+            "description": "ID of the default key-value store for this run."
+          },
+          "defaultDatasetId": {
+            "type": "string",
+            "description": "ID of the default dataset for this run."
+          },
+          "defaultRequestQueueId": {
+            "type": "string",
+            "description": "ID of the default request queue for this run."
+          },
+          "memoryMbytes": {
+            "type": "integer",
+            "description": "Memory allocated for the run, in megabytes."
+          },
+          "options": {
+            "type": "object",
+            "description": "Run configuration options.",
+            "properties": {
+              "build": {
+                "type": "string",
+                "description": "Build tag or number used."
+              },
+              "timeoutSecs": {
+                "type": "integer",
+                "description": "Run timeout in seconds."
+              },
+              "memoryMbytes": {
+                "type": "integer",
+                "description": "Requested memory in megabytes."
+              },
+              "maxTotalChargeUsd": {
+                "type": "number",
+                "description": "Maximum amount in USD the Actor can charge the user."
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "actorId",
+          "status",
+          "startedAt",
+          "defaultKeyValueStoreId",
+          "defaultDatasetId"
+        ]
+      },
+      "MetamorphRequest": {
+        "type": "object",
+        "required": [
+          "targetActorId"
+        ],
+        "properties": {
+          "targetActorId": {
+            "type": "string",
+            "description": "ID or full name of the Actor to metamorph into."
+          },
+          "input": {
+            "description": "Input for the target Actor. Stored in the default key-value store under a new input key.",
+            "type": "object",
+            "additionalProperties": true
+          },
+          "build": {
+            "type": "string",
+            "description": "Build tag or number to use for the target Actor."
+          }
+        }
+      },
+      "ChargeRequest": {
+        "type": "object",
+        "required": [
+          "eventName",
+          "count"
+        ],
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "description": "Name of the billing event (e.g., 'gpt-4o-token', 'result').",
+            "examples": [
+              "gpt-4o-token"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of events to charge for.",
+            "examples": [
+              1000
+            ]
+          }
+        }
+      },
+      "ChargeResult": {
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "description": "Name of the billing event."
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of events charged."
+          },
+          "totalChargeUsd": {
+            "type": "number",
+            "description": "Total amount charged so far in USD for this run."
+          }
+        }
+      },
+      "RunStartRequest": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "description": "Input for the Actor, stored in the default key-value store.",
+            "type": "object",
+            "additionalProperties": true
+          },
+          "memory": {
+            "type": "integer",
+            "description": "Memory allocation for the run in megabytes.",
+            "examples": [
+              2048
+            ]
+          },
+          "build": {
+            "type": "string",
+            "description": "Build tag or version to run (e.g., 'latest', 'beta', '1.0.0').",
+            "examples": [
+              "latest"
+            ]
+          },
+          "timeoutSecs": {
+            "type": "integer",
+            "description": "Run timeout in seconds."
+          },
+          "maxTotalChargeUsd": {
+            "type": "number",
+            "description": "Maximum amount in USD the Actor can charge the user. Default is 0, meaning the Actor cannot charge.",
+            "default": 0,
+            "examples": [
+              5.0
+            ]
+          },
+          "webhooks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebhookCreateRequest"
+            },
+            "description": "Webhooks to attach to the run."
+          }
+        }
+      },
+      "WebhookCreateRequest": {
+        "type": "object",
+        "required": [
+          "eventTypes",
+          "requestUrl"
+        ],
+        "properties": {
+          "eventTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ACTOR.RUN.CREATED",
+                "ACTOR.RUN.SUCCEEDED",
+                "ACTOR.RUN.FAILED",
+                "ACTOR.RUN.TIMED_OUT",
+                "ACTOR.RUN.ABORTED"
+              ]
+            },
+            "description": "Event types that trigger the webhook."
+          },
+          "requestUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to send the webhook HTTP POST request to."
+          },
+          "payloadTemplate": {
+            "type": "string",
+            "description": "Custom JSON payload template with variable substitution using `{{variable}}` syntax. Available variables: `userId`, `createdAt`, `eventType`, `eventData`, `resource`."
+          }
+        }
+      },
+      "Webhook": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the webhook."
+          },
+          "eventTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Event types that trigger the webhook."
+          },
+          "requestUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL that receives the webhook POST request."
+          },
+          "payloadTemplate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Custom payload template, or null for default payload."
+          }
+        }
+      },
+      "MemoryInfo": {
+        "type": "object",
+        "description": "Information about the Actor run's memory usage.",
+        "properties": {
+          "totalBytes": {
+            "type": "integer",
+            "description": "Total memory available to the container in bytes."
+          },
+          "freeBytes": {
+            "type": "integer",
+            "description": "Free memory available in bytes."
+          },
+          "usedBytes": {
+            "type": "integer",
+            "description": "Memory currently in use in bytes."
+          },
+          "mainProcessBytes": {
+            "type": "integer",
+            "description": "Memory used by the main Actor process in bytes."
+          },
+          "childProcessesBytes": {
+            "type": "integer",
+            "description": "Total memory used by child processes in bytes."
+          }
+        }
+      },
+      "KeyValueStore": {
+        "type": "object",
+        "description": "Represents a key-value store.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the key-value store."
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name of the key-value store, or null for unnamed stores."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the store was created."
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of last modification."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "KeyValueListResponse": {
+        "type": "object",
+        "description": "Paginated list of keys in a key-value store.",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "The record key."
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "Size of the record value in bytes."
+                },
+                "contentType": {
+                  "type": "string",
+                  "description": "MIME type of the record."
+                }
+              },
+              "required": [
+                "key",
+                "size"
+              ]
+            }
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of keys returned in this response."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of keys requested."
+          },
+          "isTruncated": {
+            "type": "boolean",
+            "description": "Whether there are more keys beyond this page."
+          },
+          "exclusiveStartKey": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The last key in this page. Use as `exclusiveStartKey` parameter for the next page."
+          }
+        }
+      },
+      "Dataset": {
+        "type": "object",
+        "description": "Represents a dataset.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the dataset."
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name of the dataset, or null for unnamed datasets."
+          },
+          "itemCount": {
+            "type": "integer",
+            "description": "Number of items in the dataset."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of when the dataset was created."
+          },
+          "modifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of last modification."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error response.",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Machine-readable error type.",
+                "examples": [
+                  "record-not-found",
+                  "charge-limit-exceeded"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "description": "Human-readable error message.",
+                "examples": [
+                  "Actor run with ID 'abc123' was not found"
+                ]
+              }
+            },
+            "required": [
+              "type",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    },
+    "responses": {
+      "NotFound": {
+        "description": "The requested resource was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Invalid request parameters or body",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  }
+}

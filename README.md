@@ -149,7 +149,7 @@ systems on top of simple ones.
 
 ![Apify Actor diagram](./img/apify-actor-drawing.png)
 
-<!-- Image sources: 
+<!-- Image sources:
   https://docs.google.com/presentation/d/1nDgrI0p2r8ouP_t_Wn02aTllP8_Std-kRuIbO8QLE7M/edit
   https://www.figma.com/design/6vbmKvB6oY3b3mTN0oAscE/Actor-Whitepaper-Diagrams-and-Presentations?node-id=0-1&p=f&t=JwAJfru2GjdQBpBV-11
 -->
@@ -577,7 +577,7 @@ The Apify CLI provides two commands: `apify` and `actor`.
 push deployment of an Actor to cloud, or access storages. For details, see [Local development](#local-development).
 
 `actor` command is to be used from within an Actor in the runtime, to implement the Actors functionality in a shell script.
-   For details, see [Actorizing existing code](#actorizing-existing-code).
+For details, see [Actorizing existing code](#actorizing-existing-code).
 
 To get help for a specific command, run:
 
@@ -746,18 +746,18 @@ int main (int argc, char *argv[]) {}
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+GET {ACTOR_API_BASE_URL}/key-value-stores/{ACTOR_DEFAULT_KEY_VALUE_STORE_ID}/records/{ACTOR_INPUT_KEY}
+Authorization: Bearer {APIFY_TOKEN}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
-### Key-value store access
-
-<!-- ASTRO:
-<Illustration
-    description="Write and read arbitrary files using a storage called Key-value store. When an Actor starts, by default it is associated with a newly-created key-value store, which only contains one file with input of the Actor."
-    position="right"
-    image={illuAPIKeyValueStoreAccess}
-    noCaption
-/>
--->
 
 Write and read arbitrary files using a storage
 called [Key-value store](https://sdk.apify.com/docs/api/key-value-store).
@@ -820,506 +820,7 @@ $ cat file.txt
 
 <!-- ASTRO:
 <Illustration
-    description="Larger results can be saved to append-only object storage called Dataset. When an Actor starts, by default it is associated with a newly-created empty default dataset. The Actor can create additional datasets or access existing datasets created by other Actors, and use those as needed."
-    position="right"
-    image={illuAPIPush}
-    noCaption
-/>
--->
-
-Larger results can be saved to append-only object storage called [Dataset](https://sdk.apify.com/docs/api/dataset).
-When an Actor starts, by default it is associated with a newly-created empty default dataset.
-The Actor can create additional datasets or access existing datasets created by other Actors,
-and use those as needed.
-
-Note that datasets can optionally be equipped with schema that ensures only certain kinds
-of objects are stored in them. See [Dataset schema file](./pages/DATASET_SCHEMA.md) for more details.
-
-<div class="clear-both" />
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-// Append result object to the default dataset associated with the run
-await Actor.pushData({
-    someResult: 123,
-});
-
-// Append result object to a specific named dataset
-const dataset = await Actor.openDataset('bob/poll-results-2019');
-await dataset.pushData({ someResult: 123 });
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="Python"> -->
-
-#### Python
-
-```python
-# Append result object to the default dataset associated with the run
-await Actor.push_data({ 'some_result': 123 })
-
-# Append result object to a specific named dataset
-dataset = await Actor.open_dataset('bob/poll-results-2019')
-await dataset.push_data({ 'some_result': 123 })
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-
-```bash
-# Push data to default dataset, in JSON format
-$ echo '{ "someResult": 123 }' | actor push-data --json
-$ actor push-data --json='{ "someResult": 123 }'
-$ actor push-data --json=@result.json
-
-# Push data to default dataset, in text format
-$ echo "someResult=123" | actor push-data
-$ actor push-data someResult=123
-
-# Push to a specific dataset in the cloud
-$ actor push-data --dataset=bob/election-data someResult=123
-
-# Push to dataset on local system
-$ actor push-data --dataset=./my_dataset someResult=123
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
-
-#### UNIX equivalent
-
-```c
-printf("Hello world\tColum 2\tColumn 3");
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### Exit Actor
-
-When the main Actor process exits and the Docker container stops running,
-the Actor run is considered finished and the process exit code is used to determine
-whether the Actor has succeeded (exit code `0` leads to status `SUCCEEDED`)
-or failed (exit code not equal to `0` leads to status `FAILED`).
-
-In the event of a non-zero exit code, the system automatically sets the Actor [status message](#actor-status)
-to something like `Actor exited with code 0`, and it might attempt
-to restart the Actor to recover from the error, depending on the system and Actor configuration.
-
-A preferred way to exit an Actor intentionally is using the `exit` or `fail` functions in SDK, as
-shown below. This has several advantages:
-
-- You can provide a custom status message for users to tell them what the Actor achieved,
-  or why it failed and how they can fix it. This greatly improves user experience.
-- When using `fail` to fail the Actor, the system considers the error permanent  and will not attempt to restart the Actor.
-- The SDK emits the `exit` event, which can be listened to and used by various
-  components of the Actor to perform a cleanup, persist state, etc.
-  Note that the caller of exit can specify how long should the system wait for all `exit`
-  event handlers to complete before closing the process, using the `timeoutSecs` option.
-  For details, see [System Events](#system-events).
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-// Actor will finish with 'SUCCEEDED' status
-await Actor.exit('Succeeded, crawled 50 pages');
-
-// Exit right away without calling `exit` handlers at all
-await Actor.exit('Done right now', { timeoutSecs: 0 });
-
-// Actor will finish with 'FAILED' status 
-await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 });
-
-// ... or nicer way using this syntactic sugar:
-await Actor.fail('Could not finish the crawl, try increasing memory');
-
-// Register a handler to be called on exit.
-// Note that the handler has `timeoutSecs` to finish its job
-Actor.on('exit', ({ statusMessage, exitCode, timeoutSecs }) => {
-    // Perform cleanup...
-})
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="Python"> -->
-
-#### Python
-
-```python
-# Actor will finish in 'SUCCEEDED' state
-await Actor.exit('Generated 14 screenshots')
-
-# Actor will finish in 'FAILED' state
-await Actor.exit('Could not finish the crawl, try increasing memory', exit_code=1)
-# ... or nicer way using this syntactic sugar:
-await Actor.fail('Could not finish the crawl, try increasing memory');
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-
-```bash
-# Actor will finish in 'SUCCEEDED' state
-$ actor exit
-$ actor exit --message "Email sent"
-
-# Actor will finish in 'FAILED' state
-$ actor exit --code=1 --message "Couldn't fetch the URL"
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
-
-#### UNIX equivalent
-
-```c
-exit(1);
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### Environment variables
-
-Actors have access to standard process environment variables.
-The Apify platform uses environment variables prefixed with `ACTOR_` to pass information to Actors 
-about the execution context.
-
-| Environment variable               | Description                                                                                                                                                                                                                |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ACTOR_ID`                         | ID of the Actor.                                                                                                                                                                                                           |
-| `ACTOR_FULL_NAME`                  | Full technical name of the Actor, in the format `owner-username/actor-name`.                                                                                                                                               |
-| `ACTOR_RUN_ID`                     | ID of the Actor run.                                                                                                                                                                                                       |
-| `ACTOR_BUILD_ID`                   | ID of the Actor build.                                                                                                                                                                                                     |
-| `ACTOR_BUILD_NUMBER`               | A string representing the version of the current Actor build.                                                                                                                                                              |
-| `ACTOR_BUILD_TAGS`                 | A comma-separated list of tags of the Actor build used in the run. Note that this environment variable is assigned at the time of start of the Actor and doesn't change over time, even if the assigned build tags change. |
-| `ACTOR_TASK_ID`                    | ID of the saved Actor task.                                                                                                                                                                                                |
-| `ACTOR_DEFAULT_KEY_VALUE_STORE_ID` | ID of the key-value store where the Actor's input and output data are stored.                                                                                                                                              |
-| `ACTOR_DEFAULT_DATASET_ID`         | ID of the dataset where you can push the data.                                                                                                                                                                             |
-| `ACTOR_DEFAULT_REQUEST_QUEUE_ID`   | ID of the request queue that stores and handles requests that you enqueue.                                                                                                                                                 |
-| `ACTOR_INPUT_KEY`                  | The key of the record in the default key-value store that holds the Actor input. Typically it's `INPUT`, but it might be something else.                                                                                   |
-| `ACTOR_MEMORY_MBYTES`              | Indicates the size of memory allocated for the Actor run, in megabytes (1,000,000 bytes). It can be used by Actors to optimize their memory usage.                                                                         |
-| `ACTOR_STARTED_AT`                 | Date when the Actor was started, in ISO 8601 format. For example, `2022-01-02T03:04:05.678`.                                                                                                                               |
-| `ACTOR_TIMEOUT_AT`                 | Date when the Actor will time out, in ISO 8601 format.                                                                                                                                                                     |
-| `ACTOR_EVENTS_WEBSOCKET_URL`       | Websocket URL where Actor may listen for events from Actor platform. See [System events](#system-events) for details.                                                                                                      |
-| `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world, either as [Actor web server](#actor-web-server) or in the [Standby mode](#standby-mode).                           |
-| `ACTOR_WEB_SERVER_URL`             | A unique hard-to-guess URL under which the current Actor run's web server is accessible from the outside world. See [Actor web server](#actor-web-server) section for details.                                     |
-| `ACTOR_STANDBY_URL`                | A general public URL under which the Actor can be started and its web server accessed in the [Standby mode](#standby-mode).                                                                                                |
-| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                                                                 |
-| `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                                                                        |
-
-The Actor developer can also define custom environment variables
-that are then passed to the Actor process both in the local development environment or on the Apify platform.
-These variables are defined in the [Actor file](#actor-file) at `.actor/actor.json` using the `environmentVariables` directive,
-or manually in the user interface in Apify Console.
-
-The environment variables can be set as secure in order to protect sensitive data such as API keys or passwords.
-The value of a secure environment variable is encrypted and can only be retrieved by the Actors during their run,
-but not outside runs. Furthermore, values of secure environment variables are omitted from the log.
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-For convenience, rather than using environment vars directly, we provide a `Configuration` class
-that allows reading and updating the Actor configuration.
-
-```javascript
-const token = Actor.config.get('token');
-
-// use different token
-Actor.config.set('token', 's0m3n3wt0k3n')
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-
-```bash
-$ echo "$ACTOR_RUN_ID started at $ACTOR_STARTED_AT"
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
-
-#### UNIX equivalent
-
-```bash
-$ echo $ACTOR_RUN_ID
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### Actor status
-
-Each Actor run has a status (the `status` field), which indicates its stage in the Actor's lifecycle.
-The status can be one of the following values:
-
-<div class="clear-both" />
-
-|Status|Type| Description                                 |
-|--- |--- |---------------------------------------------|
-|`READY`|initial| Started but not allocated to any worker yet |
-|`RUNNING`|transitional| Executing on a worker                       |
-|`SUCCEEDED`|terminal| Finished successfully                       |
-|`FAILED`|terminal| Run failed                                  |
-|`TIMING-OUT`|transitional| Timing out now                              |
-|`TIMED-OUT`|terminal| Timed out                                   |
-|`ABORTING`|transitional| Being aborted by a user or system           |
-|`ABORTED`|terminal| Aborted by a user or system                 |
-
-Additionally, the Actor run has a status message (the `statusMessage` field),
-which contains text for users informing them what the Actor is currently doing,
-and thus greatly improving their user experience.
-
-When an Actor exits, the status message is either automatically set to some default text
-(e.g. "Actor finished with exit code 1"), or to a custom message - see [Exit Actor](#exit-actor) for details.
-
-When the Actor is running, it should periodically update the status message as follows,
-to keep users informed and happy. The function can be called as often as necessary,
-the SDK only invokes API if status changed. This is to simplify usage.
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-await Actor.setStatusMessage('Crawled 45 of 100 pages');
-
-// Setting status message to other Actor externally is also possible
-await Actor.setStatusMessage('Everyone is well', { actorRunId: 123 });
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="Python"> -->
-
-#### Python
-
-```python
-await Actor.set_status_message('Crawled 45 of 100 pages')
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-
-```bash
-$ actor set-status-message "Crawled 45 of 100 pages"
-$ actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
-```
-
-Convention: The end user of an Actor should never need to look into the log to understand what happened,
-e.g. why the Actor failed. All necessary information must be set by the Actor in the status message.
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### System events
-
-Actors are notified by the system about various events such as a migration to another server,
-[abort operation](#abort-another-actor) triggered by another Actor, or the CPU being overloaded.
-
-Currently, the system sends the following events:
-
-| Event name     | Payload | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| -------------- | ------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `cpuInfo`      | `{ isCpuOverloaded: Boolean }` | The event is emitted approximately every second and it indicates whether the Actor is using the maximum of available CPU resources. If that’s the case, the Actor should not add more workload. For example, this event is used by the AutoscaledPool class.                                                                                                                                                                                                                                                                             |
-| `migrating`    | N/A | Emitted when the Actor running on the Apify platform is going to be migrated to another worker server soon. You can use it to persist the state of the Actor and abort the run, to speed up migration. See [Migration to another server](#migration-to-another-server).                                                                                                                                                                                                                                                                  |
-| `aborting`     | N/A | When a user aborts an Actor run on the Apify platform, they can choose to abort gracefully to allow the Actor some time before getting killed. This graceful abort emits the `aborting` event which the SDK uses to gracefully stop running crawls and you can use it to do your own cleanup as well.                                                                                                                                                                                                                                    |
-| `persistState` | `{ isMigrating: Boolean }` | Emitted in regular intervals (by default 60 seconds) to notify all components of Apify SDK that it is time to persist their state, in order to avoid repeating all work when the Actor restarts. This event is automatically emitted together with the migrating event, in which case the `isMigrating` flag is set to `true`. Otherwise the flag is `false`. Note that the `persistState` event is provided merely for user convenience, you can achieve the same effect using `setInterval()` and listening for the `migrating` event. |
-
-In the future, the event mechanism might be extended to custom events and messages enabling communication between
-Actors.
-
-Under the hood, Actors receive system events by connecting to a web socket address specified
-by the `ACTOR_EVENTS_WEBSOCKET_URL` environment variable.
-The system sends messages in JSON format in the following structure:
-
-```js
-{
-    // Event name
-    name: String,
-
-    // Time when the event was created, in ISO format
-    createdAt: String,
-          
-    // Optional object with payload      
-    data: Object,
-}
-```
-
-Note that some events (e.g. `persistState`) are not sent by the system via the web socket,
-but generated virtually on the Actor SDK level.
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-// Add event handler
-const handler = (data) => {
-  if (data.isCpuOverloaded) console.log('Oh no, we need to slow down!');
-}
-Actor.on('systemInfo', handler);
-
-// Remove all handlers for a specific event
-Actor.off('systemInfo');
-
-// Remove a specific event handler
-Actor.off('systemInfo', handler);
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="Python"> -->
-
-#### Python
-
-```python
-from apify import Actor, Event
-
-# Add event handler
-async def handler(data):
-  if data.cpu_info.is_overloaded:
-    print('Oh no, we need to slow down!')
-
-Actor.on(Event.SYSTEM_INFO, handler);
-
-# Remove all handlers for a specific event
-Actor.off(Event.SYSTEM_INFO);
-
-# Remove a specific event handler
-Actor.off(Event.SYSTEM_INFO, handler);
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
-
-#### UNIX equivalent
-
-```c
-signal(SIGINT, handle_sigint);
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### Get memory information
-
-Get information about the total and available memory of the Actor’s container or local system.
-This is useful to, for example, auto-scale a pool
-of workers used for crawling large websites.
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-const memoryInfo = await Actor.getMemoryInfo();
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
-
-#### UNIX equivalent
-
-```bash
-# Print memory usage of programs
-$ ps -a
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### Start another Actor
-
-<!-- ASTRO:
-<Illustration
-    description="Actor can start other Actors, if they have permission. It can override the default dataset or key-value store, and e.g. forwarding the data to another named dataset, that will be consumed by the other Actor."
-    position="content"
-    image={illuAPIStartAnother}
-    noCaption
-/>
--->
-
-Actor can start other Actors, if they have permission.
-
-The Actor can override the default dataset or key-value store,
-and, e.g. forward the data to another named dataset that will be consumed by the other Actor.
-
-The `call` operation waits for the other Actor to finish, the `start` operation
-returns immediately.
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-// Start Actor and return a Run object
-const run = await Actor.start(
-    'apify/google-search-scraper', // name of the Actor to start
-    { queries: 'test' }, // input of the Actor
-    { memory: 2048 }, // run configuration
-);
-
-// Start Actor and wait for it to finish
-const run2 = await Actor.call(
-  'apify/google-search-scraper', 
-  { queries: 'test' },
-  { memory: 2048 },
-);
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-
-```bash
-# On stdout, the commands emit Actor run object (in text or JSON format),
-# we shouldn't wait for finish, for that it should be e.g. "execute"
-$ apify call apify/google-search-scraper queries='test\ntest2' \
-  countryCode='US'
-$ apify call --json apify/google-search-scraper '{ "queries": }'
-$ apify call --input=@data.json --json apify/google-search-scraper
-$ apify call --memory=1024 --build=beta apify/google-search-scraper
-$ apify call --output-record-key=SCREENSHOT apify/google-search-scraper
-
-# Pass input from stdin
-$ cat input.json | actor call apify/google-search-scraper --json
-
-# Call local actor during development
-$ apify call file:../some-dir someInput='xxx'
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="Slack"> -->
-
-#### Slack
-
-It will also be possible to run Actors from the Slack app.
-The following command starts the Actor, and then prints the messages to a Slack channel.
-
-```
-/apify start bob/google-search-scraper startUrl=afff
+$ cat file.txt
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1327,931 +828,364 @@ The following command starts the Actor, and then prints the messages to a Slack 
 
 #### API
 
-```
-[POST] https://api.apify.com/v2/actors/apify~google-search-scraper/run
+```http
+# Get a record
+GET {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
+Authorization: Bearer {APIFY_TOKEN}
 
-[POST|GET] https://api.apify.com/v2/actors/apify~google-search-scraper/run-sync?
-  token=rWLaYmvZeK55uatRrZib4xbZs&
-  outputRecordKey=OUTPUT
-  returnDataset=true
-```
+# Set a record (with Content-Type matching the data format)
+PUT {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+{ "something": 123 }
 
-#### UNIX equivalent
+# Delete a record
+DELETE {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records/{key}
+Authorization: Bearer {APIFY_TOKEN}
 
-```bash
-# Run a program in the background
-$ command <arg1>, <arg2>, … &
-```
+# List keys in a store
+GET {ACTOR_API_BASE_URL}/key-value-stores/{storeId}/records?limit=100&prefix=screenshots
+Authorization: Bearer {APIFY_TOKEN}
 
-```c
-// Spawn another process
-posix_spawn();
-```
+# Get or create a named key-value store
+POST {ACTOR_API_BASE_URL}/key-value-stores
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### Metamorph
-
-<!-- ASTRO:
-<Illustration
-    description="Metamorph is the most magical Actor operation. It replaces running Actor’s Docker image with another Actor, similarly to UNIX `exec` command. It is used for building new Actors on top of existing ones. You simply define input schema and write README for a specific use case, and then delegate the work to another Actor."
-    position="content"
-    image={illuAPIMetamorph}
-    noCaption
-/>
--->
-
-This is the most magical Actor operation. It replaces a running Actor’s Docker image with another Actor,
-similarly to UNIX `exec` command.
-It is used for building new Actors on top of existing ones.
-You simply define the input schema and write README for a specific use case,
-and then delegate the work to another Actor.
-
-The target Actor inherits the default storages used by the calling Actor.
-The target Actor input is stored to the default key-value store,
-under a key such as `INPUT-2` (the actual key is passed via the `ACTOR_INPUT_KEY` [environment variable](#environment-variables)).
-Internally, the target Actor can recursively metamorph into another Actor.
-
-An Actor can metamorph only to Actors that have compatible output schema as the main Actor,
-in order to ensure logical and consistent outcomes for users.
-If the output schema of the target Actor is not compatible, the system should throw an error.
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-await Actor.metamorph(
-    'bob/web-scraper',
-    { startUrls: [ "https://www.example.com" ] },
-    { memoryMbytes: 4096 },
-);
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-
-```bash
-$ actor metamorph bob/web-scraper startUrls=http://example.com
-$ actor metamorph --input=@input.json --json --memory=4096 \
-  bob/web-scraper
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
-
-#### UNIX equivalent
-
-```bash
-$ exec /bin/bash
+{ "name": "screenshots-store" }
 ```
 
 <!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
-### Attach webhook to an Actor run
 
-Run another Actor or an external HTTP API endpoint after an Actor run finishes or fails.
-
-<div class="clear-both" />
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-await Actor.addWebhook({
-    eventType: ['ACTOR.RUN.SUCCEEDED', 'ACTOR.RUN.FAILED'],
-    requestUrl: 'http://api.example.com?something=123',
-    payloadTemplate: `{
-        "userId": {{userId}},
-        "createdAt": {{createdAt}},
-        "eventType": {{eventType}},
-        "eventData": {{eventData}},
-        "resource": {{resource}}
-    }`,
-});
+Expand 79 hidden lines
+printf("Hello world\tColum 2\tColumn 3");
 ```
 
 <!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
-#### CLI
+#### API
 
-```bash
-$ actor add-webhook \\
-  --event-types=ACTOR.RUN.SUCCEEDED,ACTOR.RUN.FAILED \\
-  --request-url=https://api.example.com \\
-  --payload-template='{ "test": 123" }'
+```http
+# Push a single item to the default dataset
+POST {ACTOR_API_BASE_URL}/datasets/{ACTOR_DEFAULT_DATASET_ID}/items
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-$ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
-  --request-actor=apify/send-mail \\
-  --memory=4096 --build=beta \\
-  --payload-template=@template.json
+{ "someResult": 123 }
 
-# Or maybe have a simpler API for self-actor?
-$ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
-```
+# Push multiple items at once
+POST {ACTOR_API_BASE_URL}/datasets/{ACTOR_DEFAULT_DATASET_ID}/items
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+[{ "someResult": 123 }, { "someResult": 456 }]
 
-#### UNIX equivalent
+# Get or create a named dataset
+POST {ACTOR_API_BASE_URL}/datasets
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-```bash
-# Execute commands sequentially, based on their status
-$ command1; command2    # (command separator)
-$ command1 && command2  # ("andf" symbol)
-$ command1 || command2  # ("orf" symbol)
+{ "name": "bob/poll-results-2019" }
 ```
 
 <!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
-### Abort another Actor
 
-Abort itself or another Actor running on the Apify platform.
-Aborting an Actor changes its [status](#actor-status) to `ABORTED`.
-
-<div class="clear-both" />
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-await Actor.abort({ statusMessage: 'Your job is done, friend.', actorRunId: 'RUN_ID' });
+Expand 83 hidden lines
+exit(1);
 ```
 
 <!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
-#### CLI
+#### API
 
-```bash
-$ actor abort --run-id RUN_ID 
+```http
+# Signal successful exit with a status message
+PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "status": "SUCCEEDED", "statusMessage": "Email sent", "exitCode": 0 }
+
+# Signal failure with an error message
+PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "status": "FAILED", "statusMessage": "Couldn't fetch the URL", "exitCode": 1 }
 ```
 
+Note: This API call sets the exit metadata before the process exits.
+The actual container termination is triggered by the process exiting with the corresponding exit code.
+
 <!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="UNIX equivalent"> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
-#### UNIX equivalent
 
-```bash
-# Terminate a program
-$ kill <PID>
+Expand 25 hidden lines
+| `ACTOR_STANDBY_URL`                | A general public URL under which the Actor can be started and its web server accessed in the [Standby mode](#standby-mode).                                                                                                |
+| `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                                                                 |
+| `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                                                                        |
+| `ACTOR_API_BASE_URL`               | Base URL of the Actor Runtime API that the SDK uses to communicate with the runtime back-end (e.g. `https://api.apify.com/v2` on the Apify platform, or `http://localhost:3000` for local development). See [Actor Runtime API](./openapi/openapi.json) for the full OpenAPI specification. |
+
+The Actor developer can also define custom environment variables
+that are then passed to the Actor process both in the local development environment or on the Apify platform.
+
+Expand 103 hidden lines
+Convention: The end user of an Actor should never need to look into the log to understand what happened,
+e.g. why the Actor failed. All necessary information must be set by the Actor in the status message.
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+PUT {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "statusMessage": "Crawled 45 of 100 pages" }
 ```
 
 <!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
-### Reboot an Actor
 
-<!-- ASTRO:
-<Illustration
-    description="Sometimes, an Actor might get into some error state from which it's not safe or possible to recover, e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job, the Actor can reboot its own Docker container and continue work from its previously persisted state."
-    position="right"
-    image={illuAPIReboot}
-    noCaption
-/>
--->
-
-Sometimes, an Actor might get into some error state from which it's not safe or possible to recover,
-e.g. an assertion error or a web browser crash. Rather than crashing and potentially failing the user job,
-the Actor can reboot its own Docker container and continue work from its previously persisted state.
-
-Normally, if an Actor crashes, the system also restarts its container, but
-if that happens too often in a short period of time, the system
-might completely [abort](#actor-status) the Actor run.
-The reboot operation can be used by the Actor developer to indicate that
-this is a controlled operation, and not to be considered by the system as a crash.
-
-<div class="clear-both" />
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-await Actor.reboot();
+Expand 112 hidden lines
+$ ps -a
 ```
 
 <!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="Python"> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
-#### Python
+#### API
 
-```python
-await Actor.reboot()
+```http
+GET {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/memory
+Authorization: Bearer {APIFY_TOKEN}
 ```
 
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-
-```bash
-$ actor reboot 
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### Actor web server
-
-An Actor can launch an HTTP web server that is exposed to the outside world to handle requests.
-This enables Actors to provide a custom HTTP API to integrate with other systems,
-to provide a web application for human users, to show Actor run details, diagnostics, charts,
-or to run an arbitrary web app.
-
-The port on which the Actor can launch the web server
-is specified by the `ACTOR_WEB_SERVER_PORT` environment variable.
-
-Once the web server is started, it is exposed to the public internet on a **live view URL** identified
-by the `ACTOR_WEB_SERVER_URL`, for example:
-
-```
-https://hard-to-guess-identifier.runs.apify.net
-```
-
-The live view URL has a unique hostname, which is practically impossible to guess.
-This lets you keep the web server hidden from the public yet accessible from the external internet by any parties
-with whom you share the URL.
-
-<!-- ASTRO:
-<Illustration
-    description="An Actor can launch an HTTP web server that is exposed to the outside world to handle requests. This enables Actors to provide a custom HTTP API to integrate with other systems, to provide a web application for human users, to show Actor run details, diagnostics, charts, or to run an arbitrary web app."
-    position="left"
-    image={illuAPIWebServer}
-    noCaption
-/>
--->
-
-<div class="clear-both" />
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-const express = require('express');
-const app = express();
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-app.listen(process.env.ACTOR_WEB_SERVER_PORT, () => {
-  console.log(`Example live view web server running at ${process.env.ACTOR_WEB_SERVER_URL}`)
-})
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-### Standby mode
-
-Actor Standby mode lets Actors run in the background and respond to incoming HTTP requests,
-like a web or API server.
-
-Starting an Actor run requires launching a Docker container, and so it comes with a performance penalty, sometimes many seconds for large images.
-For batch jobs this penalty is negligible, but for quick request-response interactions it becomes inefficient.
-Standby mode lets developers run Actors as web servers to run jobs that require quick response times.
-
-To use Standby mode, start an HTTP web server at the `ACTOR_WEB_SERVER_PORT` TCP port,
-and process HTTP requests.
-
-The Actor system publishes a Standby Actor's web server
-at a URL reported in the `ACTOR_STANDBY_URL` environment variable,
-and will automatically start or abort an Actor run as needed by the volume of HTTP requests or system load.
-The external Standby public URL might look like this:
-
-```
-https://bob--screenshotter.apify.actor
-```
-
-Unlike the live view URL reported in the `ACTOR_WEB_SERVER_URL` environment variable,
-the Standby URL is the same for all runs of the Actor, and it's intended to be publicly known.
-The Actor system can perform authentication of the requests going to the Standby URL using API tokens.
-
-Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
-but they might be in the future introduced as new settings in the `actor.json` file.
-
-### Migration to another server
-
-Actors can be migrated from another host server from time to time, especially long-running ones.
-When migration is imminent, the system sends the Actor the `migrating` [system event](#system-events)
-to inform the Actor, so that it can persist its state to storages.
-All executed writes to the default Actor [storage](#storage) are guaranteed to be persisted before the migration.
-After migration, the Actor is restarted on a new host. It can restore its customer state from the storages again.
-
-### Charging money
-
-<!-- ASTRO:
-<Illustration
-    description="To run an Actor on the Apify platform or another cloud platform, a user typically needs to pay to cover the computing costs. Additionally, the platforms are free to introduce other monetization mechanisms, such as charging the users a fixed monthly fee for 'renting' the Actor, or a variable fee for the number of results produced by the Actor. These charging mechanisms are beyond the scope of this whitepaper."
-    position="right"
-    image={illuSharingChargingMoney}
-    noCaption
-/>
--->
-
-To run an Actor on the Apify platform or another cloud platform,
-a user typically needs to pay to cover the computing costs.
-Additionally, the platforms are free to introduce other [monetization](#monetization)
-mechanisms, such as charging the users a fixed monthly fee for "renting" the Actor,
-or a variable fee for the number of results produced by the Actor.
-These charging mechanisms are beyond the scope of this whitepaper.
-
-On top of these external monetization systems, Actors provide
-a built-in monetization system that enables developers to charge users variable
-amounts per event, e.g. based on the number of returned results,
-complexity of the input, or the cost of external APIs used internally by the Actor.
-
-An Actor can dynamically charge the current user a specific amount of money
-by calling the `charge` function.
-Users of Actors can limit the maximum amount to be charged by the Actor
-using the `maxTotalChargeUsd` run option, which is then passed to the Actor using
-the `ACTOR_MAX_TOTAL_CHARGE_USD` environment variable.
-The Actor can call the `charge` function as many times as necessary,
-but once the total sum of charged credits would exceed this maximum limit,
-the invocation of the function throws an error.
-
-When a paid Actor subsequently starts another paid Actor, the charges performed
-by the subsequent Actors are taken from the calling Actor's allowance.
-This enables Actor economy, where Actors hierarchically pay other Actors or external APIs
-to perform parts of the job.
-
-An Actor developer can also charge the current user of an Actor a specific amount of USD.
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-const chargeInfo = await Actor.charge({
-  eventName: 'gpt-4o-token',
-  count: 1000,
-  chargePerEventUsd: 0.0001,
-});
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="Python"> -->
-
-#### Python
-```python
-charge_info = await Actor.charge(
-  event_name='gpt-4o-token',
-  count=1000,
-  charge_per_event_usd=0.0001
-)
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-```bash
-$ actor charge gpt-4o-token \
-  --count=1000
-  --chargePerEventUsd=0.0001
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-An Actor user can specify the maximum amount they are willing to pay when starting an Actor.
-
-<!-- ASTRO: <CodeSwitcher> -->
-<!-- ASTRO: <CodeExample title="Node.js"> -->
-
-#### Node.js
-
-```js
-const run = await Actor.call(
-  'bob/analyse-images',
-  { imageUrls: ['https://www.example.com/image.png'] },
-  {
-      // By default this is 0, hence Actors cannot charge users unless they explicitly allow that.
-      maxTotalChargeUsd: 5,
-  },
-);
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="Python"> -->
-
-#### Python
-
-```python
-run = await Actor.call(
-    'bob/analyse-images' ,
-    {'imageUrls': ['https://www.example.com/image.png']},
-    max_total_charge_usd=5
-)
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: <CodeExample title="CLI"> -->
-
-#### CLI
-```bash
-$ actor call bob/analyse-images \
-  --input='{"imageUrls": ["https://www.example.com/image.png"]}'
-  --max-total-charge-usd=5
-```
-
-<!-- ASTRO: </CodeExample> -->
-<!-- ASTRO: </CodeSwitcher> -->
-
-#### Rules for building Actors with variable charging
-
-If your Actor is charging users, you need to make sure at the earliest time possible
-that the Actor is being run with sufficient credits with respect to its input.
-If the maximum credits specified by the `ACTOR_MAX_TOTAL_CHARGE_USD` environment variable is
-not sufficient for the Actor's operation with respect
-to the input (e.g. user is requesting too many results for too little money),
-the Actor must fail immediately with an explanatory error status message for the user,
-and not charge the user anything.
-
-You must also charge users only **after** you have incurred the costs,
-not before. If an Actor fails in the middle of a run or is aborted, the users
-only need to be charged for results they actually received.
-Nothing will make users of your Actors angrier than charging them for something they didn't receive.
-
-## Actor definition files
-
-The Actor system uses several special files that define Actor metadata, documentation,
-instructions how to build and run it, input and output schema, etc.
-
-**These files MUST be stored in the `.actor` directory placed in Actor's top-level directory.
-The entire `.actor` directory should be added to the source control.**
-The only required files are [Actor file](#actor-file) and [Dockerfile](#dockerfile),
-all other files are optional.
-
-The Actor definition files are used by the CLI (e.g. by `apify push` and `apify run` commands),
-as well as when building Actors on the Apify platform.
-The motivation to place the files into a separate directory
-is to keep the source code repository tidy and to prevent interactions with other source files,
-in particular when creating an Actor from pre-existing software repositories.
-
-### Actor file
-
-This is the main definition file of the Actor,
-and it must always be present at `.actor/actor.json`.
-This file is in JSON format and contains a single object, whose properties
-define the main features of the Actor and link to all other necessary files.
-
-For details, see the [Actor file specification](./pages/ACTOR_FILE.md) page.
-
-#### Example Actor file at `.actor/actor.json`
+Response:
 
 ```json
 {
-  "actorSpecification": 1,
-  "name": "screenshotter",
-  "title": "Screenshotter",
-  "description": "Take a screenshot of any URL",
-  "version": "0.0",
-  "inputSchema": "./input_schema.json",
-  "outputSchema": "./output_schema.json",
-  "dockerfile": "./Dockerfile"
-}
-```
-
-### Dockerfile
-
-This file contains instructions for the system on how to build the Actor's
-Docker image and how to run it.
-Actors are started by running their Docker image,
-both locally using the `apify run` command
-as well as on the Apify platform.
-
-The Dockerfile is referenced from the [Actor file](#actor-file) using the `dockerfile`
-directive, and is typically stored at `.actor/Dockerfile`.
-
-Note that paths in Dockerfile are always specified relative to the Dockerfile's location.
-Learn more about Dockerfiles in the official [Docker reference](https://docs.docker.com/engine/reference/builder/).
-
-#### Example Dockerfile of an Actor
-
-```dockerfile
-# Specify the base Docker image. You can read more about
-# the available images at https://crawlee.dev/docs/guides/docker-images
-# You can also use any other image from Docker Hub.
-FROM apify/actor-node-playwright-chrome:22-1.46.0 AS builder
-
-# Copy just package.json and package-lock.json
-# to speed up the build using Docker layer cache.
-COPY --chown=myuser package*.json ./
-
-# Install all dependencies. Don't audit to speed up the installation.
-RUN npm install --include=dev --audit=false
-
-# Next, copy the source files using the user set
-# in the base image.
-COPY --chown=myuser . ./
-
-# Install all dependencies and build the project.
-# Don't audit to speed up the installation.
-RUN npm run build
-
-# Create final image
-FROM apify/actor-node-playwright-firefox:22-1.46.0
-
-# Copy just package.json and package-lock.json
-# to speed up the build using Docker layer cache.
-COPY --chown=myuser package*.json ./
-
-# Install NPM packages, skip optional and development dependencies to
-# keep the image small. Avoid logging too much and print the dependency
-# tree for debugging
-RUN npm --quiet set progress=false \
-    && npm install --omit=dev --omit=optional \
-    && echo "Installed NPM packages:" \
-    && (npm list --omit=dev --all || true) \
-    && echo "Node.js version:" \
-    && node --version \
-    && echo "NPM version:" \
-    && npm --version \
-    && rm -r ~/.npm
-
-# Install all required Playwright dependencies for Firefox
-RUN npx playwright install firefox
-
-# Copy built JS files from builder image
-COPY --from=builder --chown=myuser /home/myuser/dist ./dist
-
-# Next, copy the remaining files and directories with the source code.
-# Since we do this after NPM install, quick build will be really fast
-# for most source file changes.
-COPY --chown=myuser . ./
-
-# Run the image. If you know you won't need headful browsers,
-# you can remove the XVFB start script for a micro perf gain.
-CMD ./start_xvfb_and_run_cmd.sh && ./run_protected.sh npm run start:prod --silent
-```
-
-### README
-
-The README file contains Actor documentation written
-in [Markdown](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-It should contain a great explanation of what the Actor does and how to use it.
-The README file is used to generate an Actor's public web page on Apify and for other purposes.
-
-The README file is referenced from the [Actor file](#actor-file) using the `readme`
-property, and typically stored at `.actor/README.md`.
-
-Good documentation makes good Actors.
-[Read the Apify Actor marketing playbook](https://apify.notion.site/3fdc9fd4c8164649a2024c9ca7a2d0da?v=6d262c0b026d49bfa45771cd71f8c9ab) for tips on how to write great READMEs and market Actors.
-
-### Input schema file
-
-<!-- ASTRO:
-<Illustration
-    description="Actors accept an input JSON object on start, whose schema can be defined by the input schema file. This file is referenced in the Actor file as the `input` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/input_schema.json."
-    position="right"
-    image={illuDefinitionFilesInputSchemaFile}
-    noCaption
-/>
--->
-
-Actors accept an [input](#input) JSON object on start, whose schema can be defined
-by the input schema file. This file is referenced in the Actor file (`.actor/actor.json`) file
-as the `input` property.
-It is a standard JSON Schema file with our extensions, and it is typically stored at `.actor/input_schema.json`.
-
-The input schema file defines properties accepted by Actor on input. It is used by the system to:
-
-- Validate the passed input JSON object on Actor run,
-  so that Actors don't need to perform input validation and error handling in their code.
-- Render user interface for Actors to make it easy for users to run and test them manually.
-- Generate Actor API documentation and integration code examples on the web or in CLI,
-  making Actors easy to integrate for users.
-- Simplify integration of Actors into automation workflows such as Zapier or Make, by providing smart connectors
-  that smartly pre-populate and link Actor input properties.
-
-For details, see [Actor input schema file specification](./pages/INPUT_SCHEMA.md).
-
-<div class="clear-both" />
-
-This is an example of the input schema file for the `bob/screenshotter` Actor:
-
-```json
-{
-  "actorInputSchemaVersion": 1,
-  "title": "Input schema for Screenshotter Actor",
-  "description": "Enter a web page URL and it will take its screenshot with a specific width",
-  "type": "object",
-  "properties": {
-    "url": {
-      "title": "URL",
-      "type": "string",
-      "editor": "textfield",
-      "description": "URL of the webpage"
-    },
-    "width": {
-      "title": "Viewport width",
-      "type": "integer",
-      "description": "Width of the browser window.",
-      "default": 1200,
-      "minimum": 1,
-      "unit": "pixels"
-    }
-  },
-  "required": [
-    "url"
-  ]
-}
-```
-
-### Output schema file
-
-<!-- ASTRO:
-<Illustration
-    description="Similarly to input, Actors can generate an output JSON object, which links to their results. The Actor output schema file defines how such output object looks like, including types of its properties and description. This file is referenced in the Actor file as the `output` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/output_schema.json."
-    position="right"
-    image={illuDefinitionFilesOutputSchemaFile}
-    noCaption
-/>
--->
-
-Similarly to input, Actors can generate an [output](#output) JSON object, which links to their results.
-The Actor output schema file defines how such output object looks like,
-including types of its properties and description.
-This file is referenced in the Actor file (`.actor/actor.json`) file
-as the `output` property.
-It is a standard JSON Schema file with our extensions, and it is typically stored at `.actor/output_schema.json`.
-
-The output schema describes how the Actor stores its results, and it is used by the other systems:
-
-- Generate API documentation for users of Actors to figure where to find results.
-- Publish OpenAPI specification to make it easy for callers of Actors to figure where to find results.
-- Enable integrating Actors with external systems and automated workflows.
-
-For details, see [Actor output schema file specification](./pages/OUTPUT_SCHEMA.md).
-
-<div class="clear-both" />
-
-This is an example of the output schema file for the `bob/screenshotter` Actor:
-
-```json
-{
-  "actorOutputSchemaVersion": 1,
-  "title": "Output schema for Screenshotter Actor",
-  "description": "The URL to the resulting screenshot",
-  "properties": {
-    "screenshotUrl": {
-      "type": "string",
-      "title": "Web page screenshot",
-      "resourceType": "file",
-      "template": "{{actorRun.defaultKeyValueStoreUrl}}/screenshot.png"
-    }
+  "data": {
+    "totalBytes": 2147483648,
+    "freeBytes": 1073741824,
+    "usedBytes": 1073741824,
+    "mainProcessBytes": 536870912,
+    "childProcessesBytes": 536870912
   }
 }
 ```
 
-### Storage schema files
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
-Both main Actor file and input and output schema files can additionally reference schema files
-for specific storages.
-These files have custom JSON-based formats, see:
 
-- [Dataset schema file](./pages/DATASET_SCHEMA.md)
-- [Key-value store schema file](./pages/KEY_VALUE_STORE_SCHEMA.md)
-- [Request queue schema file](./pages/REQUEST_QUEUE_SCHEMA.md)
+Expand 76 hidden lines
 
-These storage schemas are used to ensure that stored objects or files
-fulfil specific criteria, their fields have certain types, etc.
-On the Apify platform, the schemas can be applied to the storages directly,
-without Actors.
+#### API
 
-Note that all the storage schemas are weak, in a sense that if the schema doesn't define a property,
-such property can be added to the storage and have an arbitrary type.
-Only properties explicitly mentioned by the schema
-are validated. This is an important feature which allows extensibility.
-For example, a data deduplication Actor might require on input datasets
-that have an `uuid: String` field in objects, but it does not care about other fields.
+```http
+POST {ACTOR_API_BASE_URL}/actors/apify~google-search-scraper/runs
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-### Backward compatibility
+{
+  "input": { "queries": "test" },
+  "memory": 2048
+}
+```
+[POST] https://api.apify.com/v2/actors/apify~google-search-scraper/run
 
-If the `.actor/actor.json` file is missing,
-the system falls back to the legacy mode,
-and looks for `apify.json`, `Dockerfile`, `README.md` and `INPUT_SCHEMA.json`
-files in the Actor's top-level directory instead.
-This behavior might be deprecated in the future.
+[POST|GET] https://api.apify.com/v2/actors/apify~google-search-scraper/run-sync?
+token=rWLaYmvZeK55uatRrZib4xbZs&
+outputRecordKey=OUTPUT
+returnDataset=true
+Response:
 
-## Development
+```json
+{
+  "data": {
+    "id": "HG7ML7M8z78YcAPEB",
+    "actorId": "HDSasDasz78YcAPEB",
+    "status": "READY",
+    "defaultKeyValueStoreId": "sfAJEHLkpnO89wbfF",
+    "defaultDatasetId": "3ZojQDdFTsyE7Moy4",
+    "startedAt": "2022-01-02T03:04:05.678Z"
+  }
+}
+```
 
-Actors can be developed locally, using a git integration, or in a web IDE.
-The SDK is currently available for Node.js, Python, and CLI.
+<!-- ASTRO: </CodeExample> -->
 
-### Local development
+Expand 73 hidden lines
+$ exec /bin/bash
+```
 
-<!-- ASTRO:
-<Illustration
-    description="The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages."
-    position="right"
-    image={illuDevelopmentLocal}
-    noCaption
-/>
--->
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
-The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages. 
+#### API
 
-Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) provides [convenient templates](https://apify.com/templates) to bootstrap an Actor in Python, JavaScript, and TypeScript.
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/metamorph
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-This example is describing how to create a simple "echo" Actor locally. The Actor will retrieve the [Input Object](#input) and it will [push](#push-results-to-dataset) it to the default [dataset](#dataset). 
+{
+  "targetActorId": "bob/web-scraper",
+  "input": { "startUrls": ["https://www.example.com"] },
+  "build": "latest"
+}
+```
 
-#### Bootstrap the Actor directory
-The `actor bootstrap` CLI command will automatically generate the `.actor` directory and configuration files:
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
+
+Expand 54 hidden lines
+$ command1 || command2  # ("orf" symbol)
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/webhooks
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{
+  "eventTypes": ["ACTOR.RUN.SUCCEEDED", "ACTOR.RUN.FAILED"],
+  "requestUrl": "http://api.example.com?something=123",
+  "payloadTemplate": "{\"userId\": {{userId}}, \"createdAt\": {{createdAt}}, \"eventType\": {{eventType}}, \"eventData\": {{eventData}}, \"resource\": {{resource}}}"
+}
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
+
+Expand 32 hidden lines
+$ kill <PID>
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{runId}/abort
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
+
+{ "gracefully": true, "statusMessage": "Your job is done, friend." }
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
+
+Expand 44 hidden lines
+#### CLI
 
 ```bash
-$ actor bootstrap
-? Actor name: actor-test
-Success: The Actor has been initialized in the current directory.
-$ tree -a
-.
-|-- .actor
-|   `-- actor.json
-|-- .gitignore
-`-- storage
-    |-- datasets
-    |   `-- default
-    |-- key_value_stores
-    |   `-- default
-    |       `-- INPUT.json
-    `-- request_queues
-        `-- default
+$ actor reboot
+$ actor reboot
 ```
 
-The command works on the best-effort basis,
-creating necessary configuration files for the specific programming language and libraries.
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
-Note: this command is not yet available and represents a future vision for the CLI.
+#### API
 
-#### Add the Actor code
-```
-$ cat << EOF > Dockerfile
-FROM node:alpine
-RUN npm -g install apify-cli 
-CMD actor push-data $(actor get-input)
-EOF
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/reboot
+Authorization: Bearer {APIFY_TOKEN}
 ```
 
-#### Run to test the Actor locally
-```
-$ echo '{"bar": "foo"}' | actor run -o -s
-[{
-  "foo": "bar"
-}]
-```
-`apify run` - starts the Actor using Dockerfile
-referenced from `.actor/actor.json` or Dockerfile in the Actor top-level directory
-(if the first is not present)
+<!-- ASTRO: </CodeExample> -->
 
-### Deployment to Apify platform
-
-The `apify push` CLI command takes information from the `.actor` directory and builds an Actor on the Apify platform,
-so that you can run it remotely.
-
-```bash
-$ apify login
-? Choose how you want to log in to Apify (Use arrow keys)
-❯ Through Apify Console in your default browser
-$ apify push
+Expand 162 hidden lines
+--chargePerEventUsd=0.0001
 ```
 
-<!-- ASTRO:
-<Illustration
-    description="The `apify push` CLI command takes information from the `.actor` directory and builds an Actor on the Apify platform, so that you can run it remotely."
-    position="left"
-    image={illuDevelopmentDeployment}
-    noCaption
-/>
--->
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
-### Continuous integration and delivery
+#### API
 
-The source code of Actors can be hosted on external source control systems like GitHub or GitLab,
-and integrated into CI/CD pipelines.
-The implementation details, as well as details of the Actor build and version management process,
-are beyond the scope of this whitepaper.
+```http
+POST {ACTOR_API_BASE_URL}/actor-runs/{ACTOR_RUN_ID}/charge
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-### Actorizing existing code
-
-You can repackage many existing software repositories
-as an Actor by creating the `.actor/` directory with the [Actor definition files](#actor-definition-files),
-and providing a Dockerfile with instruction how to run the software.
-
-The `actor` CLI command can be used from the Dockerfile's `RUN` script transform the Actor JSON input
-into the configuration of the software, usually passed via command-line arguments,
-and then store the Actor output results. 
-
-This example wraps the [`curl`](https://curl.se/docs/tutorial.html) UNIX command and pushes the result to the Actor's [key-value store](#key-value-store):
-
-```bash
-FROM alpine/curl:latest
-
-# Install node to the Alpine Docker image
-COPY --from=node:current-alpine /usr/lib /usr/lib
-COPY --from=node:current-alpine /usr/local/lib /usr/local/lib
-COPY --from=node:current-alpine /usr/local/include /usr/local/include
-COPY --from=node:current-alpine /usr/local/bin /usr/local/bin
-
-# Install the Actor CLI
-RUN npm -g install apify-cli
-
-CMD curl $(actor get-input) | actor set-value example-com --contentType text/html
+{ "eventName": "gpt-4o-token", "count": 1000 }
 ```
 
-Actorization of existing code gives developers an easy way to give their code
-a presence in the cloud in the form of an Actor, so that the users can easily try it without
-having to install and manage it locally.
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
-## Sharing and publishing
 
-Once an Actor is developed, the Actor platform lets you share it with other specific users,
-and decide whether you want to make its source code open or closed.
+Expand 38 hidden lines
+--max-total-charge-usd=5
+```
 
-You can also publish the Actor for anyone to use on a marketplace like [Apify Store](https://apify.com/store).
-The Actor will get a public landing page like `https://apify.com/bob/screenshotter`,
-showing its README, description of inputs, outputs, API examples, etc.
-Once published, your Actor is automatically exposed to organic traffic of users and potential customers.
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
 
-![Apify Actor Store](./img/apify-store.png)
+#### API
 
-<!-- ASTRO: <Picture src={illuApifyStore} alt="Apify Store" formats={['avif', 'webp']} /> -->
+```http
+POST {ACTOR_API_BASE_URL}/actors/bob~analyse-images/runs
+Content-Type: application/json
+Authorization: Bearer {APIFY_TOKEN}
 
-### Monetization
+{
+  "input": { "imageUrls": ["https://www.example.com/image.png"] },
+  "maxTotalChargeUsd": 5
+}
+```
 
-<!-- ASTRO:
-<Illustration
-    description="The monetization options for Actors include fixed rental fee, payment per result, or payment per event."
-    position="right"
-    image={illuSharingMonetization}
-    noCaption
-/>
--->
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
 
-To build a SaaS product, you usually need to:
 
-1. Develop the product
-2. Write documentation
-3. Find and buy a domain name
-4. Set up a website
-5. Setup cloud infrastructure where it runs and scales
-6. Handle payments, billing, and taxes
-7. Marketing (content, ads, SEO, and more)
-8. Sales (demos, procurement)
-
-Building software as an Actor and deploying it to the Apify platform changes this to:
-
-1. Develop the Actor
-2. Write the README
-3. Publish the Actor on Apify Store
-
-Packaging your software as Actors makes it faster to launch new small SaaS products and then earn income on them,
-using various monetization options, e.g. fixed rental fee, payment per result,
-or payment per event (see [Charging money](#charging-money)).
-This monetization gives developers an incentive to further develop and maintain their Actors.
-
-Actors provide a new way for software developers like you to monetize their skills,
-bringing the creator economy model to SaaS.
-
-For more details, read our essay [Make passive income developing web automation Actors](https://blog.apify.com/make-regular-passive-income-developing-web-automation-Actors-b0392278d085/).
-
-## Future work
-
-The goal of this whitepaper is to introduce the Actor philosophy and programming model to other developers,
+Expand 460 hidden lines
 to receive feedback, and to open the way to making Actors an open standard.
 To create an open standard, we need to:
 
 - Define a standardized low-level HTTP REST API interface for the Actor system,
   to separate "frontend" and "backend" Actor programming model implementations.
+- ~~Define a standardized low-level HTTP REST API interface for the Actor system~~ — **Done!**
+  The [Actor Runtime API](./openapi/openapi.json) OpenAPI specification defines the HTTP REST API
+  that separates "frontend" SDK implementations from "backend" Actor runtime systems.
   For example, if somebody wants to build support for the Actor programming model in Rust,
   they should just need to write a Rust "frontend" translating the commands to HTTP API calls,
   rather than having to implement the entire system. And equally, if one decides
   to develop a new Actor "backend", all existing client libraries for Rust or other languages should work with it.
+  they just need to write a Rust "frontend" translating the commands to HTTP API calls.
+  And equally, if one decides to develop a new Actor "backend", all existing client libraries
+  for Rust or other languages should work with it.
 - Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
 - Clearly separate what is the part of the standard and what is up to the discretion of the implementations.
 
 
 ## Links
 
+- [Actor Runtime API — OpenAPI specification](./openapi/openapi.json)
 - [Apify Store](https://apify.com/store)
 - [Monetize your Actor on Apify](https://apify.com/partners/actor-developers)
 - [Open-source Actors on GitHub](https://github.com/search?q=path%3A.actor%2Factor.json+&type=code)
