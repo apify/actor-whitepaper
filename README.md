@@ -1922,7 +1922,7 @@ Good documentation makes good Actors.
 
 <!-- ASTRO:
 <Illustration
-    description="Actors accept an input JSON object on start, whose schema can be defined by the input schema file. This file is referenced in the Actor file as the `input` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/input_schema.json."
+    description="Actors accept an input JSON object on start, whose schema can be defined by the input schema file. This file is referenced in the Actor file as the `inputSchema` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/input_schema.json."
     position="right"
     image={illuDefinitionFilesInputSchemaFile}
     noCaption
@@ -1931,7 +1931,7 @@ Good documentation makes good Actors.
 
 Actors accept an [input](#input) JSON object on start, whose schema can be defined
 by the input schema file. This file is referenced in the Actor file (`.actor/actor.json`) file
-as the `input` property.
+as the `inputSchema` property.
 It is a standard JSON Schema file with our extensions, and it is typically stored at `.actor/input_schema.json`.
 
 The input schema file defines properties accepted by Actor on input. It is used by the system to:
@@ -1982,7 +1982,7 @@ This is an example of the input schema file for the `bob/screenshotter` Actor:
 
 <!-- ASTRO:
 <Illustration
-    description="Similarly to input, Actors can generate an output JSON object, which links to their results. The Actor output schema file defines how such output object looks like, including types of its properties and description. This file is referenced in the Actor file as the `output` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/output_schema.json."
+    description="Similarly to input, Actors can generate an output JSON object, which links to their results. The Actor output schema file defines how such output object looks like, including types of its properties and description. This file is referenced in the Actor file as the `outputSchema` property. It is a standard JSON Schema file with our extensions, and it is typically stored at .actor/output_schema.json."
     position="right"
     image={illuDefinitionFilesOutputSchemaFile}
     noCaption
@@ -1993,7 +1993,7 @@ Similarly to input, Actors can generate an [output](#output) JSON object, which 
 The Actor output schema file defines how such output object looks like,
 including types of its properties and description.
 This file is referenced in the Actor file (`.actor/actor.json`) file
-as the `output` property.
+as the `outputSchema` property.
 It is a standard JSON Schema file with our extensions, and it is typically stored at `.actor/output_schema.json`.
 
 The output schema describes how the Actor stores its results, and it is used by the other systems:
