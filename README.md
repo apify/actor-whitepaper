@@ -912,6 +912,18 @@ In the event of a non-zero exit code, the system automatically sets the Actor [s
 to something like `Actor exited with code 0`, and it might attempt
 to restart the Actor to recover from the error, depending on the system and Actor configuration.
 
+Additionally, certain exit codes convey a specific reason for the failure. For now, only the exit code `2` has any meaning beyond failure.
+The default [status message](#actor-status) then varies according to the exit code when no custom message is set.
+The following table explains the meaning of each one:
+
+| Exit Code | Status      | Description                            |
+| --------- | ----------- | -------------------------------------- |
+| `0`       | `SUCCEEDED` | Successful run                         |
+| `1`       | `FAILED`    | Run failed                             |
+| `2`       | `FAILED`    | User Error (as in a nonsensical input) |
+| `3-10`    | `FAILED`    | Reserved for future use                |
+| `11-255`  | `FAILED`    | Run failed                             |
+
 A preferred way to exit an Actor intentionally is using the `exit` or `fail` functions in SDK, as
 shown below. This has several advantages:
 
