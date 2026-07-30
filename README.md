@@ -1654,7 +1654,7 @@ but they might be in the future introduced as new settings in the `actor.json` f
 
 Actors may interact with various MCP servers. The access to the MCP servers is going through the runtime-provided MCP proxy, to avoid passing credentials directly to the Actor.
 
-To connect to a specific MCP server, Actors should use URL `ACTOR_MCP_PROXY_URL/<connectorId>`. The `connectorId` is passed on the input and identifies the MCP server to connect to, with authorization and possible limits on the tools that might be used.
+To connect to a specific MCP server, Actors should use URL `ACTOR_MCP_PROXY_URL/<connectorId>`. The `connectorId` is passed on the input and identifies the MCP server to connect to, with credentials and possible limits on the tools that might be used.
 
 While this feature is intended mostly for Actors running as agents, MCP servers can be used even without LLMs.
 
