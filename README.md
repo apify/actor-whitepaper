@@ -53,6 +53,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Reboot an Actor](#reboot-an-actor)
   * [Actor web server](#actor-web-server)
   * [Standby mode](#standby-mode)
+  * [MCP Proxy](#mcp-proxy)
   * [Migration to another server](#migration-to-another-server)
   * [Charging money](#charging-money)
 - [Actor definition files](#actor-definition-files)
@@ -1016,6 +1017,7 @@ about the execution context.
 | `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world, either as [Actor web server](#actor-web-server) or in the [Standby mode](#standby-mode).                           |
 | `ACTOR_WEB_SERVER_URL`             | A unique hard-to-guess URL under which the current Actor run's web server is accessible from the outside world. See [Actor web server](#actor-web-server) section for details.                                     |
 | `ACTOR_STANDBY_URL`                | A general public URL under which the Actor can be started and its web server accessed in the [Standby mode](#standby-mode).                                                                                                |
+| `ACTOR_MCP_PROXY_URL`              | URL that the Actor can use as a gateway to connect to MCP servers. See [MCP Proxy](#mcp-proxy) for details.                                                                                               |
 | `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                                                                 |
 | `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                                                                        |
 
@@ -1647,6 +1649,14 @@ The Actor system can perform authentication of the requests going to the Standby
 
 Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
 but they might be in the future introduced as new settings in the `actor.json` file.
+
+### MCP Proxy
+
+Actors may interact with various MCP servers. The access to the MCP servers is going through the runtime-provided MCP proxy, to avoid passing credentials directly to the Actor.
+
+To connect to a specific MCP server, Actors should use `ACTOR_MCP_PROXY_URL/<connectorId>`.
+
+While this feature is intended mostly for Actors running as agents, MCP servers can be used even without LLMs.
 
 ### Migration to another server
 
