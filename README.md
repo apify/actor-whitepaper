@@ -1017,7 +1017,7 @@ about the execution context.
 | `ACTOR_WEB_SERVER_PORT`            | TCP port on which the Actor can start a HTTP server to receive messages from the outside world, either as [Actor web server](#actor-web-server) or in the [Standby mode](#standby-mode).                           |
 | `ACTOR_WEB_SERVER_URL`             | A unique hard-to-guess URL under which the current Actor run's web server is accessible from the outside world. See [Actor web server](#actor-web-server) section for details.                                     |
 | `ACTOR_STANDBY_URL`                | A general public URL under which the Actor can be started and its web server accessed in the [Standby mode](#standby-mode).                                                                                                |
-| `ACTOR_MCP_PROXY_URL`              | URL that the Actor can use as a gateway to connect to MCP servers. See [MCP Proxy](#mcp-proxy) for details.                                                                                               |
+| `ACTOR_MCP_CONNECTOR_BASE_URL`     | Base URL that the Actor can use as a gateway to connect to MCP servers via MCP connectors. See [MCP Proxy](#mcp-proxy) for details.                                                                                        |
 | `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                                                                 |
 | `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                                                                        |
 
@@ -1654,7 +1654,7 @@ but they might be in the future introduced as new settings in the `actor.json` f
 
 Actors may interact with various MCP servers. The access to the MCP servers is going through the runtime-provided MCP proxy, to avoid passing credentials directly to the Actor.
 
-To connect to a specific MCP server, Actors should use URL `ACTOR_MCP_PROXY_URL/<connectorId>`. The `connectorId` is passed on the input and identifies the MCP server to connect to, with credentials and possible limits on the tools that might be used.
+To connect to a specific MCP server, Actors should use URL `ACTOR_MCP_CONNECTOR_BASE_URL/<connectorId>`. The `connectorId` is passed on the input as a field with the `mcpConnector` resource type, and identifies the MCP server to connect to, with credentials and possible limits on the tools that might be used.
 
 While this feature is intended mostly for Actors running as agents, MCP servers can be used even without LLMs.
 
