@@ -105,8 +105,11 @@ as well as encourage new implementations of the model in other programming langu
 The goal of this whitepaper is to be the North Star that shows what the
 Actor programming model is and what operations it should support.
 **But this document is not an official specification.**
-The specification will be an OpenAPI schema of the Actor system interface,
-to enable new independent implementations of both the client libraries and backend systems. This is currently a work in progress.
+The formal specification is the [Actor Runtime API](./openapi/openapi.json) — an OpenAPI 3.1 schema
+that defines the HTTP REST interface between running Actors (front-end SDKs)
+and the Actor runtime system (back-end).
+This API enables thin, language-agnostic SDKs to be auto-generated for any programming language,
+and allows third-party implementations of the Actor runtime back-end.
 
 Currently, the most complete implementation of the Actor model is provided
 by the Apify platform, with SDKs for
@@ -595,6 +598,16 @@ of a running Actor, both in local environment or on the Apify platform.
 The Actor runtime system passes the context via [environment variables](#environment-variables),
 such as `APIFY_TOKEN` or `ACTOR_RUN_ID`, which is used by the SDK or CLI to interact with the runtime.
 
+Under the hood, each SDK operation maps to an HTTP REST API call defined in the
+[Actor Runtime API](./openapi/openapi.json) OpenAPI specification.
+The API examples shown below illustrate the underlying HTTP requests for each operation.
+
+> **API tab conventions:** All HTTP API examples in this section use paths relative to
+> the `ACTOR_API_BASE_URL` [environment variable](#environment-variables)
+> (e.g. `https://api.apify.com/v2`).
+> Every request must include the `Authorization: Bearer {APIFY_TOKEN}` header.
+> Request bodies are JSON (`Content-Type: application/json`) unless noted otherwise.
+
 ### Initialization
 
 The SDKs provide convenience methods to initialize the Actor and handle its results.
@@ -747,6 +760,15 @@ int main (int argc, char *argv[]) {}
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+GET /key-value-stores/{ACTOR_DEFAULT_KEY_VALUE_STORE_ID}/records/{ACTOR_INPUT_KEY}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Key-value store access
@@ -812,6 +834,32 @@ state = await Actor.get_value('my-state')
 ```bash
 $ echo "hello world" > file.txt
 $ cat file.txt
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+# Get a record
+GET /key-value-stores/{storeId}/records/{key}
+
+# Set a record (with Content-Type matching the data format)
+PUT /key-value-stores/{storeId}/records/{key}
+
+{ "something": 123 }
+
+# Delete a record
+DELETE /key-value-stores/{storeId}/records/{key}
+
+# List keys in a store
+GET /key-value-stores/{storeId}/records?limit=100&prefix=screenshots
+
+# Get or create a named key-value store
+POST /key-value-stores
+
+{ "name": "screenshots-store" }
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -897,6 +945,28 @@ $ actor push-data --dataset=./my_dataset someResult=123
 
 ```c
 printf("Hello world\tColum 2\tColumn 3");
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+# Push a single item to the default dataset
+POST /datasets/{ACTOR_DEFAULT_DATASET_ID}/items
+
+{ "someResult": 123 }
+
+# Push multiple items at once
+POST /datasets/{ACTOR_DEFAULT_DATASET_ID}/items
+
+[{ "someResult": 123 }, { "someResult": 456 }]
+
+# Get or create a named dataset
+POST /datasets
+
+{ "name": "bob/poll-results-2019" }
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1002,6 +1072,26 @@ exit(1);
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+# Signal successful exit with a status message
+PUT /actor-runs/{ACTOR_RUN_ID}
+
+{ "status": "SUCCEEDED", "statusMessage": "Email sent", "exitCode": 0 }
+
+# Signal failure with an error message
+PUT /actor-runs/{ACTOR_RUN_ID}
+
+{ "status": "FAILED", "statusMessage": "Couldn't fetch the URL", "exitCode": 1 }
+```
+
+Note: This API call sets the exit metadata before the process exits.
+The actual container termination is triggered by the process exiting with the corresponding exit code.
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Environment variables
@@ -1033,6 +1123,7 @@ about the execution context.
 | `ACTOR_MCP_CONNECTOR_BASE_URL`     | Base URL that the Actor can use as a gateway to connect to MCP servers via MCP connectors. See [MCP Proxy](#mcp-proxy) for details.                                                                                        |
 | `ACTOR_MAX_PAID_DATASET_ITEMS`     | A maximum number of results that will be charged to the user using a pay-per-result Actor.                                                                                                                                 |
 | `ACTOR_MAX_TOTAL_CHARGE_USD`       | The maximum amount of money in USD an Actor can charge its user. See [Charging money](#charging-money) for details.                                                                                                        |
+| `ACTOR_API_BASE_URL`               | Base URL of the Actor Runtime API that the SDK uses to communicate with the runtime back-end (e.g. `https://api.apify.com/v2` on the Apify platform, or `http://localhost:3000` for local development). See [Actor Runtime API](./openapi/openapi.json) for the full OpenAPI specification. |
 
 The Actor developer can also define custom environment variables
 that are then passed to the Actor process both in the local development environment or on the Apify platform.
@@ -1141,6 +1232,17 @@ $ actor set-status-message --run=[RUN_ID] --token=X "Crawled 45 of 100 pages"
 
 Convention: The end user of an Actor should never need to look into the log to understand what happened,
 e.g. why the Actor failed. All necessary information must be set by the Actor in the status message.
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+PUT /actor-runs/{ACTOR_RUN_ID}
+
+{ "statusMessage": "Crawled 45 of 100 pages" }
+```
 
 <!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
@@ -1261,6 +1363,29 @@ $ ps -a
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+GET /actor-runs/{ACTOR_RUN_ID}/memory
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "totalBytes": 2147483648,
+    "freeBytes": 1073741824,
+    "usedBytes": 1073741824,
+    "mainProcessBytes": 536870912,
+    "childProcessesBytes": 536870912
+  }
+}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Start another Actor
@@ -1342,13 +1467,28 @@ The following command starts the Actor, and then prints the messages to a Slack 
 
 #### API
 
-```
-[POST] https://api.apify.com/v2/actors/apify~google-search-scraper/run
+```http
+POST /actors/apify~google-search-scraper/runs
 
-[POST|GET] https://api.apify.com/v2/actors/apify~google-search-scraper/run-sync?
-  token=rWLaYmvZeK55uatRrZib4xbZs&
-  outputRecordKey=OUTPUT
-  returnDataset=true
+{
+  "input": { "queries": "test" },
+  "memory": 2048
+}
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "id": "HG7ML7M8z78YcAPEB",
+    "actorId": "HDSasDasz78YcAPEB",
+    "status": "READY",
+    "defaultKeyValueStoreId": "sfAJEHLkpnO89wbfF",
+    "defaultDatasetId": "3ZojQDdFTsyE7Moy4",
+    "startedAt": "2022-01-02T03:04:05.678Z"
+  }
+}
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1429,6 +1569,21 @@ $ exec /bin/bash
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST /actor-runs/{ACTOR_RUN_ID}/metamorph
+
+{
+  "targetActorId": "bob/web-scraper",
+  "input": { "startUrls": ["https://www.example.com"] },
+  "build": "latest"
+}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Attach webhook to an Actor run
@@ -1489,6 +1644,21 @@ $ command1 || command2  # ("orf" symbol)
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST /actor-runs/{ACTOR_RUN_ID}/webhooks
+
+{
+  "eventTypes": ["ACTOR.RUN.SUCCEEDED", "ACTOR.RUN.FAILED"],
+  "requestUrl": "http://api.example.com?something=123",
+  "payloadTemplate": "{\"userId\": {{userId}}, \"createdAt\": {{createdAt}}, \"eventType\": {{eventType}}, \"eventData\": {{eventData}}, \"resource\": {{resource}}}"
+}
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 ### Abort another Actor
@@ -1524,6 +1694,17 @@ $ actor abort --run-id RUN_ID
 ```bash
 # Terminate a program
 $ kill <PID>
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST /actor-runs/{runId}/abort
+
+{ "gracefully": true, "statusMessage": "Your job is done, friend." }
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1576,7 +1757,16 @@ await Actor.reboot()
 #### CLI
 
 ```bash
-$ actor reboot 
+$ actor reboot
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST /actor-runs/{ACTOR_RUN_ID}/reboot
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1754,6 +1944,17 @@ $ actor charge gpt-4o-token \
 ```
 
 <!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST /actor-runs/{ACTOR_RUN_ID}/charge
+
+{ "eventName": "gpt-4o-token", "count": 1000 }
+```
+
+<!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
 An Actor user can specify the maximum amount they are willing to pay when starting an Actor.
@@ -1795,6 +1996,20 @@ run = await Actor.call(
 $ actor call bob/analyse-images \
   --input='{"imageUrls": ["https://www.example.com/image.png"]}'
   --max-total-charge-usd=5
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: <CodeExample title="API"> -->
+
+#### API
+
+```http
+POST /actors/bob~analyse-images/runs
+
+{
+  "input": { "imageUrls": ["https://www.example.com/image.png"] },
+  "maxTotalChargeUsd": 5
+}
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -2263,18 +2478,26 @@ The goal of this whitepaper is to introduce the Actor philosophy and programming
 to receive feedback, and to open the way to making Actors an open standard.
 To create an open standard, we need to:
 
-- Define a standardized low-level HTTP REST API interface for the Actor system,
-  to separate "frontend" and "backend" Actor programming model implementations.
-  For example, if somebody wants to build support for the Actor programming model in Rust,
-  they should just need to write a Rust "frontend" translating the commands to HTTP API calls,
-  rather than having to implement the entire system. And equally, if one decides
-  to develop a new Actor "backend", all existing client libraries for Rust or other languages should work with it.
+- ~~Define a standardized low-level HTTP REST API interface for the Actor system~~ — **Done!**
+  The [Actor Runtime API](./openapi/openapi.json) is an OpenAPI 3.1 specification
+  that defines the HTTP REST interface between running Actors and the runtime system, covering:
+  - Actor run management (status, status messages, abort, reboot, metamorph, charge)
+  - Key-value store operations (get/set/delete records, list keys, create named stores)
+  - Dataset operations (push/get items, create named datasets)
+  - Webhook attachment to Actor runs
+  - Memory information
+
+  This separation enables thin, language-agnostic SDKs to be auto-generated
+  for any programming language (e.g. a Rust SDK would simply translate calls to this HTTP API),
+  and allows third-party implementations of the Actor runtime back-end
+  (all existing SDKs would work against any conforming back-end).
 - Finalize specification of all the schema files, including [output](#output-schema-file) and [storage](#storage-schema-files) schema files.
 - Clearly separate what is the part of the standard and what is up to the discretion of the implementations.
 
 
 ## Links
 
+- [Actor Runtime API — OpenAPI specification](./openapi/openapi.json)
 - [Apify Store](https://apify.com/store)
 - [Monetize your Actor on Apify](https://apify.com/partners/actor-developers)
 - [Open-source Actors on GitHub](https://github.com/search?q=path%3A.actor%2Factor.json+&type=code)
