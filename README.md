@@ -53,6 +53,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Reboot an Actor](#reboot-an-actor)
   * [Actor web server](#actor-web-server)
   * [Standby mode](#standby-mode)
+  * [Multi-tenant Standby mode](#multi-tenant-standby-mode)
   * [MCP Proxy](#mcp-proxy)
   * [Migration to another server](#migration-to-another-server)
   * [Charging money](#charging-money)
