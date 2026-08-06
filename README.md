@@ -1666,16 +1666,24 @@ but they might be in the future introduced as new settings in the `actor.json` f
 
 ### Multi-tenant Standby mode
 
-When the Actor system executes an Actor, it does that in the context of a single user that runs the Actor. For example, if the Actor produces some data and pushes them to a dataset, that dataset belongs to the user who run the Actor. This applies also for Standby: When a user sends a request to an Actor, the Actor system spins up a dedicated instance for that user.
+When the Actor system executes an Actor, it does that in the context of a single user that runs the Actor. For example,
+if the Actor produces some data and pushes them to a dataset, that dataset belongs to the user who run the Actor. This
+applies also for Standby: When a user sends a request to an Actor, the Actor system spins up a dedicated instance for
+that user.
 
 Multi-tenant Standby mode is an alternative mode where the standby Actor runs under one user but handles
 incoming requests from different users. The Actor then behaves more like a standard cloud-hosted microservice or an API.
 
-The Actor system is responsible for authenticating and authorizing individual requests, and then routing them to the correct run instance.
+The Actor system is responsible for authenticating and authorizing individual requests, and then routing them to the
+correct run instance.
 
-The system will also inject to each request an `X-Actor-Request-ID` HTTP header with a unique request identifier. The header purpose is generic (for example, tracking), but the Actor will in particular use it when [charging the user for money](#charging-money), so that the system can correctly identify which user to charge.
+The system will also inject to each request an `X-Actor-Request-ID` HTTP header with a unique request identifier. The
+header purpose is generic (for example, tracking), but the Actor will in particular use it when [charging the user for money](#charging-money),
+so that the system can correctly identify which user to charge.
 
-The Actor system might choose to support other authorization methods. It might, for example, inject a platform API token of the calling user to allow the Actor to perform additional operations on behalf of the user (such as accessing storages). That is for now outside the scope of this specification.
+The Actor system might choose to support other authorization methods. It might, for example, inject a platform API
+token of the calling user to allow the Actor to perform additional operations on behalf of the user (such as accessing
+storages). That is for now outside the scope of this specification.
 
 ### MCP Proxy
 
@@ -1814,7 +1822,8 @@ $ actor call bob/analyse-images \
 <!-- ASTRO: </CodeExample> -->
 <!-- ASTRO: </CodeSwitcher> -->
 
-If the Actor is in the [multi-tenant Standby mode](#multi-tenant-standby-mode), you also need to pass the request ID from the `X-Actor-Request-ID` header to the `charge` function so that the Actor system knows which user to charge.
+If the Actor is in the [multi-tenant Standby mode](#multi-tenant-standby-mode), you also need to pass the request ID
+from the `X-Actor-Request-ID` header to the `charge` function so that the Actor system knows which user to charge.
 
 #### Rules for building Actors with variable charging
 
