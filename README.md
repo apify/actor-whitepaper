@@ -1662,8 +1662,9 @@ the Standby URL is the same for all runs of the Actor, and it's intended to be p
 The Actor system can perform authentication of the requests going to the Standby URL using API tokens.
 
 The Actor system injects into each request an `X-Actor-Request-ID` HTTP header
-with a unique request identifier. It's meant as a generic purpose identifier that will be used for
-features that require request identification (such as [charging](#charging-money) in the [multi-tenant mode](#multi-tenant-standby-mode)).
+with a unique request identifier.
+It's meant as a generic purpose identifier that will be used for features that require request identification
+(such as [charging](#charging-money) in the [multi-tenant mode](#multi-tenant-standby-mode)).
 
 Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
 but they might be in the future introduced as new settings in the `actor.json` file.
