@@ -1661,6 +1661,10 @@ Unlike the live view URL reported in the `ACTOR_WEB_SERVER_URL` environment vari
 the Standby URL is the same for all runs of the Actor, and it's intended to be publicly known.
 The Actor system can perform authentication of the requests going to the Standby URL using API tokens.
 
+The Actor system injects into each request an `X-Actor-Request-ID` HTTP header
+with a unique request identifier. It's meant as a generic purpose identifier that will be used for
+features that require request identification (such as [charging](#charging-money) in the [multi-tenant mode](#multi-tenant-standby-mode)).
+
 Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
 but they might be in the future introduced as new settings in the `actor.json` file.
 
@@ -1681,11 +1685,11 @@ The Actor then behaves more like a standard cloud-hosted microservice or an API.
 The Actor system is responsible for authenticating and authorizing individual requests,
 and then routing them to the correct run instance.
 
-The system will also inject into each request an `X-Actor-Request-ID` HTTP header
-with a unique request identifier.
-The header purpose is generic (it can be used, for example, for tracking),
-but the Actor will in particular use it when [charging the user for money](#charging-money).
-It will allow the system to correctly identify which user to charge.
+Because a single run serves requests from several users,
+the Actor needs to tell the Actor system which request a charge belongs to.
+It does that by passing the identifier from the `X-Actor-Request-ID` header
+when [charging the user for money](#charging-money).
+This allows the system to correctly identify which user to charge.
 
 The Actor system might choose to support other authorization methods.
 It might, for example, inject a platform API token of the calling user
