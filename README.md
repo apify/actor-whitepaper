@@ -1666,6 +1666,10 @@ with a unique request identifier.
 It's meant as a generic purpose identifier that will be used for features that require request identification
 (such as [charging](#charging-money) in the [multi-tenant mode](#multi-tenant-standby-mode)).
 
+Each identifier must be unique and generated using a cryptographically secure random generator
+to make it impossible to guess,
+and it is only valid for the lifetime of the specific HTTP request.
+
 Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
 but they might be in the future introduced as new settings in the `actor.json` file.
 
@@ -1689,7 +1693,7 @@ and then routing them to the correct run instance.
 Because a single run serves requests from several users,
 the Actor needs to tell the Actor system which request a charge belongs to.
 It does that by passing the identifier from the `X-Actor-Request-ID` header
-when [charging the user for money](#charging-money).
+when [charging the user money](#charging-money).
 This allows the system to correctly identify which user to charge.
 
 The Actor system might choose to support other authorization methods.
@@ -1838,6 +1842,8 @@ $ actor call bob/analyse-images \
 If the Actor is in the [multi-tenant Standby mode](#multi-tenant-standby-mode),
 you also need to pass the request ID from the `X-Actor-Request-ID` header
 to the `charge` function so that the Actor system knows which user to charge.
+The Actor system is responsible for validating the passed `requestId`,
+to ensure it corresponds to the `X-Actor-Request-ID` of an actual live HTTP request.
 
 <!-- ASTRO: <CodeSwitcher> -->
 <!-- ASTRO: <CodeExample title="Node.js"> -->
