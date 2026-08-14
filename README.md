@@ -53,6 +53,7 @@ By [Jan Čurn](https://apify.com/jancurn),
   * [Reboot an Actor](#reboot-an-actor)
   * [Actor web server](#actor-web-server)
   * [Standby mode](#standby-mode)
+  * [Multi-tenant Standby mode](#multi-tenant-standby-mode)
   * [MCP Proxy](#mcp-proxy)
   * [Migration to another server](#migration-to-another-server)
   * [Charging money](#charging-money)
@@ -150,7 +151,7 @@ systems on top of simple ones.
 
 ![Apify Actor diagram](./img/apify-actor-drawing.png)
 
-<!-- Image sources: 
+<!-- Image sources:
   https://docs.google.com/presentation/d/1nDgrI0p2r8ouP_t_Wn02aTllP8_Std-kRuIbO8QLE7M/edit
   https://www.figma.com/design/6vbmKvB6oY3b3mTN0oAscE/Actor-Whitepaper-Diagrams-and-Presentations?node-id=0-1&p=f&t=JwAJfru2GjdQBpBV-11
 -->
@@ -950,7 +951,7 @@ await Actor.exit('Succeeded, crawled 50 pages');
 // Exit right away without calling `exit` handlers at all
 await Actor.exit('Done right now', { timeoutSecs: 0 });
 
-// Actor will finish with 'FAILED' status 
+// Actor will finish with 'FAILED' status
 await Actor.exit('Could not finish the crawl, try increasing memory', { exitCode: 1 });
 
 // ... or nicer way using this syntactic sugar:
@@ -1007,7 +1008,7 @@ exit(1);
 ### Environment variables
 
 Actors have access to standard process environment variables.
-The Apify platform uses environment variables prefixed with `ACTOR_` to pass information to Actors 
+The Apify platform uses environment variables prefixed with `ACTOR_` to pass information to Actors
 about the execution context.
 
 | Environment variable               | Description                                                                                                                                                                                                                |
@@ -1173,8 +1174,8 @@ The system sends messages in JSON format in the following structure:
 
     // Time when the event was created, in ISO format
     createdAt: String,
-          
-    // Optional object with payload      
+
+    // Optional object with payload
     data: Object,
 }
 ```
@@ -1297,7 +1298,7 @@ const run = await Actor.start(
 
 // Start Actor and wait for it to finish
 const run2 = await Actor.call(
-  'apify/google-search-scraper', 
+  'apify/google-search-scraper',
   { queries: 'test' },
   { memory: 2048 },
 );
@@ -1473,7 +1474,7 @@ $ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED \\
   --payload-template=@template.json
 
 # Or maybe have a simpler API for self-actor?
-$ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail 
+$ actor add-webhook --event-types=ACTOR.RUN.SUCCEEDED --request-actor=apify/send-mail
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1513,7 +1514,7 @@ await Actor.abort({ statusMessage: 'Your job is done, friend.', actorRunId: 'RUN
 #### CLI
 
 ```bash
-$ actor abort --run-id RUN_ID 
+$ actor abort --run-id RUN_ID
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1576,7 +1577,7 @@ await Actor.reboot()
 #### CLI
 
 ```bash
-$ actor reboot 
+$ actor reboot
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -1660,8 +1661,46 @@ Unlike the live view URL reported in the `ACTOR_WEB_SERVER_URL` environment vari
 the Standby URL is the same for all runs of the Actor, and it's intended to be publicly known.
 The Actor system can perform authentication of the requests going to the Standby URL using API tokens.
 
+The Actor system injects into each request an `X-Actor-Request-ID` HTTP header
+with a unique request identifier.
+It's meant as a generic purpose identifier that will be used for features that require request identification
+(such as [charging](#charging-money) in the [multi-tenant mode](#multi-tenant-standby-mode)).
+
+Each identifier must be unique and generated using a cryptographically secure random generator
+to make it impossible to guess,
+and it is only valid for the lifetime of the specific HTTP request.
+
 Currently, the specific Standby mode settings, authentication options, or OpenAPI schema are not part of this Actor specification,
 but they might be in the future introduced as new settings in the `actor.json` file.
+
+### Multi-tenant Standby mode
+
+When the Actor system executes an Actor, it does that in the context
+of a single user who runs the Actor.
+For example, if the Actor produces some data and pushes them to a dataset,
+that dataset belongs to the user who runs the Actor.
+
+This also applies to Standby: When a user sends a request to an Actor,
+the Actor system spins up a dedicated instance for that user.
+
+Multi-tenant Standby mode is an alternative mode where the Standby Actor
+runs under one user but handles incoming requests from different users.
+The Actor then behaves more like a standard cloud-hosted microservice or an API.
+
+The Actor system is responsible for authenticating and authorizing individual requests,
+and then routing them to the correct run instance.
+
+Because a single run serves requests from several users,
+the Actor needs to tell the Actor system which request a charge belongs to.
+It does that by passing the identifier from the `X-Actor-Request-ID` header
+when [charging the user money](#charging-money).
+This allows the system to correctly identify which user to charge.
+
+The Actor system might choose to support other authorization methods.
+It might, for example, inject a platform API token of the calling user
+to allow the Actor to perform additional operations on behalf of the user
+(such as accessing storages).
+That is for now outside the scope of this specification.
 
 ### MCP Proxy
 
@@ -1795,6 +1834,35 @@ run = await Actor.call(
 $ actor call bob/analyse-images \
   --input='{"imageUrls": ["https://www.example.com/image.png"]}'
   --max-total-charge-usd=5
+```
+
+<!-- ASTRO: </CodeExample> -->
+<!-- ASTRO: </CodeSwitcher> -->
+
+If the Actor is in the [multi-tenant Standby mode](#multi-tenant-standby-mode),
+you also need to pass the request ID from the `X-Actor-Request-ID` header
+to the `charge` function so that the Actor system knows which user to charge.
+The Actor system is responsible for validating the passed `requestId`,
+to ensure it corresponds to the `X-Actor-Request-ID` of an actual live HTTP request.
+
+<!-- ASTRO: <CodeSwitcher> -->
+<!-- ASTRO: <CodeExample title="Node.js"> -->
+
+#### Node.js
+
+```js
+app.post('/summarize', async (req, res) => {
+  const summary = await summarize(req.body.text);
+
+  await Actor.charge({
+    eventName: 'gpt-4o-token',
+    count: summary.tokenCount,
+    chargePerEventUsd: 0.0001,
+    requestId: req.headers['x-actor-request-id'],
+  });
+
+  res.json(summary);
+})
 ```
 
 <!-- ASTRO: </CodeExample> -->
@@ -2093,11 +2161,11 @@ The SDK is currently available for Node.js, Python, and CLI.
 />
 -->
 
-The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages. 
+The Actor programming model is language agnostic, but the framework has native support for detection of the JavaScript and Python languages.
 
 Tip: [Apify CLI](https://docs.apify.com/cli/docs/next/reference#apify-create-actorname) provides [convenient templates](https://apify.com/templates) to bootstrap an Actor in Python, JavaScript, and TypeScript.
 
-This example is describing how to create a simple "echo" Actor locally. The Actor will retrieve the [Input Object](#input) and it will [push](#push-results-to-dataset) it to the default [dataset](#dataset). 
+This example is describing how to create a simple "echo" Actor locally. The Actor will retrieve the [Input Object](#input) and it will [push](#push-results-to-dataset) it to the default [dataset](#dataset).
 
 #### Bootstrap the Actor directory
 The `actor bootstrap` CLI command will automatically generate the `.actor` directory and configuration files:
@@ -2130,7 +2198,7 @@ Note: this command is not yet available and represents a future vision for the C
 ```
 $ cat << EOF > Dockerfile
 FROM node:alpine
-RUN npm -g install apify-cli 
+RUN npm -g install apify-cli
 CMD actor push-data $(actor get-input)
 EOF
 ```
@@ -2182,7 +2250,7 @@ and providing a Dockerfile with instruction how to run the software.
 
 The `actor` CLI command can be used from the Dockerfile's `RUN` script transform the Actor JSON input
 into the configuration of the software, usually passed via command-line arguments,
-and then store the Actor output results. 
+and then store the Actor output results.
 
 This example wraps the [`curl`](https://curl.se/docs/tutorial.html) UNIX command and pushes the result to the Actor's [key-value store](#key-value-store):
 
