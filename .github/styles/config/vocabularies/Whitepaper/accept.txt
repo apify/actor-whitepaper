@@ -1,0 +1,24 @@
+# General
+Whitepaper
+
+# Companies
+Apify
+Zapier
+
+# Apify-related
+(?i)actor(izing|ization)
+
+# Technologies
+Dockerfile
+SDKs
+automations
+env
+microapps
+msg
+serverless
+storages
+
+# People
+Franta
+Marek
+Ondra
