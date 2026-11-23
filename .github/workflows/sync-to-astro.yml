@@ -20,6 +20,7 @@ jobs:
   sync:
     name: Sync Whitepaper to Astro (PR flow)
     runs-on: ubuntu-latest
+    environment: automation
     permissions:
       contents: write      # needed for pushing changes
       pull-requests: write # needed for creating PRs
